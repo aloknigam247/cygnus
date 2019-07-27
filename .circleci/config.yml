@@ -8,7 +8,10 @@ jobs:
       - checkout
       - run:
           name: Build Source Code
-          command: echo "Build Start"
+          command: |
+            echo "Build Start"
+            make
+            echo "Build End"
 
 workflows:
   version: 2

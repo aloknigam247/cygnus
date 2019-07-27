@@ -6,7 +6,7 @@ export DEP          := $(BUILD_DIR)/dep
 export OBJ          := $(BUILD_DIR)/obj
 export LIB_DIR      := $(SOURCE_DIR)/lib
 export OUT_DIR      := $(SOURCE_DIR)/out
-export EXECUTABLE   := $(BIN)/exe
+export EXECUTABLE   := $(BIN)/cygnus
 export EXT_PATH 		:= $(SOURCE_DIR)/ext
 export EXT_LIBS     := 	# Path of external libs for linking filled in ext/*/options.mk
 
