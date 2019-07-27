@@ -1,0 +1,17 @@
+version: 2.0
+
+jobs:
+  source-code-build:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - checkout
+      - run:
+          name: Build Source Code
+          command: echo "Build Start"
+
+workflows:
+  version: 2
+  Regression:
+    jobs:
+      - source-code-build
