@@ -1,0 +1,75 @@
+#!/bin/bash
+
+declare -a valid_list
+declare -a valid_tests
+
+#defaults
+declare test_dir='./'
+
+printUsage() {
+  cat << EOF
+  cytest [<options>]
+    -d <test_dir> : testcases directory
+    -h|--help     : help
+EOF
+  exit
+}
+
+parseCmdLine() {
+  while [ $1 ]; do
+    case $1 in
+      -d) 
+          if [[ -z $2 ]];then
+            echo "ERROR: specify directory with -d"
+            echo "    -d <test_dir> : testcases directory"
+            exit 1
+          fi
+          test_dir=$2/
+          shift 2
+          ;;
+      -h|--help) 
+          printUsage
+          ;;
+      *)  
+          test_list+=" $1"
+          shift
+    esac
+  done
+}
+
+validateTests() {
+  for test in $test_list; do
+    if ! [[ $test =~ "unit.*\.cyt" || -a $test_dir$test ]]; then
+        echo "WARN: [invalid testcase] $test"
+        continue
+    fi
+    valid_tests+=" $test"
+  done
+  
+  if [[ -z $valid_tests ]]; then
+    echo "ERROR: testcases missing"
+    exit 1
+  fi
+}
+
+runTest() {
+  testcase=$1
+  testcase_dir=`dirname $testcase`
+
+  echo "[RUN] $testcase"
+  if [[ ! -a $test_dir$testcase_dir/Makefile ]]; then
+    gen-make -d $test_dir$testcase_dir -i $CYGNUS_HOME/include test.cc
+  fi
+  make --no-print-directory -C $test_dir/$testcase_dir
+}
+
+main() {
+  parseCmdLine $@
+  validateTests
+
+  for test in $valid_tests; do
+    runTest $test
+  done
+}
+
+main $@

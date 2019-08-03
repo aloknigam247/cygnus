@@ -8,7 +8,7 @@ src: $(DEP_FILES) $(OBJ_FILES)
 
 $(DEP_FILES): $(DEP)/%.d : %.cc
 	$(CPP_COMPILE) -MM -MF $@ -MT $(OBJ)/$(^:.cc=.o) $^
-	@touch Makefile
+	$Qtouch Makefile
 
 $(OBJ_FILES):
 	$(CPP_COMPILE) -c -o $@ $<
