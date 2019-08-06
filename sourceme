@@ -1,0 +1,7 @@
+rPath=`pwd`/$BASH_SOURCE
+
+export CYGNUS_HOME=$(dirname $(realpath $rPath))
+
+export PATH=$CYGNUS_HOME/build/bin:$CYGNUS_HOME/tools:$PATH
+
+echo CYGNUS_HOME: $CYGNUS_HOME
