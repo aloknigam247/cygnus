@@ -23,7 +23,7 @@ def printMakefile(opt, target, h_deps, cc_deps):
 
     # Common rules
     print("CY_COMP := g++ -I " + opt.incDir, file = makefile)
-    print("OBJ_DIR := $(CYGNUS_HOME)/tests/unit/obj\n", file = makefile)  
+    print("OBJ_DIR := " + os.path.relpath("obj", opt.cDir[opt.cDir.rfind("unit/"):]) + "\n", file = makefile)  
     print("all: $(OBJ_DIR) " + target + "\n", file = makefile)
     
     # Target rules
