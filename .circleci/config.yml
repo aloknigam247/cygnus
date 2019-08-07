@@ -15,10 +15,10 @@ jobs:
   unit-test:
     steps:
       - run:
-        name: Run Unit Test
-        command: |
-          source sourceme
-          cytest -d tests
+          name: Run Unit Test
+          command: |
+            source sourceme
+            cytest -d tests
 
 
 workflows:
