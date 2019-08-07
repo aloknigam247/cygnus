@@ -27,6 +27,7 @@ jobs:
       - run:
           name: Run Unit Test
           command: |
+            ls
             cd ~/project
             source sourceme
             cytest -d tests
