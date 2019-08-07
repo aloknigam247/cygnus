@@ -1,7 +1,7 @@
 version: 2.0
 
 jobs:
-  source-code-build:
+  build-code:
     machine:
       image: ubuntu-1604:201903-01
     steps:
@@ -12,9 +12,20 @@ jobs:
             echo "Build Start"
             make
             echo "Build End"
+  unit-test:
+    steps:
+      - run:
+        name: Run Unit Test
+        command: |
+          source sourceme
+          cytest -d tests
+
 
 workflows:
   version: 2
-  Regression:
+  Build:
     jobs:
-      - source-code-build
+      - build-code
+  Unit Test:
+    jobs:
+      - unit-test
