@@ -33,10 +33,6 @@ jobs:
             cd ~/cygnus
             source sourceme
             cytest -d tests -a  | tee cytest.log 2>&1
-            pwd
-            ls
-            find
-            cat cytest.log
       - store_artifacts:
           path: ~/cygnus/cytest.log
           destination: unit-test-log
