@@ -1,20 +1,48 @@
 version: 2.0
 
 jobs:
-  source-code-build:
+  build-code:
     machine:
       image: ubuntu-1604:201903-01
+    working_directory: ~/cygnus
     steps:
       - checkout
       - run:
           name: Build Source Code
           command: |
             echo "Build Start"
-            make
+            make | tee make.log 2>&1
             echo "Build End"
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - cygnus
+      - store_artifacts:
+          path: make.log
+          destination: build-log
+
+  unit-test:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Run Unit Test
+          command: |
+            cd ~/cygnus
+            source sourceme
+            cytest -d tests -a  | tee cytest.log 2>&1
+      - store_artifacts:
+          path: ~/cygnus/cytest.log
+          destination: unit-test-log
+
 
 workflows:
   version: 2
-  Regression:
+  Commit-Test:
     jobs:
-      - source-code-build
+      - build-code
+      - unit-test:
+          requires:
+            - build-code

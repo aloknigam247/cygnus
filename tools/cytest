@@ -1,0 +1,236 @@
+#!/bin/bash
+
+declare -a valid_list
+declare -a valid_tests
+declare -A option
+declare -A values
+declare EXITCODE=0
+
+# DEFAULTS
+test_dir='.'
+out_dir='test_run'
+
+####################################################################
+# How to create new option                                         #
+#   * help      : create help statement spaces are replacec by .   #
+#   * metavar   : string to be displayed for option argument       #
+#   * value     : type of value                                    #
+#                   bool    - no argument                          #
+#                   string  - option expects single argument       #
+#   * with      : mention dependency of option                     #
+####################################################################
+option['-a']="value=bool with=-d help=pick.testcases.from.directory.in.-d"
+option['-d']="value=string metavar=dir help=test.case.directory"
+option['-h']="value=bool help=help"
+option['-o']="value=string metavar=dir help=output.directory.of.test.run"
+
+EXIT(){
+    exit $EXITCODE
+}
+
+LOG(){
+    local msg=${2:?"message missing."}
+    case $1 in
+        E)
+            echo "[ERROR] $msg"
+            EXITCODE=1
+            ;;
+        I)
+            echo "[INFO] $msg"
+            ;;
+        W)
+            echo "[WARN] $msg"
+            ;;
+        *)
+            LOG E "unrecognized log type"
+            EXIT
+            ;;
+    esac
+}
+
+usage(){
+    echo "USAGE: `basename $0` [options] [file...]"
+    for opt in ${!option[@]}; do
+        m=''
+        h=''
+        mst=''
+        for param in ${option[$opt]}; do
+            case $param in
+                metavar=*)
+                    m="<${param#*=}>"
+                    ;;
+                help=*)
+                    h=${param#*=}
+                    ;;
+                with=*)
+                    mst=", depends on ${param#*=}"
+                    ;;
+            esac
+        done
+        echo "    $opt $m: ${h//./ } $mst"
+    done
+    EXIT
+}
+
+optionError(){
+    LOG E "option \`$1' expects argument"
+    for param in ${option[$1]};do
+        case $param in
+            metavar=*)
+                m="<${param#*=}>"
+                ;;
+            help=*)
+                h=${param#*=}
+                ;;
+            with=*)
+                mst=", depends on ${param#*=}"
+                ;;
+        esac
+    done
+    if [[ -z $h ]]; then
+        LOG W "short help for option \`$1' is missing."
+    else
+            echo "    $1 $m: ${h//./ } $mst"
+    fi
+}
+
+parseCmdLine() {
+    declare -A must
+
+    while [ $1 ]; do
+        opt=$1
+        dest=''
+        val=''
+        error=''
+        if [[ ${option[$opt]} ]]; then
+            for param in ${option[$opt]}; do
+                case $param in
+                    value=*)
+                        if [[ $param == "value=string" ]]; then
+                            if [[ -n $2 && ! $2 =~ ^- ]]; then
+                                val=$2
+                                shift
+                            else
+                                optionError $opt
+                                error=1
+                                continue
+                            fi
+                        elif [[ $param == "value=bool" ]]; then # can be removed
+                            val="true"
+                        fi
+                        ;;
+                    with=*)
+                        local deps=${param#*=}
+                        for o in ${deps//,/ }; do
+                            must["$o"]=$opt
+                        done
+                        ;;
+                    metavar=*|help=*)
+                        ;;
+                    *)
+                        LOG W "invalid parameter $param defined in option \`$opt'"
+                        error=1
+                        continue
+                        ;;
+                esac
+            done
+            if [[ $val ]]; then
+                values[$opt]=$val
+            fi
+        elif [[ $1 =~ ^- ]]; then
+            LOG I "ignoring unknown option \`$opt'"
+        else
+            pos+=" $opt"
+        fi
+        shift
+    done
+    if [[ -n $pos ]]; then
+        values["test_list"]="$pos"
+        echo ""
+    fi
+
+    if [[ ${values["-h"]} ]]; then
+        usage
+    fi
+
+    for o in ${!must[@]}; do
+        if [[ -z ${values[$o]} ]]; then
+            LOG E "option\[s\] $o is missing needed by ${must[$o]}"
+            optionError ${must[$o]}
+        fi
+    done
+
+    for i in ${!values[@]}; do
+        echo "$i: ${values[$i]}"
+    done
+}
+
+validateTests() {
+    if [[ ${values["-a"]} ]]; then
+        if [[ ${values["test_list"]} ]]; then
+            echo -e "$IGN -a is given, ignoring ${values["test_list"]}"
+        fi
+        test -d $test_dir && cd $test_dir
+        valid_tests=`find -type f -path "unit*.cyt" | sed 's|./||'`
+        cd - > /dev/null
+        if [[ -z $valid_tests ]]; then
+            LOG W "no testcases found in directory: $test_dir"
+            EXIT
+        fi
+    else
+        for test in ${values["test_list"]}; do
+            if [[ $test =~ unit.*\.cyt && -a $test_dir/$test ]]; then
+                valid_tests+=" $test"
+            else
+                LOG W "[invalid testcase] $test"
+                continue
+            fi
+        done
+        if [[ -z $valid_tests ]]; then
+          LOG E "testcases missing"
+          EXIT
+        fi
+    fi
+}
+
+makeRunDir(){
+    testcase=$1
+    test_out=$out_dir/`dirname $testcase`
+    rm -rf $test_out
+    mkdir -p $test_out
+    ln -rs $test_dir/`dirname $testcase`/* $test_out/
+}
+
+runTest() {
+  testcase=$1
+  testcase_dir=`dirname $testcase`
+
+  echo "[RUN] $testcase"
+  echo "creating run dir"
+  makeRunDir $testcase
+  if [[ ! -a $test_dir/$testcase_dir/Makefile ]]; then
+    gen-make -d $out_dir/$testcase_dir -i $CYGNUS_HOME/include test.cc
+  fi
+  make --no-print-directory -C $out_dir/$testcase_dir | tee $out_dir/$testcase_dir/make.log
+}
+
+main() {
+    parseCmdLine $@
+    test_dir=${values['-d']:-$test_dir}
+    out_dir=${values['-o']:-$out_dir} 
+    echo test_dir: $test_dir
+    echo out_dir : $out_dir
+
+    test -d $test_dir || LOG E "directory \`$test_dir' does not exit"
+    if [[ $test_out == $out_dir ]]; then
+        LOG E "test directory and out directory cannot be same"
+        EXIT
+    fi
+    validateTests
+
+    for test in $valid_tests; do
+        runTest $test
+    done
+}
+
+main $@

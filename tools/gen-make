@@ -1,0 +1,83 @@
+#!/usr/bin/python3.6
+
+import os
+import argparse
+
+######################## class Args ########################
+class Args:
+    __parser = argparse.ArgumentParser()
+
+    def __init__(self):
+        self.__parser.add_argument("file", help="genrate Makefile for this file")
+        self.__parser.add_argument("-d", dest="cDir", metavar="dir", default=".", help="alternate location of file if not current directory")
+        self.__parser.add_argument("-i", dest="incDir", metavar="dir", required=True, help="path of include directory")
+
+    def parse(self):
+        return self.__parser.parse_args()
+
+
+######################## printMakefile ########################
+def printMakefile(opt, target, h_deps, cc_deps):
+    o_deps = []
+    makefile = open("Makefile", "w")
+
+    # Common rules
+    print("CY_COMP := g++ -I " + opt.incDir, file = makefile)
+    print("OBJ_DIR := " + os.path.relpath("obj", opt.cDir[opt.cDir.rfind("unit/"):]) + "\n", file = makefile)  
+    print("all: $(OBJ_DIR) " + target + "\n", file = makefile)
+    
+    # Target rules
+    print(target + ": ", end = '', file = makefile)
+    for dep in cc_deps:
+        obj = dep.replace(os.environ["CYGNUS_HOME"] + "/src", "$(OBJ_DIR)").replace(".cc", ".o")
+        o_deps.append(obj)
+        print(obj, end = ' ', file = makefile)
+
+    print("", file = makefile)
+    print("\t$(CY_COMP) -o $@ $^\n", file = makefile)
+
+    for dep in o_deps:
+        print(dep + ": " + cc_deps.pop(0) + " " + h_deps.pop(0), file = makefile)
+        print("\t$(CY_COMP) -c $< -o $@\n", file = makefile)
+
+    print("$(OBJ_DIR):", file = makefile)
+    print("\tmkdir $@\n", file = makefile)
+
+    # Clean target
+    print("clean:\n\trm -rf ", end='', file=makefile)
+    for dep in o_deps:
+        print(dep, end=' ', file=makefile)
+    print(target, file=makefile)
+
+
+######################## main ########################
+def main():
+    args = Args()
+    opt = args.parse()
+    
+    h_deps = []
+    cc_deps = []
+    
+    os.chdir(opt.cDir)
+    if not os.path.isabs(opt.incDir):
+        opt.incDir = os.path.relpath(opt.incDir, opt.cDir)
+    cmd = "g++ -MM -I " + opt.incDir + " " + opt.file
+    print(cmd)
+    output = os.popen(cmd).read()
+    line = output.split(' ')
+    
+    target = line.pop(0).strip(".o:")
+    cc_deps.append(line.pop(0)) # this file is test.cc
+    h_deps.append(line.pop(0))  # this file is test.h
+    
+    for dep in line:
+        dep = dep.strip('\n');
+        if dep == "\\":
+            continue
+        h_deps.append(dep)
+        cc_deps.append(dep.replace("include", "src").replace(".h", ".cc"))
+
+    printMakefile(opt, target, h_deps, cc_deps)
+
+if __name__ == "__main__":
+    main()
