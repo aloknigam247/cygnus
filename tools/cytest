@@ -4,6 +4,7 @@ declare -a valid_list
 declare -a valid_tests
 declare -A option
 declare -A values
+declare EXITCODE=0
 
 # DEFAULTS
 test_dir='.'
@@ -29,7 +30,6 @@ EXIT(){
 
 LOG(){
     local msg=${2:?"message missing."}
-    EXITCODE=0
     case $1 in
         E)
             echo "[ERROR] $msg"

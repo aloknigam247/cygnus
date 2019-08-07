@@ -4,7 +4,7 @@ jobs:
   build-code:
     machine:
       image: ubuntu-1604:201903-01
-    working_directory: ~/project
+    working_directory: ~/cygnus
     steps:
       - checkout
       - run:
@@ -16,20 +16,18 @@ jobs:
       - persist_to_workspace:
           root: ~/
           paths:
-            - project
+            - cygnus
 
   unit-test:
     machine:
       image: ubuntu-1604:201903-01
     steps:
       - attach_workspace:
-          at: ~/project
+          at: ~/
       - run:
           name: Run Unit Test
           command: |
-            ls
-            find
-            cd ~/project/project
+            cd ~/cygnus
             source sourceme
             cytest -d tests -a
 
