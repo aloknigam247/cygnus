@@ -29,7 +29,7 @@ jobs:
           command: |
             ls
             find
-            cd ~/project
+            cd ~/project/project
             source sourceme
             cytest -d tests
 
