@@ -4,9 +4,6 @@ declare -a valid_list
 declare -a valid_tests
 declare -A option
 declare -A values
-ERR='\n[ERR]'
-INF='[INF]'
-WRN='[WRN]'
 
 # DEFAULTS
 test_dir='.'
@@ -25,6 +22,31 @@ option['-a']="value=bool with=-d help=pick.testcases.from.directory.in.-d"
 option['-d']="value=string metavar=dir help=test.case.directory"
 option['-h']="value=bool help=help"
 option['-o']="value=string metavar=dir help=output.directory.of.test.run"
+
+EXIT(){
+    exit $EXITCODE
+}
+
+LOG(){
+    local msg=${2:?"message missing."}
+    EXITCODE=0
+    case $1 in
+        E)
+            echo "[ERROR] $msg"
+            EXITCODE=1
+            ;;
+        I)
+            echo "[INFO] $msg"
+            ;;
+        W)
+            echo "[WARN] $msg"
+            ;;
+        *)
+            LOG E "unrecognized log type"
+            EXIT
+            ;;
+    esac
+}
 
 usage(){
     echo "USAGE: `basename $0` [options] [file...]"
@@ -47,11 +69,11 @@ usage(){
         done
         echo "    $opt $m: ${h//./ } $mst"
     done
-    exit
+    EXIT
 }
 
 optionError(){
-    echo -e "$ERR option \`$1' expects argument"
+    LOG E "option \`$1' expects argument"
     for param in ${option[$1]};do
         case $param in
             metavar=*)
@@ -66,7 +88,7 @@ optionError(){
         esac
     done
     if [[ -z $h ]]; then
-        echo "$WRN short help for option \`$1' is missing."
+        LOG W "short help for option \`$1' is missing."
     else
             echo "    $1 $m: ${h//./ } $mst"
     fi
@@ -106,7 +128,7 @@ parseCmdLine() {
                     metavar=*|help=*)
                         ;;
                     *)
-                        echo "$WRN invalid parameter $param defined in option \`$opt'"
+                        LOG W "invalid parameter $param defined in option \`$opt'"
                         error=1
                         continue
                         ;;
@@ -116,7 +138,7 @@ parseCmdLine() {
                 values[$opt]=$val
             fi
         elif [[ $1 =~ ^- ]]; then
-            echo "$INF ignoring unknown option \`$opt'"
+            LOG I "ignoring unknown option \`$opt'"
         else
             pos+=" $opt"
         fi
@@ -133,7 +155,7 @@ parseCmdLine() {
 
     for o in ${!must[@]}; do
         if [[ -z ${values[$o]} ]]; then
-            echo -e $ERR option\[s\] $o is missing needed by ${must[$o]} 
+            LOG E "option\[s\] $o is missing needed by ${must[$o]}"
             optionError ${must[$o]}
         fi
     done
@@ -148,25 +170,25 @@ validateTests() {
         if [[ ${values["test_list"]} ]]; then
             echo -e "$IGN -a is given, ignoring ${values["test_list"]}"
         fi
-        cd $test_dir
+        test -d $test_dir && cd $test_dir
         valid_tests=`find -type f -path "unit*.cyt" | sed 's|./||'`
         cd - > /dev/null
         if [[ -z $valid_tests ]]; then
-            echo -e "$WRN no testcases found in directory: $test_dir"
-            exit 0
+            LOG W "no testcases found in directory: $test_dir"
+            EXIT
         fi
     else
         for test in ${values["test_list"]}; do
             if [[ $test =~ unit.*\.cyt && -a $test_dir/$test ]]; then
                 valid_tests+=" $test"
             else
-                echo "$WRN [invalid testcase] $test"
+                LOG W "[invalid testcase] $test"
                 continue
             fi
         done
         if [[ -z $valid_tests ]]; then
-          echo -e "$ERR testcases missing"
-          exit 1
+          LOG E "testcases missing"
+          EXIT
         fi
     fi
 }
@@ -199,9 +221,10 @@ main() {
     echo test_dir: $test_dir
     echo out_dir : $out_dir
 
+    test -d $test_dir || LOG E "directory \`$test_dir' does not exit"
     if [[ $test_out == $out_dir ]]; then
-        echo $ERR test directory and out directory cannot be same
-        exit 1
+        LOG E "test directory and out directory cannot be same"
+        EXIT
     fi
     validateTests
 
