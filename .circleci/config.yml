@@ -33,6 +33,9 @@ jobs:
             cd ~/cygnus
             source sourceme
             cytest -d tests -a  | tee cytest.log 2>&1
+            pwd
+            ls
+            find
       - persist_to_workspace:
           root: ~/cygnus
           paths:
