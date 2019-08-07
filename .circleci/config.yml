@@ -17,8 +17,6 @@ jobs:
           root: ~/
           paths:
             - cygnus
-      - store_test_results:
-          path: tools
       - store_artifacts:
           path: tools
           destination: tr1
