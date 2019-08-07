@@ -12,7 +12,10 @@ jobs:
             echo "Build Start"
             make
             echo "Build End"
+
   unit-test:
+    machine:
+      image: ubuntu-1604:201903-01
     steps:
       - run:
           name: Run Unit Test
