@@ -40,7 +40,7 @@ jobs:
 
 workflows:
   version: 2
-  Build:
+  Commit-Test:
     jobs:
       - build-code
       - unit-test:
