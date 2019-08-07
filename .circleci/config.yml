@@ -42,7 +42,7 @@ jobs:
           paths:
             - cygnus
       - store_artifacts:
-          path: cytest.log
+          path: ~/
           destination: unit-test-log
 
 
