@@ -14,9 +14,9 @@ jobs:
             make
             echo "Build End"
       - persist_to_workspace:
-          root: workspace
+          root: /
           paths:
-            - /tmp
+            - tmp
 
   unit-test:
     machine:
@@ -27,7 +27,7 @@ jobs:
       - run:
           name: Run Unit Test
           command: |
-            cd $CIRCLE_WORKING_DIRECTORY
+            cd /tmp
             source sourceme
             cytest -d tests
 
