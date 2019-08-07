@@ -4,14 +4,24 @@ declare -a valid_list
 declare -a valid_tests
 declare -A option
 declare -A values
-ERR='[ERR]'
+ERR='\n[ERR]'
 INF='[INF]'
 WRN='[WRN]'
 
-#defaults
+# DEFAULTS
 test_dir='.'
 out_dir='test_run'
 
+####################################################################
+# How to create new option                                         #
+#   * help      : create help statement spaces are replacec by .   #
+#   * metavar   : string to be displayed for option argument       #
+#   * value     : type of value                                    #
+#                   bool    - no argument                          #
+#                   string  - option expects single argument       #
+#   * with      : mention dependency of option                     #
+####################################################################
+option['-a']="value=bool with=-d help=pick.testcases.from.directory.in.-d"
 option['-d']="value=string metavar=dir help=test.case.directory"
 option['-h']="value=bool help=help"
 option['-o']="value=string metavar=dir help=output.directory.of.test.run"
@@ -21,6 +31,7 @@ usage(){
     for opt in ${!option[@]}; do
         m=''
         h=''
+        mst=''
         for param in ${option[$opt]}; do
             case $param in
                 metavar=*)
@@ -29,15 +40,18 @@ usage(){
                 help=*)
                     h=${param#*=}
                     ;;
+                with=*)
+                    mst=", depends on ${param#*=}"
+                    ;;
             esac
         done
-        echo "    $opt $m: ${h//./ }"
+        echo "    $opt $m: ${h//./ } $mst"
     done
     exit
 }
 
 optionError(){
-    echo "$ERR option \`$1' expects argument"
+    echo -e "$ERR option \`$1' expects argument"
     for param in ${option[$1]};do
         case $param in
             metavar=*)
@@ -46,16 +60,21 @@ optionError(){
             help=*)
                 h=${param#*=}
                 ;;
+            with=*)
+                mst=", depends on ${param#*=}"
+                ;;
         esac
     done
     if [[ -z $h ]]; then
         echo "$WRN short help for option \`$1' is missing."
     else
-            echo "    $1 $m: ${h//./ }"
+            echo "    $1 $m: ${h//./ } $mst"
     fi
 }
 
 parseCmdLine() {
+    declare -A must
+
     while [ $1 ]; do
         opt=$1
         dest=''
@@ -77,6 +96,12 @@ parseCmdLine() {
                         elif [[ $param == "value=bool" ]]; then # can be removed
                             val="true"
                         fi
+                        ;;
+                    with=*)
+                        local deps=${param#*=}
+                        for o in ${deps//,/ }; do
+                            must["$o"]=$opt
+                        done
                         ;;
                     metavar=*|help=*)
                         ;;
@@ -106,24 +131,43 @@ parseCmdLine() {
         usage
     fi
 
+    for o in ${!must[@]}; do
+        if [[ -z ${values[$o]} ]]; then
+            echo -e $ERR option\[s\] $o is missing needed by ${must[$o]} 
+            optionError ${must[$o]}
+        fi
+    done
+
     for i in ${!values[@]}; do
         echo "$i: ${values[$i]}"
     done
 }
 
 validateTests() {
-    for test in ${values["test_list"]}; do
-        if [[ $test =~ unit.*\.cyt && -a $test_dir/$test ]]; then
-            valid_tests+=" $test"
-        else
-            echo "$WRN [invalid testcase] $test"
-            continue
+    if [[ ${values["-a"]} ]]; then
+        if [[ ${values["test_list"]} ]]; then
+            echo -e "$IGN -a is given, ignoring ${values["test_list"]}"
         fi
-    done
-    
-    if [[ -z $valid_tests ]]; then
-      echo "$ERR testcases missing"
-      exit 1
+        cd $test_dir
+        valid_tests=`find -type f -path "unit*.cyt" | sed 's|./||'`
+        cd - > /dev/null
+        if [[ -z $valid_tests ]]; then
+            echo -e "$WRN no testcases found in directory: $test_dir"
+            exit 0
+        fi
+    else
+        for test in ${values["test_list"]}; do
+            if [[ $test =~ unit.*\.cyt && -a $test_dir/$test ]]; then
+                valid_tests+=" $test"
+            else
+                echo "$WRN [invalid testcase] $test"
+                continue
+            fi
+        done
+        if [[ -z $valid_tests ]]; then
+          echo -e "$ERR testcases missing"
+          exit 1
+        fi
     fi
 }
 
