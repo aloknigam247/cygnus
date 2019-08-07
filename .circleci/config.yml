@@ -11,15 +11,15 @@ jobs:
           name: Build Source Code
           command: |
             echo "Build Start"
-            make
+            make | tee make.log 2>&1
             echo "Build End"
       - persist_to_workspace:
           root: ~/
           paths:
             - cygnus
       - store_artifacts:
-          path: tools
-          destination: tr1
+          path: make.log
+          destination: build-log
 
   unit-test:
     machine:
@@ -32,7 +32,10 @@ jobs:
           command: |
             cd ~/cygnus
             source sourceme
-            cytest -d tests -a
+            cytest -d tests -a  | tee cytest.log 2>&1
+      - store_artifacts:
+          path: cytest.log
+          destination: unit-test-log
 
 
 workflows:
