@@ -20,6 +20,7 @@ jobs:
       - run:
           name: Run Unit Test
           command: |
+            cd $CIRCLE_WORKING_DIRECTORY
             source sourceme
             cytest -d tests
 
