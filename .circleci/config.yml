@@ -37,12 +37,8 @@ jobs:
             ls
             find
             cat cytest.log
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - cygnus
       - store_artifacts:
-          path: ~/cygnus
+          path: ~/cygnus/cytest.log
           destination: unit-test-log
 
 
