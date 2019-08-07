@@ -37,6 +37,6 @@ workflows:
   Build:
     jobs:
       - build-code
-      - unit-test
+      - unit-test:
           requires:
             - build-code
