@@ -17,6 +17,8 @@ jobs:
           root: ~/
           paths:
             - cygnus
+      - store_test_results:
+          path: tools
 
   unit-test:
     machine:
