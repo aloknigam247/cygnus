@@ -1,35 +1,77 @@
 #!/usr/bin/python3.6
 
-import os
 import argparse
+import os
+import subprocess
+import sys
 
-######################## class Args ########################
+######################## CLASS ########################
+class IO:
+    tag_id = {
+                "C":"CMD",      # Command tag
+                "E":"ERROR",    # Error tag
+                "F":"FAIL",     # Fail tag
+                "I":"INFO",     # Info tag
+                "W":"WARN"      # Warning tag
+            }
+
+    @staticmethod
+    def log(mode, msg):
+        tag = IO.tag_id.get(mode)
+        if(tag == None):
+            raise Exception("unknown mode \`" + mode + "' specified")
+        
+        print("[%s] %s" %(tag, msg))
+
+    @staticmethod
+    def cmdOut(msg):
+        for line in msg.split('\n'):
+            print(" >  " + line)
+
+    @staticmethod
+    def fileAppend(fd, msg, line_end='\n'):
+        print(msg, end=line_end, file=fd)
+
 class Args:
     __parser = argparse.ArgumentParser()
 
     def __init__(self):
         self.__parser.add_argument("file", help="genrate Makefile for this file")
         self.__parser.add_argument("-d", dest="cDir", metavar="dir", default=".", help="alternate location of file if not current directory")
-        self.__parser.add_argument("-i", dest="incDir", metavar="dir", required=True, help="path of include directory")
+        self.__parser.add_argument("-i", dest="incDir", metavar="dir", action="append", required=True, help="path of include directory")
 
     def parse(self):
         return self.__parser.parse_args()
 
 
-######################## printMakefile ########################
+######################### FUNCTIONS ########################
 def printMakefile(opt, target, h_deps, cc_deps):
     o_deps = []
     makefile = open("Makefile", "w")
 
+    IO.fileAppend(makefile, "############# Configs #############")
+    
     # Common rules
-    print("CY_COMP := g++ -I " + opt.incDir, file = makefile)
+    IO.fileAppend(makefile, "CY_COMP = g++ $(INC)\n")
+    IO.fileAppend(makefile, "INC = ", '')
+    for i in opt.incDir:
+        IO.fileAppend(makefile, " \\\n    -I " + i, '')
+    IO.fileAppend(makefile,'\n')
+
     print("OBJ_DIR := " + os.path.relpath("obj", opt.cDir[opt.cDir.rfind("unit/"):]) + "\n", file = makefile)  
+    IO.fileAppend(makefile, "############# Targets #############")
     print("all: $(OBJ_DIR) " + target + "\n", file = makefile)
     
     # Target rules
     print(target + ": ", end = '', file = makefile)
+    #o_deps.append(cc_deps.pop(0))
     for dep in cc_deps:
-        obj = dep.replace(os.environ["CYGNUS_HOME"] + "/src", "$(OBJ_DIR)").replace(".cc", ".o")
+        print("dep: " + dep)
+        ind = dep.find("/src")
+        if(ind > 0):
+            obj = "$(OBJ_DIR)" + dep[ind+4:].replace(".cc", ".o")
+        else:
+            obj = dep.replace(".cc", ".o")
         o_deps.append(obj)
         print(obj, end = ' ', file = makefile)
 
@@ -50,22 +92,38 @@ def printMakefile(opt, target, h_deps, cc_deps):
     print(target, file=makefile)
 
 
-######################## main ########################
+######################## MAIN ########################
 def main():
     args = Args()
     opt = args.parse()
-    
     h_deps = []
     cc_deps = []
     
     os.chdir(opt.cDir)
-    if not os.path.isabs(opt.incDir):
-        opt.incDir = os.path.relpath(opt.incDir, opt.cDir)
-    cmd = "g++ -MM -I " + opt.incDir + " " + opt.file
-    print(cmd)
-    output = os.popen(cmd).read()
-    line = output.split(' ')
     
+    t = []
+    for path in opt.incDir:
+        if not os.path.isabs(path):
+            t.append(os.path.relpath(path, opt.cDir))
+        else:
+            t.append(path)
+    opt.incDir = t
+
+    # Run command
+    cmd = ["g++", "-MM"]
+    for i in opt.incDir:
+        cmd.append("-I" + i)
+    cmd.append(opt.file)
+    IO.log("C", ' '.join(cmd))
+    proc = subprocess.Popen(cmd, stdout = subprocess.PIPE, stderr = subprocess.STDOUT)
+    stdout, stderr = proc.communicate()
+
+    if(proc.returncode):
+        IO.cmdOut(stdout.decode("utf-8"))
+        IO.log("F", "command failed: " + ' '.join(cmd))
+        return 1
+    
+    line = stdout.decode("utf-8").split(' ')
     target = line.pop(0).strip(".o:")
     cc_deps.append(line.pop(0)) # this file is test.cc
     h_deps.append(line.pop(0))  # this file is test.h
@@ -80,4 +138,5 @@ def main():
     printMakefile(opt, target, h_deps, cc_deps)
 
 if __name__ == "__main__":
-    main()
+    ret = main()
+    sys.exit(ret)
