@@ -2,7 +2,9 @@
 #include <string>
 
 class Log {
-    void prnt(const std::string &msg) {std::cout << msg << '\n';}
+    private:
+        void prnt(const std::string &msg) {std::cout << msg << '\n';}
+
     public:
         void D(const std::string &msg) { std::cout << "[DEBUG] "; prnt(msg);}
         void E(const std::string &msg) { std::cout << "[ERROR] "; prnt(msg);}

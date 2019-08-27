@@ -52,44 +52,41 @@ def printMakefile(opt, target, h_deps, cc_deps):
     IO.fileAppend(makefile, "############# Configs #############")
     
     # Common rules
-    IO.fileAppend(makefile, "CY_COMP = g++ $(INC)\n")
-    IO.fileAppend(makefile, "INC = ", '')
+    IO.fileAppend(makefile, "CY_COMP = g++ $(INC)\n\n" + 
+            "INC := ", '')
     for i in opt.incDir:
         IO.fileAppend(makefile, " \\\n    -I " + i, '')
     IO.fileAppend(makefile,'\n')
 
-    print("OBJ_DIR := " + os.path.relpath("obj", opt.cDir[opt.cDir.rfind("unit/"):]) + "\n", file = makefile)  
-    IO.fileAppend(makefile, "############# Targets #############")
-    print("all: $(OBJ_DIR) " + target + "\n", file = makefile)
+    IO.fileAppend(makefile, "OBJ_DIR := " + os.path.relpath("obj", opt.cDir[opt.cDir.rfind("unit/"):]) + "\n\n" +
+                            "############# Targets #############\n" +
+                            "all: $(OBJ_DIR) " + target + "\n")
     
     # Target rules
-    print(target + ": ", end = '', file = makefile)
-    #o_deps.append(cc_deps.pop(0))
+    IO.fileAppend(makefile, target + ": ", '')
     for dep in cc_deps:
-        print("dep: " + dep)
         ind = dep.find("/src")
         if(ind > 0):
             obj = "$(OBJ_DIR)" + dep[ind+4:].replace(".cc", ".o")
         else:
             obj = dep.replace(".cc", ".o")
         o_deps.append(obj)
-        print(obj, end = ' ', file = makefile)
+        IO.fileAppend(makefile, obj, ' ')
 
-    print("", file = makefile)
-    print("\t$(CY_COMP) -o $@ $^\n", file = makefile)
+    IO.fileAppend(makefile, "\n\t$(CY_COMP) -o $@ $^\n")
 
     for dep in o_deps:
-        print(dep + ": " + cc_deps.pop(0) + " " + h_deps.pop(0), file = makefile)
-        print("\t$(CY_COMP) -c $< -o $@\n", file = makefile)
+        IO.fileAppend(makefile, dep + ": " + cc_deps.pop(0) + " " + h_deps.pop(0) + '\n' +
+                                "\t$(CY_COMP) -c $< -o $@\n")
 
-    print("$(OBJ_DIR):", file = makefile)
-    print("\tmkdir $@\n", file = makefile)
+    IO.fileAppend(makefile, "$(OBJ_DIR):\n" +
+                            "\tmkdir $@\n")
 
     # Clean target
-    print("clean:\n\trm -rf ", end='', file=makefile)
+    IO.fileAppend(makefile, "clean:\n\trm -rf ", '')
     for dep in o_deps:
-        print(dep, end=' ', file=makefile)
-    print(target, file=makefile)
+        IO.fileAppend(makefile, dep, ' ')
+    IO.fileAppend(makefile, target)
 
 
 ######################## MAIN ########################
