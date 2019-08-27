@@ -14,7 +14,8 @@ export EXT_LIBS     := 	# Path of external libs for linking filled in ext/*/opti
 DUMP         := $(BIN) $(DEP) $(OBJ) $(BUILD_DIR) $(LIB_DIR)	# Targets producing files which needs to be cleaned on make clean
 
 ########### Compile Flags ########### 
-export CPP_COMPILE = $(CXX) $$(INCLUDE_DIR) -L $(LIB_DIR)	# $$(INCLUDE_DIR) is passed to sub-make to fill and use
+export CPP_FLAGS = -std=c++11
+export CPP_COMPILE = $(CXX) $(CPP_FLAGS) $$(INCLUDE_DIR) -L $(LIB_DIR)	# $$(INCLUDE_DIR) is passed to sub-make to fill and use
 
 ########### Make Flags ########### 
 export MAKE_FLAGS :=--no-print-directory 
