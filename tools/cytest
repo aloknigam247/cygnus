@@ -168,10 +168,10 @@ parseCmdLine() {
 validateTests() {
     if [[ ${values["-a"]} ]]; then
         if [[ ${values["test_list"]} ]]; then
-            echo -e "$IGN -a is given, ignoring ${values["test_list"]}"
+            LOG I "-a is given, ignoring ${values["test_list"]}"
         fi
         test -d $test_dir && cd $test_dir
-        valid_tests=`find -type f -path "unit*.cyt" | sed 's|./||'`
+        valid_tests=`find -type f -path "./unit*.cyt" | sed 's|./||'`
         cd - > /dev/null
         if [[ -z $valid_tests ]]; then
             LOG W "no testcases found in directory: $test_dir"
@@ -202,16 +202,30 @@ makeRunDir(){
 }
 
 runTest() {
-  testcase=$1
-  testcase_dir=`dirname $testcase`
+    testcase=$1
+    testcase_dir=`dirname $testcase`
+    run_log=$out_dir/$testcase_dir/run.log
+    #run_log_color=$out_dir/$testcase_dir/.run.log
 
-  echo "[RUN] $testcase"
-  echo "creating run dir"
-  makeRunDir $testcase
-  if [[ ! -a $test_dir/$testcase_dir/Makefile ]]; then
-    gen-make -d $out_dir/$testcase_dir -i $CYGNUS_HOME/include test.cc
-  fi
-  make --no-print-directory -C $out_dir/$testcase_dir | tee $out_dir/$testcase_dir/make.log
+    echo -n "[RUN] $testcase"
+    
+    makeRunDir $testcase
+    {
+        LOG I "Run directory created"
+        if [[ ! -a $test_dir/$testcase_dir/Makefile ]]; then
+            gen-make -d $out_dir/$testcase_dir -i $CYGNUS_HOME/include -i $CYGNUS_HOME/tests/utils/include test.cc
+        fi
+        if [[ $? -ne 0 ]]; then
+            EXIT 1
+        fi
+        make --no-print-directory -C $out_dir/$testcase_dir 2>&1 | tee $out_dir/$testcase_dir/make.log
+        #sed 's|\x1b\[[;0-9]*m\x1b\[K||g' $out_dir/$testcase_dir/make.log.color > $out_dir/$testcase_dir/make.log
+        cd $out_dir/$testcase_dir
+        ./test
+    } > $run_log 2>&1
+    #sed 's|\x1b\[[;0-9]*m\x1b\[K||g' $run_log_color > $run_log
+    echo " --STATUS??--"
+    cd - > /dev/null
 }
 
 main() {
