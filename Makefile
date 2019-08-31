@@ -7,7 +7,7 @@ INC_LIBS = ## libs needed for .o --> executable
 
 DIRS := src
 
-.PHONY: $(DIRS) run $(EXT_LIBS)
+.PHONY: $(DIRS) $(EXT_LIBS)
 
 all: $(DIRS) $(EXECUTABLE)
 

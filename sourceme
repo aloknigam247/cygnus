@@ -2,6 +2,12 @@ rPath=`pwd`/$BASH_SOURCE
 
 export CYGNUS_HOME=$(dirname $(realpath $rPath))
 
-export PATH=$CYGNUS_HOME/build/bin:$CYGNUS_HOME/tools:$PATH
+if [[ ! $PATH =~ $CYGNUS_HOME/build/bin ]]; then
+    export PATH=$CYGNUS_HOME/build/bin:$PATH
+fi
+
+if [[ ! $PATH =~ $CYGNUS_HOME/tools ]]; then
+    export PATH=$CYGNUS_HOME/tools:$PATH
+fi
 
 echo CYGNUS_HOME: $CYGNUS_HOME

@@ -1,0 +1,26 @@
+#!/bin/bash
+
+source $CYGNUS_HOME/tools/funcs.bash    # source common functions
+
+OPTION['--strict']="value=bool help=use.strict.options.for.compilation"
+OPTION['--lint']="value=bool help=use.lint.tool.along.with.compilation"
+
+lintRun() {
+    mkdir -p lint-report
+    scan-build-8 -o lint-report make STRICT=yes
+}
+
+main() {
+    parseCmdLine $@
+    if [[ ${VALUES['--strict']} ]]; then
+        STRICT="STRICT=yes"
+        make clean
+    fi
+
+    if [[ ${VALUES['--lint']} ]]; then
+        lintRun
+    fi
+    make $STRICT
+}
+
+main $@
