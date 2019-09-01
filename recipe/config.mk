@@ -16,7 +16,7 @@ DUMP         := $(BIN) $(DEP) $(OBJ) $(BUILD_DIR) $(LIB_DIR)	# Targets producing
 ########### Compile Flags ########### 
 export CPP_FLAGS = -std=c++11
 ifdef STRICT
-	CPP_FLAGS += -Wall -Walloc-zero -Wchkp -Wduplicated-branches -Weffc++ -Werror -Wextra -Wformat -Winline -Wmissing-include-dirs -Woverloaded-virtual -Wstrict-overflow=5 -Wstringop-overflow -Wsuggest-attribute=const -Wswitch-default -Wswitch-enum -Wunused -Wunused-macros
+	CPP_FLAGS += -Wall -Walloc-zero -Wchkp -Wduplicated-branches -Weffc++ -Wextra -Wformat -Winline -Wmissing-include-dirs -Woverloaded-virtual -Wstrict-overflow=5 -Wstringop-overflow -Wsuggest-attribute=const -Wswitch-default -Wswitch-enum -Wunused -Wunused-macros
 endif
 export CPP_COMPILE = $(CXX) $(CPP_FLAGS) $$(INCLUDE_DIR) -L $(LIB_DIR)	# $$(INCLUDE_DIR) is passed to sub-make to fill and use
 

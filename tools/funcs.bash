@@ -30,13 +30,14 @@ LOG(){
             ;;
         *)
             LOG E "unrecognized log type"
-            EXIT
+            EXIT 1
             ;;
     esac
 }
 
 ####################################################################
 # How to create new option                                         #
+#   * eval      : action to evaluate when option is found          #
 #   * help      : create help statement, use . in place of space   #
 #   * metavar   : string to be displayed for option argument       #
 #   * value     : type of value                                    #
@@ -53,8 +54,8 @@ declare -A VALUES
 declare POS_NAME
 
 # Default options
-OPTION['-h']='value=bool help=print.help'
-OPTION['--help']='value=bool help=print.help'
+OPTION['-h']='value=bool,help=print help'
+OPTION['--help']='value=bool,help=print help'
 
 # Print usage
 usage(){
@@ -93,6 +94,8 @@ usage(){
         m=''
         h=''
         mst=''
+        local IFS_Prev=$IFS
+        IFS=','
         for param in ${OPTION[$opt]}; do
             case $param in
                 metavar=*)
@@ -106,7 +109,8 @@ usage(){
                     ;;
             esac
         done
-        printf "    %-$(($max_len + 3))s: %s%s\n" "$opt $m" "${h//./ }" "$mst"
+        IFS=$IFS_Prev
+        printf "    %-$(($max_len + 3))s: %s%s\n" "$opt $m" "${h}" "$mst"
     done
     EXIT
 }
@@ -160,6 +164,8 @@ parseCmdLine() {
         val=''
         error=''
         if [[ ${OPTION[$opt]} ]]; then
+            local IFS_Prev=$IFS
+            IFS=','
             for param in ${OPTION[$opt]}; do
                 case $param in
                     value=*)
@@ -182,6 +188,9 @@ parseCmdLine() {
                             must["$o"]=$opt
                         done
                         ;;
+                    eval=*)
+                        eval ${param#*=}
+                        ;;
                     metavar=*|help=*)
                         ;;
                     *)
@@ -191,6 +200,7 @@ parseCmdLine() {
                         ;;
                 esac
             done
+            IFS=$IFS_Prev
             if [[ $val ]]; then
                 VALUES[$opt]=$val
             fi
@@ -217,7 +227,8 @@ parseCmdLine() {
         fi
     done
 
+    echo "Options: "
     for i in ${!VALUES[@]}; do
-        echo "$i: ${VALUES[$i]}"
+        echo -e "    $i: ${VALUES[$i]}"
     done
 }

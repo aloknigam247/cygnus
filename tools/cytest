@@ -9,10 +9,10 @@ declare -a valid_tests
 test_dir='.'
 out_dir='test_run'
 
-OPTION['-a']='value=bool with=-d help=pick.testcases.from.directory.in.-d'
-OPTION['-d']='value=string metavar=dir help=test.case.directory'
-OPTION['-o']='value=string metavar=dir help=output.directory.of.test.run'
-OPTION['POS']='dest=test_list count=0+'
+OPTION['-a']='value=bool,with=-d,help=pick testcases from directory in -d'
+OPTION['-d']='value=string,metavar=dir,help=test case directory'
+OPTION['-o']='value=string,metavar=dir,help=output directory of test run'
+OPTION['POS']='dest=test_list,count=0+'
 
 validateTests() {
     if [[ ${VALUES["-a"]} ]]; then
