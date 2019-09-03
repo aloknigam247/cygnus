@@ -22,9 +22,9 @@ jobs:
       - run:
           name: Build Release
           command: |
-            echo "Build Start"
+            cd ~/cygnus
+            source sourceme
             cybuild --release 2>&1 | tee build.log
-            echo "Build End"
       - persist_to_workspace:
           root: ~/
           paths:
@@ -43,9 +43,9 @@ jobs:
       - run:
           name: Build Release
           command: |
-            echo "Build Start"
+            cd ~/cygnus
+            source sourceme
             cybuild --release 2>&1 | tee build.log
-            echo "Build End"
       - persist_to_workspace:
           root: ~/
           paths:
@@ -64,9 +64,9 @@ jobs:
       - run:
           name: Build Release
           command: |
-            echo "Build Start"
+            cd ~/cygnus
+            source sourceme
             cybuild --release 2>&1 | tee build.log
-            echo "Build End"
       - persist_to_workspace:
           root: ~/
           paths:
@@ -85,9 +85,9 @@ jobs:
       - run:
           name: Build Release
           command: |
-            echo "Build Start"
+            cd ~/cygnus
+            source sourceme
             cybuild --release 2>&1 | tee build.log
-            echo "Build End"
       - persist_to_workspace:
           root: ~/
           paths:
