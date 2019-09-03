@@ -1,7 +1,3 @@
-# Top Makefile
-
-include recipe/procs.mk
-
 #---------- Configs ---------- #
 .DEFAULT_GOAL = compile
 .PHONY: src compile
