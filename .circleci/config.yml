@@ -1,17 +1,92 @@
 version: 2.0
 
 jobs:
-  build-code:
+  checkout:
     machine:
       image: ubuntu-1604:201903-01
     working_directory: ~/cygnus
     steps:
       - checkout
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - cygnus
+
+  build-release:
+    machine:
+      image: ubuntu-1604:201903-01
+    working_directory: ~/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
       - run:
-          name: Build Source Code
+          name: Build Release
           command: |
             echo "Build Start"
-            make 2>&1 | tee build.log
+            cybuild --release 2>&1 | tee build.log
+            echo "Build End"
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - cygnus
+      - store_artifacts:
+          path: build.log
+          destination: build-log
+
+  build-mem:
+    machine:
+      image: ubuntu-1604:201903-01
+    working_directory: ~/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Build Release
+          command: |
+            echo "Build Start"
+            cybuild --release 2>&1 | tee build.log
+            echo "Build End"
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - cygnus
+      - store_artifacts:
+          path: build.log
+          destination: build-log
+
+  build-cov:
+    machine:
+      image: ubuntu-1604:201903-01
+    working_directory: ~/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Build Release
+          command: |
+            echo "Build Start"
+            cybuild --release 2>&1 | tee build.log
+            echo "Build End"
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - cygnus
+      - store_artifacts:
+          path: build.log
+          destination: build-log
+
+  build-perf:
+    machine:
+      image: ubuntu-1604:201903-01
+    working_directory: ~/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Build Release
+          command: |
+            echo "Build Start"
+            cybuild --release 2>&1 | tee build.log
             echo "Build End"
       - persist_to_workspace:
           root: ~/
@@ -36,13 +111,33 @@ jobs:
       - store_artifacts:
           path: ~/cygnus/cytest.log
           destination: unit-test-log
+  
+  warnings:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - attach_workspace:
+          at: ~/
+
+  lint:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - attach_workspace:
+          at: ~/
+  styling:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - attach_workspace:
+          at: ~/
 
 
 workflows:
   version: 2
   Commit-Test:
     jobs:
-      - build-code
-      - unit-test:
+      - checkout
+      - build-code:
           requires:
-            - build-code
+            - checkout

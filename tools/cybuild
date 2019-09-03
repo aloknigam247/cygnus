@@ -2,19 +2,30 @@
 
 source $CYGNUS_HOME/tools/funcs.bash    # source common functions
 
-OPTION['--strict']="value=bool,eval=RUN_MODE=strict,help=use strict options for compilation"
+OPTION['--clean']="value=bool,eval=OPT_MODE=clean,help=clean generated files"
+OPTION['--debug']="value=bool,eval=OPT_MODE=debug,help=create debug build"
 OPTION['--lint']="value=bool,eval=RUN_MODE=lint,help=use lint tool along with compilation"
+OPTION['--release']="value=bool,eval=OPT_MODE=release,help=create release build"
+OPTION['--strict']="value=bool,eval=RUN_MODE=strict,help=use strict options for compilation"
+
+declare RUN_MODE
+declare OPT_MODE=debug
+
+MAKE() {
+    echo make MODE=$OPT_MODE
+    make MODE=$OPT_MODE
+}
 
 strictRun() {
     mkdir -p reports/warnings
-    make -q `pwd`/build/bin/cygnus && make clean
-    make STRICT=yes 2>reports/warnings/warns
+    MAKE -q `pwd`/build/bin/cygnus && MAKE clean
+    MAKE STRICT=yes 2>reports/warnings/warns
     echo "Warnings: `grep -c "warning:" reports/warnings/warns`"
 }
 
 lintRun() {
     mkdir -p reports/lint
-    make -q `pwd`/build/bin/cygnus && make clean
+    MAKE -q `pwd`/build/bin/cygnus && make clean
     scan-build-8 --status-bugs -stats -o report/lint make STRICT=yes
 }
 
@@ -28,7 +39,7 @@ main() {
             strictRun
             ;;
         *)
-            make
+            MAKE
             ;;
     esac
 }
