@@ -138,6 +138,6 @@ workflows:
   Commit-Test:
     jobs:
       - checkout
-      - build-code:
+      - build-release:
           requires:
             - checkout
