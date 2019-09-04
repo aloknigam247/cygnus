@@ -30,7 +30,8 @@ export OBJ DEP
 #---------- Compile Flags ----------# 
 export CPP_FLAGS += -std=c++11
 ifdef STRICT
-	CPP_FLAGS += -Wall -Walloc-zero -Wchkp -Wduplicated-branches -Weffc++ -Wextra -Wformat -Winline -Wmissing-include-dirs -Woverloaded-virtual -Wstrict-overflow=5 -Wstringop-overflow -Wsuggest-attribute=const -Wswitch-default -Wswitch-enum -Wunused -Wunused-macros
+	CPP_FLAGS += -Wall -Wchkp -Weffc++ -Wextra -Wformat -Winline -Wmissing-include-dirs -Woverloaded-virtual -Wstrict-overflow=5 -Wsuggest-attribute=const -Wswitch-default -Wswitch-enum -Wunused -Wunused-macros
+# -Walloc-zero -Wduplicated-branches -Wstringop-overflow disabling for now as circleci doesn't have g++ 7.4
 endif
 export CPP_COMPILE = $(CXX) $(CPP_FLAGS) $$(INCLUDE_DIR)	# $$(INCLUDE_DIR) is passed to sub-make to fill and use
 

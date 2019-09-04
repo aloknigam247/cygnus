@@ -19,7 +19,12 @@ strictRun() {
     mkdir -p reports/warnings
     MAKE -q `pwd`/build/bin/cygnus && MAKE clean
     MAKE STRICT=yes 2>reports/warnings/warns
-    echo "Warnings: `grep -c "warning:" reports/warnings/warns`"
+    warning_num=`grep -c "warning:" reports/warnings/warns`
+    echo "Warnings: $warning_num"
+    if [[ $warning_num -gt 0 ]]; then
+        return 1;
+    fi
+    
 }
 
 lintRun() {
