@@ -17,7 +17,7 @@ MAKE() {
 
 strictRun() {
     mkdir -p reports/warnings
-    MAKE -q `pwd`/build/bin/cygnus && MAKE clean
+    MAKE -q && MAKE clean
     MAKE STRICT=yes 2>reports/warnings/warns
     warning_num=`grep -c "warning:" reports/warnings/warns`
     echo "Warnings: $warning_num"
@@ -29,8 +29,8 @@ strictRun() {
 
 lintRun() {
     mkdir -p reports/lint
-    MAKE -q `pwd`/build/bin/cygnus && make clean
-    scan-build-8 --status-bugs -stats -o report/lint make STRICT=yes
+    MAKE -q && MAKE clean
+    scan-build-8 --status-bugs -stats -o reports/lint make MODE=$OPT_MODE STRICT=yes CPP_FLAGS=-Werror
 }
 
 main() {

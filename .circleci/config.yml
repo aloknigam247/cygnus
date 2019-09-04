@@ -20,7 +20,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          name: Build Release
+          name: Release Build
           command: |
             cd ~/cygnus
             source sourceme
@@ -41,7 +41,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          name: Build Release
+          name: Memory Build
           command: |
             cd ~/cygnus
             source sourceme
@@ -62,7 +62,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          name: Build Release
+          name: Coverage Build
           command: |
             cd ~/cygnus
             source sourceme
@@ -83,7 +83,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          name: Build Release
+          name: Performance Build
           command: |
             cd ~/cygnus
             source sourceme
@@ -124,6 +124,10 @@ jobs:
               cd ~/cygnus
               source sourceme
               cybuild --strict --release 2>&1 | tee build.log
+      - store_artifacts:
+          path: build.log
+          path: reports/warnings/warns
+          destination: Warnings log
 
   lint:
     machine:
@@ -131,6 +135,13 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
+      - run:
+          name: Lint Run
+          command: |
+              cd ~/cygnus
+              source sourceme
+              cybuild --lint --release 2>&1 | tee build.log
+
   styling:
     machine:
       image: ubuntu-1604:201903-01
