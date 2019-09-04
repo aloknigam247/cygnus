@@ -201,7 +201,6 @@ workflows:
       - reports:
           requires:
             - styling
-            - warnings
             - unit-test
             - lint
             - coverage
