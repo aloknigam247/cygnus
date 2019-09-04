@@ -125,8 +125,7 @@ jobs:
               source sourceme
               cybuild --strict --release 2>&1 | tee build.log
       - store_artifacts:
-          path: build.log
-          path: reports/warnings/warns
+          path: build.log reports/warnings/warns
           destination: Warnings log
 
   lint:
