@@ -157,8 +157,7 @@ jobs:
     machine:
       image: ubuntu-1604:201903-01
     steps:
-      - attach_workspace:
-          at: ~/
+      - run: echo "Report generation step."
 
 workflows:
   version: 2
