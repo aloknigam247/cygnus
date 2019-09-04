@@ -1,0 +1,51 @@
+#!/bin/bash
+
+source $CYGNUS_HOME/tools/funcs.bash    # source common functions
+
+OPTION['--clean']="value=bool,eval=OPT_MODE=clean,help=clean generated files"
+OPTION['--debug']="value=bool,eval=OPT_MODE=debug,help=create debug build"
+OPTION['--lint']="value=bool,eval=RUN_MODE=lint,help=use lint tool along with compilation"
+OPTION['--release']="value=bool,eval=OPT_MODE=release,help=create release build"
+OPTION['--strict']="value=bool,eval=RUN_MODE=strict,help=use strict options for compilation"
+
+declare RUN_MODE
+declare OPT_MODE=debug
+
+MAKE() {
+    make MODE=$OPT_MODE $@
+}
+
+strictRun() {
+    mkdir -p reports/warnings
+    MAKE -q && MAKE clean
+    MAKE STRICT=yes 2>reports/warnings/warns
+    warning_num=`grep -c "warning:" reports/warnings/warns`
+    echo "Warnings: $warning_num"
+    if [[ $warning_num -gt 0 ]]; then
+        return 1;
+    fi
+    
+}
+
+lintRun() {
+    mkdir -p reports/lint
+    MAKE -q && MAKE clean
+    scan-build-8 --status-bugs -stats -o reports/lint make MODE=$OPT_MODE STRICT=yes CPP_FLAGS=-Werror
+}
+
+main() {
+    parseCmdLine $@
+    case $RUN_MODE in
+        lint)
+            lintRun
+            ;;
+        strict)
+            strictRun
+            ;;
+        *)
+            MAKE
+            ;;
+    esac
+}
+
+main $@
