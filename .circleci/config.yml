@@ -118,6 +118,12 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
+      - run:
+          name: Compiler Warnings on strict mode
+          command: |
+              cd ~/cygnus
+              source sourceme
+              cybuild --strict --release 2>&1 | tee build.log
 
   lint:
     machine:
