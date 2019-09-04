@@ -5,11 +5,14 @@ Q	:= @
 
 #---------- Modes ----------# 
 ifeq ($(MODE),debug)
-MODE = debug
+MODE 		 = debug
+CPP_FLAGS 	+= -g
 else ifeq ($(MODE),release)
-MODE = release
+MODE 		 = release
+CPP_FLAGS 	+= -O
 else
-MODE = debug
+MODE 		 = debug
+CPP_FLAGS 	+= -g
 $(info debug as defaut mode)
 endif
 
@@ -25,15 +28,15 @@ EXE 	:= $(BIN)/cygnus
 export OBJ DEP
 
 #---------- Compile Flags ----------# 
-export CPP_FLAGS = -std=c++11
+export CPP_FLAGS += -std=c++11
 ifdef STRICT
 	CPP_FLAGS += -Wall -Walloc-zero -Wchkp -Wduplicated-branches -Weffc++ -Wextra -Wformat -Winline -Wmissing-include-dirs -Woverloaded-virtual -Wstrict-overflow=5 -Wstringop-overflow -Wsuggest-attribute=const -Wswitch-default -Wswitch-enum -Wunused -Wunused-macros
 endif
 export CPP_COMPILE = $(CXX) $(CPP_FLAGS) $$(INCLUDE_DIR)	# $$(INCLUDE_DIR) is passed to sub-make to fill and use
 
 #---------- Make Flags ----------#
-export MAKE			 = $Qmake $(MAKE_FLAGS)
 export MAKE_FLAGS	:= --no-print-directory 
+export MAKE			 = $Qmake $(MAKE_FLAGS)
 
 #---------- Rules ----------#
 compile: $(DUMP) src $(EXE)

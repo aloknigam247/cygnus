@@ -141,3 +141,21 @@ workflows:
       - build-release:
           requires:
             - checkout
+      - build-cov:
+          requires:
+            - build-release
+      - build-mem:
+          requires:
+            - build-release
+      - build-perf:
+          requires:
+            - build-release
+      - warnings:
+          requires:
+            - build-release
+      - unit-test:
+          requires:
+            - build-release
+      - lint:
+          requires:
+            - warnings
