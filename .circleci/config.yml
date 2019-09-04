@@ -142,14 +142,8 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          name: Get scan-build-8
-          command: sudo apt-get install clang-tools-8
-      - run:
           name: Lint Run
-          command: |
-              cd ~/cygnus
-              source sourceme
-              cybuild --lint --release 2>&1 | tee build.log
+          command: echo "Disabled"
 
   styling:
     machine:
