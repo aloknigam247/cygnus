@@ -132,12 +132,42 @@ jobs:
       - attach_workspace:
           at: ~/
 
+  coverage:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - attach_workspace:
+          at: ~/
+
+  memory:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - attach_workspace:
+          at: ~/
+
+  performance:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - attach_workspace:
+          at: ~/
+
+  reports:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - attach_workspace:
+          at: ~/
 
 workflows:
   version: 2
   Commit-Test:
     jobs:
       - checkout
+      - styling:
+          requires:
+            - checkout
       - build-release:
           requires:
             - checkout
@@ -159,3 +189,21 @@ workflows:
       - lint:
           requires:
             - warnings
+      - coverage:
+          requires:
+            - build-cov
+      - memory:
+          requires:
+            - build-mem
+      - performance:
+          requires:
+            - build-perf
+      - reports:
+          requires:
+            - styling
+            - warnings
+            - unit-test
+            - lint
+            - coverage
+            - memory
+            - performance
