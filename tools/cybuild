@@ -12,7 +12,7 @@ declare RUN_MODE
 declare OPT_MODE=debug
 
 MAKE() {
-    make MODE=$OPT_MODE
+    make MODE=$OPT_MODE $@
 }
 
 strictRun() {

@@ -23,7 +23,7 @@ DEP		:= $(BLD_DIR)/dep/$(MODE)
 OBJ		:= $(BLD_DIR)/obj/$(MODE)
 MOD_EXE	:= $(BIN)/cygnus-$(MODE)
 DUMP 	:= $(BIN) $(OBJ) $(DEP)
-EXE 	:= $(BIN)/cygnus
+EXE 	:= $(BLD_DIR)/bin/cygnus
 
 export OBJ DEP
 
