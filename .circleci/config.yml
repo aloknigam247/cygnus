@@ -142,6 +142,9 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
+          name: Get scan-build-8
+          command: sudo apt-get install clang-tools-8
+      - run:
           name: Lint Run
           command: |
               cd ~/cygnus
