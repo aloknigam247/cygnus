@@ -63,12 +63,14 @@ usage(){
     max_len=0
     pos_name=''
     for opt in ${!OPTION[@]}; do
+        local IFS_Prev=$IFS
+        IFS=','
         for param in ${OPTION[$opt]}; do
             case $param in
                 metavar=*)
                     len=${param#*=}
                     t_len=$(( ${#opt} + ${#len} ))
-                    [[ $max_len < $t_len ]] && max_len=$t_len
+                    [[ $max_len -lt $t_len ]] && max_len=$t_len
                     break
                     ;;
                 count=1)
@@ -85,11 +87,12 @@ usage(){
                     ;;
             esac
         done
-        [[ $max_len < ${#opt} ]] && max_len=${#opt}
+        [[ $max_len -lt ${#opt} ]] && max_len=${#opt}
+        IFS=$IFS_Prev
     done
 
     # print usage now
-    echo "Usage: `basename $0` [option] $pos_name"
+    echo "Usage: `basename $0` [options] $pos_name"
     for opt in `echo ${!OPTION[@]} | sed 's/ /\n/g' | sort | grep -v POS`; do
         m=''
         h=''
@@ -119,7 +122,9 @@ usage(){
 # Usage: optionError <option>
 optionError(){
     LOG E "option \`$1' expects argument"
-    for param in ${option[$1]};do
+    local IFS_Prev=$IFS
+    IFS=','
+    for param in ${OPTION[$1]};do
         case $param in
             metavar=*)
                 m="<${param#*=}>"
@@ -132,6 +137,7 @@ optionError(){
                 ;;
         esac
     done
+    IFS=$IFS_Prev
     if [[ -z $h ]]; then
         LOG W "short help for option \`$1' is missing."
     else
@@ -147,6 +153,8 @@ parseCmdLine() {
     declare -A must
 
     # Set positional argument name
+    local IFS_Prev=$IFS
+    IFS=','
     if [[ ${OPTION['POS']} ]]; then
         for param in ${OPTION['POS']}; do
             case $param in
@@ -157,6 +165,7 @@ parseCmdLine() {
             esac
         done
     fi
+    IFS=$IFS_Prev
 
     while [ $1 ]; do
         opt=$1
@@ -226,6 +235,8 @@ parseCmdLine() {
             optionError ${must[$o]}
         fi
     done
+    
+    [[ $EXITCODE -ne 0 ]] && EXIT
 
     echo "Options: "
     for i in ${!VALUES[@]}; do

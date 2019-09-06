@@ -4,6 +4,7 @@ source $CYGNUS_HOME/tools/funcs.bash    # source common functions
 
 declare -a valid_list
 declare -a valid_tests
+declare MAKE_TARGET=all
 
 # DEFAULTS
 test_dir='.'
@@ -12,7 +13,19 @@ out_dir='test_run'
 OPTION['-a']='value=bool,with=-d,help=pick testcases from directory in -d'
 OPTION['-d']='value=string,metavar=dir,help=test case directory'
 OPTION['-o']='value=string,metavar=dir,help=output directory of test run'
+OPTION['--coverage']='value=bool,eval=preCoverage,help=run coverage tests'
 OPTION['POS']='dest=test_list,count=0+'
+
+preCoverage() {
+    MAKE_TARGET='coverage'
+    out_dir='test_cov'
+    mkdir -p reports/cov
+}
+
+postCoverage() {
+    lcov --capture --directory test_cov --no-external --output-file reports/cov/coverage.info --directory src --directory include
+    genhtml reports/cov/coverage.info --output-directory reports/cov/lcov
+}
 
 validateTests() {
     if [[ ${VALUES["-a"]} ]]; then
@@ -67,13 +80,14 @@ runTest() {
         if [[ $? -ne 0 ]]; then
             EXIT 1
         fi
-        make --no-print-directory -C $out_dir/$testcase_dir 2>&1 | tee $out_dir/$testcase_dir/make.log
+        make --no-print-directory -C $out_dir/$testcase_dir $MAKE_TARGET 2>&1 | tee $out_dir/$testcase_dir/make.log
         #sed 's|\x1b\[[;0-9]*m\x1b\[K||g' $out_dir/$testcase_dir/make.log.color > $out_dir/$testcase_dir/make.log
         cd $out_dir/$testcase_dir
-        exec test
+        ./test
+        status=$?
     } > $run_log 2>&1
     #sed 's|\x1b\[[;0-9]*m\x1b\[K||g' $run_log_color > $run_log
-    echo " --STATUS??--"
+    [[ $status -eq 0 ]] && echo " --PASS--" || echo " --FAIL-- "
     cd - > /dev/null
 }
 
@@ -94,6 +108,8 @@ main() {
     for test in $valid_tests; do
         runTest $test
     done
+
+    [[ $MAKE_TARGET == "coverage" ]] && postCoverage
 }
 
 main $@

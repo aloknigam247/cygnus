@@ -158,6 +158,19 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
+      - run:
+          name: Coverage Run
+          command: |
+              cd ~/cygnus
+              source sourceme
+              cytest -a -d tests --coverage
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - cygnus
+      - store_artifacts:
+          path: reports/cov
+          destination: Coverage data
 
   memory:
     machine:
