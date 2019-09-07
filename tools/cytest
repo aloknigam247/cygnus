@@ -23,7 +23,7 @@ preCoverage() {
 }
 
 postCoverage() {
-    export $PATH=~/cygnus/ext/lcov/usr/bin$PATH
+    export PATH=~/cygnus/ext/lcov/usr/bin:$PATH
     #lcov --capture --directory test_cov --no-external --output-file reports/cov/coverage.info --directory src --directory include
     lcov --config-file ~/cygnus/ext/etc/lcovrc  --capture --directory test_cov --no-external --output-file reports/cov/coverage.info --directory src --directory include
     genhtml reports/cov/coverage.info --output-directory reports/cov/lcov
@@ -112,7 +112,13 @@ main() {
         runTest $test
     done
 
-    [[ $MAKE_TARGET == "coverage" ]] && postCoverage
+    case $MAKE_TARGET in
+        coverage)
+            postCoverage
+            ;;
+    esac
+    return 0
 }
 
 main $@
+
