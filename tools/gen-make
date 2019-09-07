@@ -51,7 +51,7 @@ def printMakefile(opt, target, h_deps, cc_deps):
     IO.fileAppend(makefile, "############# Configs #############")
     
     # Common rules
-    IO.fileAppend(makefile, "CY_COMP = g++ $(COMP_FLAGS) $(INC)\n\n" + 
+    IO.fileAppend(makefile, "CY_COMP = g++ -std=c++11 $(COMP_FLAGS) $(INC)\n\n" +  # tempo fix for c++11
             "INC := ", '')
     for i in opt.incDir:
         IO.fileAppend(makefile, " \\\n    -I " + i, '')
