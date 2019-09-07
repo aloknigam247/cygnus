@@ -75,7 +75,9 @@ runTest() {
     {
         LOG I "Run directory created"
         if [[ ! -a $test_dir/$testcase_dir/Makefile ]]; then
-            gen-make -d $out_dir/$testcase_dir -i $CYGNUS_HOME/include -i $CYGNUS_HOME/tests/utils/include test.cc
+            ## tempo fix
+            test -f /usr/bin/python3.6 && pyt=python3.6 || pyt=python3.5
+            $pyt tools/gen-make -d $out_dir/$testcase_dir -i $CYGNUS_HOME/include -i $CYGNUS_HOME/tests/utils/include test.cc
         fi
         if [[ $? -ne 0 ]]; then
             EXIT 1
