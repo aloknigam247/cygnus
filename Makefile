@@ -4,16 +4,17 @@
 Q	:= @
 
 #---------- Modes ----------# 
-ifeq ($(MODE),debug)
-MODE 		 = debug
+ifeq ($(MODE),coverage)
+CPP_FLAGS 	+= --coverage -g
+else ifeq ($(MODE),debug)
 CPP_FLAGS 	+= -g
 else ifeq ($(MODE),release)
-MODE 		 = release
 CPP_FLAGS 	+= -O
-else
-MODE 		 = debug
+else ifndef MODE
 CPP_FLAGS 	+= -g
 $(info debug as defaut mode)
+else
+$(error unknown MODE '$(MODE)')
 endif
 
 #---------- Path Configurations ----------# 
@@ -33,7 +34,7 @@ ifdef STRICT
 	CPP_FLAGS += -Wall -Wchkp -Weffc++ -Wextra -Wformat -Winline -Wmissing-include-dirs -Woverloaded-virtual -Wstrict-overflow=5 -Wsuggest-attribute=const -Wswitch-default -Wswitch-enum -Wunused -Wunused-macros
 # -Walloc-zero -Wduplicated-branches -Wstringop-overflow disabling for now as circleci doesn't have g++ 7.4
 endif
-export CPP_COMPILE = $(CXX) $(CPP_FLAGS) $$(INCLUDE_DIR)	# $$(INCLUDE_DIR) is passed to sub-make to fill and use
+export CPP_COMPILE := $(CXX) $(CPP_FLAGS)	# $$(INCLUDE_DIR) is passed to sub-make to fill and use
 
 #---------- Make Flags ----------#
 export MAKE_FLAGS	:= --no-print-directory 
@@ -51,8 +52,9 @@ src:
 $(EXE): $(MOD_EXE)
 	ln -sfr $< $@
 
+$(MOD_EXE):  INCLUDE_DIR=''
 $(MOD_EXE):  $(addprefix $(OBJ)/,$(notdir $(subst .cc,.o,$(wildcard src/*.cc))))
-	$(CXX) -o $@ $^
+	$(CPP_COMPILE) -o $@ $^
 
 clean:
 	rm -rf $(BLD_DIR)

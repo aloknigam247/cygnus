@@ -1,4 +1,3 @@
-#!/usr/bin/python3.6
 
 import argparse
 import os
@@ -52,7 +51,7 @@ def printMakefile(opt, target, h_deps, cc_deps):
     IO.fileAppend(makefile, "############# Configs #############")
     
     # Common rules
-    IO.fileAppend(makefile, "CY_COMP = g++ $(INC)\n\n" + 
+    IO.fileAppend(makefile, "CY_COMP = g++ -std=c++11 $(COMP_FLAGS) $(INC)\n\n" +  # tempo fix for c++11
             "INC := ", '')
     for i in opt.incDir:
         IO.fileAppend(makefile, " \\\n    -I " + i, '')
@@ -60,7 +59,9 @@ def printMakefile(opt, target, h_deps, cc_deps):
 
     IO.fileAppend(makefile, "OBJ_DIR := " + os.path.relpath("obj", opt.cDir[opt.cDir.rfind("unit/"):]) + "\n\n" +
                             "############# Targets #############\n" +
-                            "all: $(OBJ_DIR) " + target + "\n")
+                            "all: $(OBJ_DIR) " + target + "\n\n" +
+                            "coverage: COMP_FLAGS += --coverage\n" +
+                            "coverage: all\n")
     
     # Target rules
     IO.fileAppend(makefile, target + ": ", '')

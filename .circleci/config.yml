@@ -33,69 +33,6 @@ jobs:
           path: build.log
           destination: build-log
 
-  build-mem:
-    machine:
-      image: ubuntu-1604:201903-01
-    working_directory: ~/cygnus
-    steps:
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Memory Build
-          command: |
-            cd ~/cygnus
-            source sourceme
-            cybuild --release 2>&1 | tee build.log
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - cygnus
-      - store_artifacts:
-          path: build.log
-          destination: build-log
-
-  build-cov:
-    machine:
-      image: ubuntu-1604:201903-01
-    working_directory: ~/cygnus
-    steps:
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Coverage Build
-          command: |
-            cd ~/cygnus
-            source sourceme
-            cybuild --release 2>&1 | tee build.log
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - cygnus
-      - store_artifacts:
-          path: build.log
-          destination: build-log
-
-  build-perf:
-    machine:
-      image: ubuntu-1604:201903-01
-    working_directory: ~/cygnus
-    steps:
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Performance Build
-          command: |
-            cd ~/cygnus
-            source sourceme
-            cybuild --release 2>&1 | tee build.log
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - cygnus
-      - store_artifacts:
-          path: build.log
-          destination: build-log
-
   unit-test:
     machine:
       image: ubuntu-1604:201903-01
@@ -129,10 +66,10 @@ jobs:
           paths:
             - cygnus
       - store_artifacts:
-          path: build.log
+          path: ~/cygnus/build.log
           destination: Build log
       - store_artifacts:
-          path: reports/warnings/warns
+          path: ~/cygnus/reports/warnings/warns
           destination: Warnings
 
   lint:
@@ -158,6 +95,19 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
+      - run:
+          name: Coverage Run
+          command: |
+              cd ~/cygnus
+              source sourceme
+              cytest -a -d tests --coverage
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - cygnus
+      - store_artifacts:
+          path: ~/cygnus/reports/cov
+          destination: Coverage data
 
   memory:
     machine:
@@ -190,15 +140,6 @@ workflows:
       - build-release:
           requires:
             - checkout
-      - build-cov:
-          requires:
-            - build-release
-      - build-mem:
-          requires:
-            - build-release
-      - build-perf:
-          requires:
-            - build-release
       - warnings:
           requires:
             - build-release
@@ -210,13 +151,13 @@ workflows:
             - warnings
       - coverage:
           requires:
-            - build-cov
+            - build-release
       - memory:
           requires:
-            - build-mem
+            - build-release
       - performance:
           requires:
-            - build-perf
+            - build-release
       - reports:
           requires:
             - styling
