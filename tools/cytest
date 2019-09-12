@@ -77,8 +77,12 @@ runTest() {
     {
         LOG I "Run directory created"
         if [[ ! -a $test_dir/$testcase_dir/Makefile ]]; then
+<<<<<<< Updated upstream
             ## tempo fix
             python3.6 tools/gen-make -d $out_dir/$testcase_dir -i $CYGNUS_HOME/include -i $CYGNUS_HOME/tests/utils/include test.cc
+=======
+            gen-make -d $out_dir/$testcase_dir -i $CYGNUS_HOME/include -i $CYGNUS_HOME/tests/utils/include test.cpp
+>>>>>>> Stashed changes
         fi
         if [[ $? -ne 0 ]]; then
             EXIT 1
