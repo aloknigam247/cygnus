@@ -242,4 +242,5 @@ parseCmdLine() {
     for i in ${!VALUES[@]}; do
         echo -e "    $i: ${VALUES[$i]}"
     done
+    echo
 }

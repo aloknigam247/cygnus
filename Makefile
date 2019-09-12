@@ -5,13 +5,17 @@ Q	:= @
 
 #---------- Modes ----------# 
 ifeq ($(MODE),coverage)
-CPP_FLAGS 	+= --coverage -g
+CPP_FLAGS 	+= --coverage -g3
+MODE=coverage
 else ifeq ($(MODE),debug)
-CPP_FLAGS 	+= -g
+CPP_FLAGS 	+= -g3
+MODE=debug
 else ifeq ($(MODE),release)
 CPP_FLAGS 	+= -O
+MODE=release
 else ifndef MODE
-CPP_FLAGS 	+= -g
+CPP_FLAGS 	+= -g3
+MODE=debug
 $(info debug as defaut mode)
 else
 $(error unknown MODE '$(MODE)')
@@ -53,7 +57,7 @@ $(EXE): $(MOD_EXE)
 	ln -sfr $< $@
 
 $(MOD_EXE):  INCLUDE_DIR=''
-$(MOD_EXE):  $(addprefix $(OBJ)/,$(notdir $(subst .cc,.o,$(wildcard src/*.cc))))
+$(MOD_EXE):  $(addprefix $(OBJ)/,$(notdir $(subst .cpp,.o,$(wildcard src/*.cpp))))
 	$(CPP_COMPILE) -o $@ $^
 
 clean:

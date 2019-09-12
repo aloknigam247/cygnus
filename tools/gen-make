@@ -44,7 +44,7 @@ class Args:
 
 
 ######################### FUNCTIONS ########################
-def printMakefile(opt, target, h_deps, cc_deps):
+def printMakefile(opt, target, h_deps, cpp_deps):
     o_deps = []
     makefile = open("Makefile", "w")
 
@@ -65,19 +65,19 @@ def printMakefile(opt, target, h_deps, cc_deps):
     
     # Target rules
     IO.fileAppend(makefile, target + ": ", '')
-    for dep in cc_deps:
+    for dep in cpp_deps:
         ind = dep.find("/src")
         if(ind > 0):
-            obj = "$(OBJ_DIR)" + dep[ind+4:].replace(".cc", ".o")
+            obj = "$(OBJ_DIR)" + dep[ind+4:].replace(".cpp", ".o")
         else:
-            obj = dep.replace(".cc", ".o")
+            obj = dep.replace(".cpp", ".o")
         o_deps.append(obj)
         IO.fileAppend(makefile, obj, ' ')
 
     IO.fileAppend(makefile, "\n\t$(CY_COMP) -o $@ $^\n")
 
     for dep in o_deps:
-        IO.fileAppend(makefile, dep + ": " + cc_deps.pop(0) + " " + h_deps.pop(0) + '\n' +
+        IO.fileAppend(makefile, dep + ": " + cpp_deps.pop(0) + " " + h_deps.pop(0) + '\n' +
                                 "\t$(CY_COMP) -c $< -o $@\n")
 
     IO.fileAppend(makefile, "$(OBJ_DIR):\n" +
@@ -95,7 +95,7 @@ def main():
     args = Args()
     opt = args.parse()
     h_deps = []
-    cc_deps = []
+    cpp_deps = []
     
     os.chdir(opt.cDir)
     
@@ -123,7 +123,7 @@ def main():
     
     line = stdout.decode("utf-8").split(' ')
     target = line.pop(0).strip(".o:")
-    cc_deps.append(line.pop(0)) # this file is test.cc
+    cpp_deps.append(line.pop(0)) # this file is test.cpp
     h_deps.append(line.pop(0))  # this file is test.h
     
     for dep in line:
@@ -131,9 +131,9 @@ def main():
         if dep == "\\":
             continue
         h_deps.append(dep)
-        cc_deps.append(dep.replace("include", "src").replace(".h", ".cc"))
+        cpp_deps.append(dep.replace("include", "src").replace(".h", ".cpp"))
 
-    printMakefile(opt, target, h_deps, cc_deps)
+    printMakefile(opt, target, h_deps, cpp_deps)
 
 if __name__ == "__main__":
     ret = main()

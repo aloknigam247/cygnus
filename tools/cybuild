@@ -37,6 +37,7 @@ lintRun() {
 
 main() {
     parseCmdLine $@
+    [[ ${VALUES['--force']} ]] && MAKE clean
     case $RUN_MODE in
         lint)
             lintRun
