@@ -155,7 +155,7 @@ jobs:
       - run:
           name: Report Generation
           command: |
-              cd ~/cygnus
+              cd ~
               source sourceme
               gen-report | tee report.log
 
