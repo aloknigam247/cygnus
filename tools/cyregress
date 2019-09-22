@@ -10,9 +10,11 @@ declare MAKE_TARGET=all
 test_dir='.'
 out_dir='test_run'
 
-OPTION['-a']='value=bool,with=-d,help=pick testcases from directory in -d'
+OPTION['-a']='value=bool,with=-d,help=run all testcases in this directory'
 OPTION['-d']='value=string,metavar=dir,help=test case directory'
+OPTION['-f']='value=bool,with=-d,without=-a,help=run unit tests only'
 OPTION['-o']='value=string,metavar=dir,help=output directory of test run'
+OPTION['-u']='value=bool,with=-d,without=-a,help=run functional tests only'
 OPTION['--coverage']='value=bool,eval=preCoverage,help=run coverage tests'
 OPTION['POS']='dest=test_list,count=0+'
 
@@ -33,7 +35,29 @@ validateTests() {
             LOG I "-a is given, ignoring ${VALUES["test_list"]}"
         fi
         test -d $test_dir && cd $test_dir
-        valid_tests=`find -type f -path "./unit*.cyt" | sed 's|./||'`
+        valid_tests=`find -type f -path "./unit*.cyt" -o -path "./func*.cyt" | sed 's|^./||'`
+        cd - > /dev/null
+        if [[ -z $valid_tests ]]; then
+            LOG W "no testcases found in directory: $test_dir"
+            EXIT
+        fi
+    elif [[ ${VALUES["-f"]} ]]; then
+        if [[ ${VALUES["test_list"]} ]]; then
+            LOG I "-f is given, ignoring ${VALUES["test_list"]}"
+        fi
+        test -d $test_dir && cd $test_dir
+        valid_tests=`find -type f -path "./func*.cyt" | sed 's|^./||'`
+        cd - > /dev/null
+        if [[ -z $valid_tests ]]; then
+            LOG W "no testcases found in directory: $test_dir"
+            EXIT
+        fi
+    elif [[ ${VALUES["-u"]} ]]; then
+        if [[ ${VALUES["test_list"]} ]]; then
+            LOG I "-u is given, ignoring ${VALUES["test_list"]}"
+        fi
+        test -d $test_dir && cd $test_dir
+        valid_tests=`find -type f -path "./unit*.cyt" | sed 's|^./||'`
         cd - > /dev/null
         if [[ -z $valid_tests ]]; then
             LOG W "no testcases found in directory: $test_dir"
@@ -41,7 +65,7 @@ validateTests() {
         fi
     else
         for test in ${VALUES["test_list"]}; do
-            if [[ $test =~ unit.*\.cyt && -a $test_dir/$test ]]; then
+            if [[ $test =~ unit.*\.cyt || $test =~ func.*\.cyt && -a $test_dir/$test ]]; then
                 valid_tests+=" $test"
             else
                 LOG W "[invalid testcase] $test"
@@ -56,20 +80,31 @@ validateTests() {
 }
 
 makeRunDir(){
-    testcase=$1
-    test_out=$out_dir/`dirname $testcase`
+    local testcase=$1
+    local test_out=$out_dir/`dirname $testcase`
     rm -rf $test_out
     mkdir -p $test_out
     ln -rs $test_dir/`dirname $testcase`/* $test_out/
 }
 
-runTest() {
-    testcase=$1
-    testcase_dir=`dirname $testcase`
-    run_log=$out_dir/$testcase_dir/run.log
+runFuncTest() {
+    local testcase=$1
+    local testcase_dir=`dirname $testcase`
+    local run_log=$out_dir/$testcase_dir/unit_test.log
+
+    echo "[RUN] $testcase"
+    makeRunDir $testcase
+    cd $out_dir/$testcase_dir
+    ./runme
+}
+
+runUnitTest() {
+    local testcase=$1
+    local testcase_dir=`dirname $testcase`
+    local run_log=$out_dir/$testcase_dir/unit_test.log
     #run_log_color=$out_dir/$testcase_dir/.run.log
 
-    echo -n "[RUN] $testcase"
+    echo "[RUN] $testcase"
     
     makeRunDir $testcase
     {
@@ -89,6 +124,15 @@ runTest() {
     #sed 's|\x1b\[[;0-9]*m\x1b\[K||g' $run_log_color > $run_log
     [[ $status -eq 0 ]] && echo " --PASS--" || echo " --FAIL-- "
     cd - > /dev/null
+}
+
+runTest() {
+    if [[ $1 =~ 'func' ]]; then
+        runFuncTest $1
+    else
+        runUnitTest $1
+    fi
+    echo ""
 }
 
 main() {

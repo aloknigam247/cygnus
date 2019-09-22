@@ -8,7 +8,7 @@ mkdir docs
 mkdir -p reports/docs
 
 doxygen $CONFIG
-undoc=`cat reports/docs/undocumented | wc -l`
+undoc=`cat reports/docs/undoc | wc -l`
 
 diff -qr docs docs.old
 if [[ $? -eq 0 ]]; then
@@ -19,5 +19,5 @@ fi
 
 rm -rf docs.old
 
-echo "Undocumented: $undoc"
-echo "Need to update docs: $doc_diff"
+echo "Undocumented: $undoc" | tee reports/docs/status
+echo "Need to update docs: $doc_diff" | tee -a reports/docs/status

@@ -8,7 +8,7 @@
 ################################
 declare EXITCODE=0
 EXIT(){
-    exit ${1:?$EXITCODE}
+    exit ${1:-$EXITCODE}
 }
 
 ############################
@@ -96,7 +96,8 @@ usage(){
     for opt in `echo ${!OPTION[@]} | sed 's/ /\n/g' | sort | grep -v POS`; do
         m=''
         h=''
-        mst=''
+        with=''
+        without=''
         local IFS_Prev=$IFS
         IFS=','
         for param in ${OPTION[$opt]}; do
@@ -108,12 +109,15 @@ usage(){
                     h=${param#*=}
                     ;;
                 with=*)
-                    mst=", depends on ${param#*=}"
+                    with=", with ${param#*=}"
+                    ;;
+                without=*)
+                    without=", without ${param#*=}"
                     ;;
             esac
         done
         IFS=$IFS_Prev
-        printf "    %-$(($max_len + 3))s: %s%s\n" "$opt $m" "${h}" "$mst"
+        printf "    %-$(($max_len + 3))s: %s%s%s\n" "$opt $m" "${h}" "$with" "$without"
     done
     EXIT
 }
