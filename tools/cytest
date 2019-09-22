@@ -23,9 +23,7 @@ preCoverage() {
 }
 
 postCoverage() {
-    export PATH=~/cygnus/ext/lcov/usr/bin:$PATH
-    #lcov --capture --directory test_cov --no-external --output-file reports/cov/coverage.info --directory src --directory include
-    lcov --config-file ~/cygnus/ext/etc/lcovrc  --capture --directory test_cov --no-external --output-file reports/cov/coverage.info --directory src --directory include
+    lcov --capture --directory test_cov --no-external --output-file reports/cov/coverage.info --directory src --directory include
     genhtml reports/cov/coverage.info --output-directory reports/cov/lcov --demangle-cpp
 }
 
@@ -77,8 +75,7 @@ runTest() {
     {
         LOG I "Run directory created"
         if [[ ! -a $test_dir/$testcase_dir/Makefile ]]; then
-            ## tempo fix
-            python3.6 tools/gen-make -d $out_dir/$testcase_dir -i $CYGNUS_HOME/include -i $CYGNUS_HOME/tests/utils/include test.cc
+            gen-make -d $out_dir/$testcase_dir -i $CYGNUS_HOME/include -i $CYGNUS_HOME/tests/utils/include test.cc
         fi
         if [[ $? -ne 0 ]]; then
             EXIT 1
