@@ -46,6 +46,22 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
+      - run:
+          name: Generate Docs
+          command: |
+            cd ~/cygnus
+            source sourceme
+            gen-docs
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - cygnus
+      - store_artifacts:
+          path: ~/cygnus/docs
+          destination: Docs
+      - store_artifacts:
+          path: ~/cygnus/reports/docs/undocumented
+          destination: Doc Coverage
 
   unit-test:
     docker:
