@@ -1,0 +1,16 @@
+#!/bin/bash
+
+CONFIG=.doxygen/config
+
+mv docs docs.bk
+
+mkdir docs
+mkdir -p reports/docs
+
+doxygen $CONFIG
+
+diff -qr docs docs.bk && doc_diff='yes' || doc_diff='no'
+undoc=`wc -l reports/docs/undocumented`
+
+echo "Undocumented: $undoc"
+echo "Need to update docs: $doc_diff"
