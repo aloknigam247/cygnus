@@ -2,7 +2,7 @@
 
 CONFIG=.doxygen/config
 
-mv docs docs.bk
+mv docs docs.old
 
 mkdir docs
 mkdir -p reports/docs
@@ -10,14 +10,14 @@ mkdir -p reports/docs
 doxygen $CONFIG
 undoc=`cat reports/docs/undocumented | wc -l`
 
-diff -qr docs docs.bk
+diff -qr docs docs.old
 if [[ $? -eq 0 ]]; then
     doc_diff=no
 else
     doc_diff=yes
 fi
 
-rm -rf docs.bk
+rm -rf docs.old
 
 echo "Undocumented: $undoc"
 echo "Need to update docs: $doc_diff"
