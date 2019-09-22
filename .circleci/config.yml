@@ -181,7 +181,7 @@ workflows:
             - build-release
       - lint:
           requires:
-            - warnings
+            - build-release
       - coverage:
           requires:
             - build-release
