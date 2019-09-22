@@ -2,8 +2,8 @@ version: 2.0
 
 jobs:
   checkout:
-    machine:
-      image: ubuntu-1604:201903-01
+    docker:
+      - image: aloknigam247/cygnus
     working_directory: ~/cygnus
     steps:
       - checkout
@@ -13,8 +13,8 @@ jobs:
             - cygnus
 
   build-release:
-    machine:
-      image: ubuntu-1604:201903-01
+    docker:
+      - image: aloknigam247/cygnus
     working_directory: ~/cygnus
     steps:
       - attach_workspace:
@@ -33,9 +33,23 @@ jobs:
           path: build.log
           destination: build-log
 
+  code-style:
+    docker:
+      - image: aloknigam247/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
+
+  docs:
+    docker:
+      - image: aloknigam247/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
+
   unit-test:
-    machine:
-      image: ubuntu-1604:201903-01
+    docker:
+      - image: aloknigam247/cygnus
     steps:
       - attach_workspace:
           at: ~/
@@ -50,8 +64,8 @@ jobs:
           destination: unit-test-log
   
   warnings:
-    machine:
-      image: ubuntu-1604:201903-01
+    docker:
+      - image: aloknigam247/cygnus
     steps:
       - attach_workspace:
           at: ~/
@@ -73,8 +87,8 @@ jobs:
           destination: Warnings
 
   lint:
-    machine:
-      image: ubuntu-1604:201903-01
+    docker:
+      - image: aloknigam247/cygnus
     steps:
       - attach_workspace:
           at: ~/
@@ -82,16 +96,9 @@ jobs:
           name: Lint Run
           command: echo "Disabled"
 
-  styling:
-    machine:
-      image: ubuntu-1604:201903-01
-    steps:
-      - attach_workspace:
-          at: ~/
-
   coverage:
-    machine:
-      image: ubuntu-1604:201903-01
+    docker:
+      - image: aloknigam247/cygnus
     steps:
       - attach_workspace:
           at: ~/
@@ -110,22 +117,22 @@ jobs:
           destination: Coverage data
 
   memory:
-    machine:
-      image: ubuntu-1604:201903-01
+    docker:
+      - image: aloknigam247/cygnus
     steps:
       - attach_workspace:
           at: ~/
 
   performance:
-    machine:
-      image: ubuntu-1604:201903-01
+    docker:
+      - image: aloknigam247/cygnus
     steps:
       - attach_workspace:
           at: ~/
 
   reports:
-    machine:
-      image: ubuntu-1604:201903-01
+    docker:
+      - image: aloknigam247/cygnus
     steps:
       - run: echo "Report generation step."
 
@@ -134,10 +141,13 @@ workflows:
   Commit-Test:
     jobs:
       - checkout
-      - styling:
+      - build-release:
           requires:
             - checkout
-      - build-release:
+      - code-style:
+          requires:
+            - checkout
+      - docs:
           requires:
             - checkout
       - warnings:
@@ -160,7 +170,8 @@ workflows:
             - build-release
       - reports:
           requires:
-            - styling
+            - code-style
+            - docs
             - unit-test
             - lint
             - coverage
