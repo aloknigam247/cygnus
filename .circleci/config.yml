@@ -53,9 +53,9 @@ jobs:
             source sourceme
             gen-docs
       - persist_to_workspace:
-          root: ~/
+          root: ~/cygnus
           paths:
-            - cygnus
+            - reports
       - store_artifacts:
           path: ~/cygnus/docs
           destination: Docs
@@ -92,9 +92,9 @@ jobs:
               source sourceme
               cybuild --strict --release 2>&1 | tee build.log
       - persist_to_workspace:
-          root: ~/
+          root: ~/cygnus
           paths:
-            - cygnus
+            - reports
       - store_artifacts:
           path: ~/cygnus/build.log
           destination: Build log
@@ -125,9 +125,9 @@ jobs:
               source sourceme
               cytest -a -d tests --coverage
       - persist_to_workspace:
-          root: ~/
+          root: ~/cygnus
           paths:
-            - cygnus
+            - reports
       - store_artifacts:
           path: ~/cygnus/reports/cov
           destination: Coverage data
