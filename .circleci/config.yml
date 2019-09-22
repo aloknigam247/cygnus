@@ -50,6 +50,7 @@ jobs:
           name: Generate Docs
           command: |
             cd ~/cygnus
+            source sourceme
             gen-docs
       - persist_to_workspace:
           root: ~/
