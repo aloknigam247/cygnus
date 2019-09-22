@@ -50,8 +50,7 @@ jobs:
           name: Generate Docs
           command: |
             cd ~/cygnus
-            mkdir -p reports/docs
-            doxygen .doxygen/config
+            gen-docs
       - persist_to_workspace:
           root: ~/
           paths:
