@@ -1,0 +1,59 @@
+#!/bin/bash
+
+source $CYGNUS_HOME/tools/funcs.bash    # source common functions
+
+docsReport() {
+    echo "DOCS::"
+    echo "Status:"
+    test -f reports/docs/status && cat reports/docs/status
+    echo ""
+    echo "Undocumented:"
+    test -f reports/docs/undoc && cat reports/docs/undoc
+    echo ""
+}
+
+unitReport() {
+    echo "Unit Test::"
+    echo "Log:"
+    test -f unittest.log && cat unittest.log
+    echo ""
+}
+
+warnReport() {
+    echo "Compiler Warnings::"
+    test -f reports/warnings/warns
+    echo ""
+}
+
+lintReport() {
+    echo "Lint Report::"
+    echo ""
+}
+
+covReport() {
+    echo "Coverage Report::"
+    echo ""
+}
+
+memReport() {
+    echo "Memory Report::"
+    echo ""
+}
+
+perfReport() {
+    echo "Performace Report::"
+    echo ""
+}
+
+main() {
+    parseCmdLine $@
+    docsReport
+    unitReport
+    warnReport
+    lintReport
+    covReport
+    memReport
+    perfReport
+}
+
+main $@

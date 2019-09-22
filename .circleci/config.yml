@@ -53,9 +53,9 @@ jobs:
             source sourceme
             gen-docs
       - persist_to_workspace:
-          root: ~/
+          root: ~/cygnus
           paths:
-            - cygnus
+            - reports
       - store_artifacts:
           path: ~/cygnus/docs
           destination: Docs
@@ -74,9 +74,9 @@ jobs:
           command: |
             cd ~/cygnus
             source sourceme
-            cytest -d tests -a 2>&1 | tee cytest.log
+            cyregress -d tests -a 2>&1 | tee unittest.log
       - store_artifacts:
-          path: ~/cygnus/cytest.log
+          path: ~/cygnus/cyregress.log
           destination: unit-test-log
   
   warnings:
@@ -92,9 +92,9 @@ jobs:
               source sourceme
               cybuild --strict --release 2>&1 | tee build.log
       - persist_to_workspace:
-          root: ~/
+          root: ~/cygnus
           paths:
-            - cygnus
+            - reports
       - store_artifacts:
           path: ~/cygnus/build.log
           destination: Build log
@@ -123,11 +123,11 @@ jobs:
           command: |
               cd ~/cygnus
               source sourceme
-              cytest -a -d tests --coverage
+              cyregress -a -d tests --coverage
       - persist_to_workspace:
-          root: ~/
+          root: ~/cygnus
           paths:
-            - cygnus
+            - reports
       - store_artifacts:
           path: ~/cygnus/reports/cov
           destination: Coverage data
@@ -150,7 +150,14 @@ jobs:
     docker:
       - image: aloknigam247/cygnus
     steps:
-      - run: echo "Report generation step."
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Report Generation
+          command: |
+              cd ~
+              source cygnus/sourceme
+              gen-report | tee report.log
 
 workflows:
   version: 2
@@ -174,7 +181,7 @@ workflows:
             - build-release
       - lint:
           requires:
-            - warnings
+            - build-release
       - coverage:
           requires:
             - build-release
