@@ -8,7 +8,7 @@
 ################################
 declare EXITCODE=0
 EXIT(){
-    exit ${1:?$EXITCODE}
+    exit ${1:-$EXITCODE}
 }
 
 ############################
