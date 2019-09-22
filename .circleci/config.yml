@@ -49,8 +49,9 @@ jobs:
       - run:
           name: Generate Docs
           command: |
-              mkdir -p reports/docs
-              doxygen .doxygen/config
+            cd ~/cygnus
+            mkdir -p reports/docs
+            doxygen .doxygen/config
       - persist_to_workspace:
           root: ~/
           paths:
