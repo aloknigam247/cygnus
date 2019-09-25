@@ -12,7 +12,7 @@ jobs:
           paths:
             - cygnus
 
-  compiler-warnings:
+  comp-warnings:
     docker:
       - image: aloknigam247/cygnus
     steps:
@@ -35,7 +35,7 @@ jobs:
           path: ~/cygnus/reports/warnings/warns
           destination: Warnings
 
-  functional-tests:
+  func-tests:
     docker:
       - image: aloknigam247/cygnus
     steps:
@@ -67,21 +67,21 @@ jobs:
           path: ~/cygnus/cyregress.log
           destination: unit-test-log
   
-  performance-checks:
+  perf-checks:
     docker:
       - image: aloknigam247/cygnus
     steps:
       - attach_workspace:
           at: ~/
 
-  memory-checks:
+  mem-checks:
     docker:
       - image: aloknigam247/cygnus
     steps:
       - attach_workspace:
           at: ~/
 
-  coverage-unit:
+  unit-cov:
     docker:
       - image: aloknigam247/cygnus
     steps:
@@ -101,7 +101,7 @@ jobs:
           path: ~/cygnus/reports/cov
           destination: Coverage data
 
-  coverage-functional:
+  func-cov:
     docker:
       - image: aloknigam247/cygnus
     steps:
@@ -161,7 +161,7 @@ jobs:
       - attach_workspace:
           at: ~/
 
-  report-generation:
+  report-gen:
     docker:
       - image: aloknigam247/cygnus
     steps:
@@ -176,28 +176,28 @@ jobs:
 
 workflows:
   version: 2
-  Commit-Test:
+  Commit-Regression:
     jobs:
       - checkout
-      - compiler-warnings:
+      - comp-warnings:
           requires:
             - checkout
-      - functional-tests:
+      - func-tests:
           requires:
-            - compiler-warnings
-      - coverage-functional:
+            - comp-warnings
+      - func-cov:
           requires:
-            - compiler-warnings
+            - comp-warnings
       - unit-tests:
           requires:
             - checkout
-      - performance-checks:
+      - perf-checks:
           requires:
             - checkout
-      - memory-checks:
+      - mem-checks:
           requires:
             - checkout
-      - coverage-unit:
+      - unit-cov:
           requires:
             - checkout
       - lint-checks:
@@ -209,14 +209,14 @@ workflows:
       - code-style:
           requires:
             - checkout
-      - report-generation:
+      - report-gen:
           requires:
-            - functional-tests
-            - coverage-functional
+            - func-tests
+            - func-cov
             - unit-tests
-            - performance-checks
-            - memory-checks
-            - coverage-unit
+            - unit-cov
+            - perf-checks
+            - mem-checks
             - lint-checks
             - docs-checks
             - code-style
