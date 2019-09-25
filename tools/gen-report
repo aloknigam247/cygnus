@@ -54,6 +54,7 @@ main() {
     covReport
     memReport
     perfReport
+    EXIT
 }
 
 main $@

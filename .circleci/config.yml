@@ -181,7 +181,6 @@ jobs:
               cd ~
               source cygnus/sourceme
               gen-report | tee report.log
-              exit 1
       - store_artifacts:
           path: ~/logs
           destination: Logs
