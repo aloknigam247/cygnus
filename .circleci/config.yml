@@ -4,6 +4,7 @@ jobs:
   checkout:
     docker:
       - image: aloknigam247/cygnus
+    working_directory: ~/cygnus
     steps:
       - checkout
       - run:
