@@ -81,7 +81,27 @@ jobs:
       - attach_workspace:
           at: ~/
 
-  test-coverage:
+  coverage-unit:
+    docker:
+      - image: aloknigam247/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Coverage Run
+          command: |
+              cd ~/cygnus
+              source sourceme
+              cyregress -a -d tests --coverage
+      - persist_to_workspace:
+          root: ~/cygnus
+          paths:
+            - reports
+      - store_artifacts:
+          path: ~/cygnus/reports/cov
+          destination: Coverage data
+
+  coverage-functional:
     docker:
       - image: aloknigam247/cygnus
     steps:
@@ -165,6 +185,9 @@ workflows:
       - functional-tests:
           requires:
             - compiler-warnings
+      - coverage-functional:
+          requires:
+            - compiler-warnings
       - unit-tests:
           requires:
             - checkout
@@ -174,7 +197,7 @@ workflows:
       - memory-checks:
           requires:
             - checkout
-      - test-coverage:
+      - coverage-unit:
           requires:
             - checkout
       - lint-checks:
