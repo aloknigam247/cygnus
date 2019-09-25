@@ -12,74 +12,7 @@ jobs:
           paths:
             - cygnus
 
-  build-release:
-    docker:
-      - image: aloknigam247/cygnus
-    working_directory: ~/cygnus
-    steps:
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Release Build
-          command: |
-            cd ~/cygnus
-            source sourceme
-            cybuild --release 2>&1 | tee build.log
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - cygnus
-      - store_artifacts:
-          path: build.log
-          destination: build-log
-
-  code-style:
-    docker:
-      - image: aloknigam247/cygnus
-    steps:
-      - attach_workspace:
-          at: ~/
-
-  docs:
-    docker:
-      - image: aloknigam247/cygnus
-    steps:
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Generate Docs
-          command: |
-            cd ~/cygnus
-            source sourceme
-            gen-docs
-      - persist_to_workspace:
-          root: ~/cygnus
-          paths:
-            - reports
-      - store_artifacts:
-          path: ~/cygnus/docs
-          destination: Docs
-      - store_artifacts:
-          path: ~/cygnus/reports/docs/undocumented
-          destination: Doc Coverage
-
-  unit-test:
-    docker:
-      - image: aloknigam247/cygnus
-    steps:
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Run Unit Test
-          command: |
-            cd ~/cygnus
-            source sourceme
-            cyregress -d tests -a 2>&1 | tee unittest.log
-      - store_artifacts:
-          path: ~/cygnus/cyregress.log
-          destination: unit-test-log
-  
-  warnings:
+  compiler-warnings:
     docker:
       - image: aloknigam247/cygnus
     steps:
@@ -102,17 +35,53 @@ jobs:
           path: ~/cygnus/reports/warnings/warns
           destination: Warnings
 
-  lint:
+  functional-tests:
     docker:
       - image: aloknigam247/cygnus
     steps:
       - attach_workspace:
           at: ~/
       - run:
-          name: Lint Run
-          command: echo "Disabled"
+          name: Run Unit Test
+          command: |
+            cd ~/cygnus
+            source sourceme
+            cyregress -d tests -a 2>&1 | tee unittest.log
+      - store_artifacts:
+          path: ~/cygnus/cyregress.log
+          destination: unit-test-log
+  
+  unit-tests:
+    docker:
+      - image: aloknigam247/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Run Unit Test
+          command: |
+            cd ~/cygnus
+            source sourceme
+            cyregress -d tests -a 2>&1 | tee unittest.log
+      - store_artifacts:
+          path: ~/cygnus/cyregress.log
+          destination: unit-test-log
+  
+  performance-checks:
+    docker:
+      - image: aloknigam247/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
 
-  coverage:
+  memory-checks:
+    docker:
+      - image: aloknigam247/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
+
+  test-coverage:
     docker:
       - image: aloknigam247/cygnus
     steps:
@@ -132,21 +101,47 @@ jobs:
           path: ~/cygnus/reports/cov
           destination: Coverage data
 
-  memory:
+  lint-checks:
+    docker:
+      - image: aloknigam247/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Lint Run
+          command: echo "Disabled"
+
+  docs-checks:
+    docker:
+      - image: aloknigam247/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Generate Docs
+          command: |
+            cd ~/cygnus
+            source sourceme
+            gen-docs
+      - persist_to_workspace:
+          root: ~/cygnus
+          paths:
+            - reports
+      - store_artifacts:
+          path: ~/cygnus/docs
+          destination: Docs
+      - store_artifacts:
+          path: ~/cygnus/reports/docs/undocumented
+          destination: Doc Coverage
+
+  code-style:
     docker:
       - image: aloknigam247/cygnus
     steps:
       - attach_workspace:
           at: ~/
 
-  performance:
-    docker:
-      - image: aloknigam247/cygnus
-    steps:
-      - attach_workspace:
-          at: ~/
-
-  reports:
+  report-generation:
     docker:
       - image: aloknigam247/cygnus
     steps:
@@ -164,39 +159,40 @@ workflows:
   Commit-Test:
     jobs:
       - checkout
-      - build-release:
+      - compiler-warnings:
+          requires:
+            - checkout
+      - functional-tests:
+          requires:
+            - compiler-warnings
+      - unit-tests:
+          requires:
+            - checkout
+      - performance-checks:
+          requires:
+            - checkout
+      - memory-checks:
+          requires:
+            - checkout
+      - test-coverge:
+          requires:
+            - build-release
+      - lint-checks:
+          requires:
+            - checkout
+      - docs-checks:
           requires:
             - checkout
       - code-style:
           requires:
             - checkout
-      - docs:
+      - report-generation:
           requires:
-            - checkout
-      - warnings:
-          requires:
-            - build-release
-      - unit-test:
-          requires:
-            - build-release
-      - lint:
-          requires:
-            - build-release
-      - coverage:
-          requires:
-            - build-release
-      - memory:
-          requires:
-            - build-release
-      - performance:
-          requires:
-            - build-release
-      - reports:
-          requires:
+            - functional-tests
+            - unit-tests
+            - performance-checks
+            - memory-checks
+            - test-coverage
+            - lint-checks
+            - docs-checks
             - code-style
-            - docs
-            - unit-test
-            - lint
-            - coverage
-            - memory
-            - performance
