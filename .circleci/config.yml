@@ -71,12 +71,18 @@ jobs:
             - reports
             - logs
   
-  perf-checks:
+  performance:
     docker:
       - image: aloknigam247/cygnus
     steps:
       - attach_workspace:
           at: ~/
+      - run:
+          name: Memory Checks
+          command: |
+              cd ~/cygnus
+              source sourceme
+              cyregress -a -d tests --perf 2>&1 | tee logs/perf.log
       - persist_to_workspace:
           root: ~/cygnus
           paths:
@@ -211,7 +217,7 @@ workflows:
       - unit-tests:
           requires:
             - checkout
-      - perf-checks:
+      - performance:
           requires:
             - checkout
       - mem-checks:
@@ -235,7 +241,7 @@ workflows:
             - func-cov
             - unit-tests
             - unit-cov
-            - perf-checks
+            - performance
             - mem-checks
             - lint-checks
             - docs-checks
