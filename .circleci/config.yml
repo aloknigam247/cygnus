@@ -4,9 +4,14 @@ jobs:
   checkout:
     docker:
       - image: aloknigam247/cygnus
-    working_directory: ~/cygnus
     steps:
       - checkout
+      - run:
+          name: Initial setup
+          command: |
+              cd ~/cygnus
+              mkdir logs
+              mkdir reports
       - persist_to_workspace:
           root: ~/
           paths:
@@ -23,7 +28,7 @@ jobs:
           command: |
               cd ~/cygnus
               source sourceme
-              cybuild --strict --release 2>&1 | tee build.log
+              cybuild --strict --release 2>&1 | tee logs/build.log
       - persist_to_workspace:
           root: ~/
           paths:
@@ -40,11 +45,12 @@ jobs:
           command: |
             cd ~/cygnus
             source sourceme
-            cyregress -f -d tests 2>&1 | tee unittest.log
+            cyregress -f -d tests 2>&1 | tee logs/func_test.log
       - persist_to_workspace:
           root: ~/cygnus
           paths:
             - reports
+            - logs
   
   unit-tests:
     docker:
@@ -57,12 +63,12 @@ jobs:
           command: |
             cd ~/cygnus
             source sourceme
-            cyregress -u -d tests 2>&1 | tee unittest.log
-            mkdir reports
+            cyregress -u -d tests 2>&1 | tee unit_test.log
       - persist_to_workspace:
           root: ~/cygnus
           paths:
             - reports
+            - logs
   
   perf-checks:
     docker:
@@ -177,6 +183,9 @@ jobs:
       - store_artifacts:
           path: ~/cygnus/docs
           destination: Docs
+      - store_artifacts:
+          path: ~/cygnus/logs
+          destination: Logs
       - store_artifacts:
           path: ~/cygnus/reports
           destination: Reports
