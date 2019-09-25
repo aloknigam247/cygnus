@@ -58,6 +58,7 @@ jobs:
             cd ~/cygnus
             source sourceme
             cyregress -u -d tests 2>&1 | tee unittest.log
+            mkdir reports
       - persist_to_workspace:
           root: ~/cygnus
           paths:
@@ -193,7 +194,7 @@ workflows:
             - comp-warnings
       - func-cov:
           requires:
-            - comp-warnings
+            - checkout
       - unit-tests:
           requires:
             - checkout
