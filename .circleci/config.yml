@@ -29,7 +29,7 @@ jobs:
           command: |
               cd ~/cygnus
               source sourceme
-              cybuild --strict --release 2>&1 | tee logs/build.log
+              cybuild --strict --release 2>&1 | tee logs/warnings.log
       - persist_to_workspace:
           root: ~/
           paths:
@@ -182,13 +182,10 @@ jobs:
               source cygnus/sourceme
               gen-report | tee report.log
       - store_artifacts:
-          path: ~/cygnus/docs
-          destination: Docs
-      - store_artifacts:
-          path: ~/cygnus/logs
+          path: ~/logs
           destination: Logs
       - store_artifacts:
-          path: ~/cygnus/reports
+          path: ~/reports
           destination: Reports
 
 workflows:
