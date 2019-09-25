@@ -174,7 +174,7 @@ workflows:
       - memory-checks:
           requires:
             - checkout
-      - test-coverge:
+      - test-coverage:
           requires:
             - checkout
       - lint-checks:
