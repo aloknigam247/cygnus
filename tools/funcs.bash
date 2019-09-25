@@ -1,5 +1,6 @@
 ############################################################
 # Commonn functions for logging and command line parsing   #
+# NOTE: all variable name start with _ in this file        #
 ############################################################
 
 ################################ 
@@ -16,17 +17,17 @@ EXIT(){
 # Usage: Log <tag> "<msg>" #
 ############################
 LOG(){
-    local msg=${2:?"message missing."}
+    local _msg=${2:?"message missing."}
     case $1 in
         E)
-            echo "[ERROR] $msg"
+            echo "[ERROR] $_msg"
             EXITCODE=1
             ;;
         I)
-            echo "[INFO] $msg"
+            echo "[INFO] $_msg"
             ;;
         W)
-            echo "[WARN] $msg"
+            echo "[WARN] $_msg"
             ;;
         *)
             LOG E "unrecognized log type"
@@ -37,13 +38,13 @@ LOG(){
 
 ####################################################################
 # How to create new option                                         #
-#   * eval      : action to evaluate when option is found          #
-#   * help      : create help statement, use . in place of space   #
-#   * metavar   : string to be displayed for option argument       #
-#   * value     : type of value                                    #
+#   * eval:      : action to evaluate when option is found          #
+#   * help:      : create help statement, use . in place of space   #
+#   * metavar:   : string to be displayed for option argument       #
+#   * value:     : type of value                                    #
 #                   bool    - no argument                          #
 #                   string  - option expects single argument       #
-#   * with      : mention dependency of option                     #
+#   * with:      : mention dependency of option                     #
 #   ** POS      : special option to provide positional args        #
 #                                                                  #
 #   OPTION['option-name']="list of above options"                  #
@@ -51,73 +52,73 @@ LOG(){
 ####################################################################
 declare -A OPTION
 declare -A VALUES
-declare POS_NAME
+declare _POS_NAME
 
 # Default options
-OPTION['-h']='value=bool,help=print help'
-OPTION['--help']='value=bool,help=print help'
+OPTION['-h']='value:bool,help:print help'
+OPTION['--help']='value:bool,help:print help'
 
 # Print usage
 usage(){
     # scan all options for alignments
-    max_len=0
-    pos_name=''
-    for opt in ${!OPTION[@]}; do
-        local IFS_Prev=$IFS
+    local _max_len=0
+    local _pos_name=''
+    for _opt in ${!OPTION[@]}; do
+        local _IFS_Prev=$IFS
         IFS=','
-        for param in ${OPTION[$opt]}; do
-            case $param in
-                metavar=*)
-                    len=${param#*=}
-                    t_len=$(( ${#opt} + ${#len} ))
-                    [[ $max_len -lt $t_len ]] && max_len=$t_len
+        for _param in ${OPTION[$_opt]}; do
+            case $_param in
+                metavar:*)
+                    len=${_param#*:}
+                    t_len=$(( ${#_opt} + ${#_len} ))
+                    [[ $_max_len -lt $t_len ]] && _max_len=$t_len
                     break
                     ;;
-                count=1)
-                    pos_name="$POS_NAME"
+                count:1)
+                    _pos_name="$_POS_NAME"
                     break
                     ;;
-                count=0+)
-                    pos_name="[$POS_NAME...]"
+                count:0+)
+                    _pos_name="[$_POS_NAME...]"
                     break
                     ;;
-                count=1+)
-                    pos_name="$POS_NAME..."
+                count:1+)
+                    _pos_name="$_POS_NAME..."
                     break
                     ;;
             esac
         done
-        [[ $max_len -lt ${#opt} ]] && max_len=${#opt}
-        IFS=$IFS_Prev
+        [[ $_max_len -lt ${#_opt} ]] && _max_len=${#_opt}
+        IFS=$_IFS_Prev
     done
 
     # print usage now
     echo "Usage: `basename $0` [options] $pos_name"
     for opt in `echo ${!OPTION[@]} | sed 's/ /\n/g' | sort | grep -v POS`; do
-        m=''
-        h=''
-        with=''
-        without=''
+        _meta=''
+        _help=''
+        _with=''
+        _without=''
         local IFS_Prev=$IFS
         IFS=','
         for param in ${OPTION[$opt]}; do
             case $param in
-                metavar=*)
-                    m="<${param#*=}>"
+                metavar:*)
+                    _meta="<${param#*:}>"
                     ;;
-                help=*)
-                    h=${param#*=}
+                help:*)
+                    _help=${param#*:}
                     ;;
-                with=*)
-                    with=", with ${param#*=}"
+                with:*)
+                    _with=", with ${param#*:}"
                     ;;
-                without=*)
-                    without=", without ${param#*=}"
+                without:*)
+                    _without=", without ${param#*:}"
                     ;;
             esac
         done
         IFS=$IFS_Prev
-        printf "    %-$(($max_len + 3))s: %s%s%s\n" "$opt $m" "${h}" "$with" "$without"
+        printf "    %-$(($_max_len + 3))s: %s%s%s\n" "$opt $_meta" "${_help}" "$_with" "$_without"
     done
     EXIT
 }
@@ -126,26 +127,32 @@ usage(){
 # Usage: optionError <option>
 optionError(){
     LOG E "option \`$1' expects argument"
-    local IFS_Prev=$IFS
+    local _IFS_Prev=$IFS
+    local _meta=''
+    local _help=''
+    local _with=''
+    local _without=''
     IFS=','
-    for param in ${OPTION[$1]};do
-        case $param in
-            metavar=*)
-                m="<${param#*=}>"
+    for _param in ${OPTION[$1]};do
+        case $_param in
+            metavar:*)
+                _meta="<${_param#*:}>"
                 ;;
-            help=*)
-                h=${param#*=}
+            help:*)
+                _help=${_param#*:}
                 ;;
-            with=*)
-                mst=", depends on ${param#*=}"
+            with:*)
+                _with=", with ${_param#*:}"
                 ;;
+            _without:*)
+                _without=", without ${_param#*:}"
         esac
     done
-    IFS=$IFS_Prev
-    if [[ -z $h ]]; then
+    IFS=$_IFS_Prev
+    if [[ -z $_help ]]; then
         LOG W "short help for option \`$1' is missing."
     else
-            echo "    $1 $m: ${h//./ } $mst"
+            echo "    $1 $_meta: ${_help//./ } $_with $_without"
     fi
 }
 
@@ -154,78 +161,88 @@ optionError(){
 #   OPTION: associative array that has all options defined
 #   VALUES: values of options mentioned in OPTION
 parseCmdLine() {
-    declare -A must
+    declare -A _with
+    declare -A _without
 
     # Set positional argument name
-    local IFS_Prev=$IFS
+    local _IFS_Prev=$IFS
     IFS=','
     if [[ ${OPTION['POS']} ]]; then
-        for param in ${OPTION['POS']}; do
-            case $param in
-                dest=*)
-                    POS_NAME=${param#*=}
+        for _param in ${OPTION['POS']}; do
+            case $_param in
+                dest:*)
+                    _POS_NAME=${_param#*:}
                     break
                     ;;
             esac
         done
     fi
-    IFS=$IFS_Prev
+    IFS=$_IFS_Prev
 
     while [ $1 ]; do
-        opt=$1
-        dest=''
-        val=''
-        error=''
-        if [[ ${OPTION[$opt]} ]]; then
-            local IFS_Prev=$IFS
+        _opt=$1
+        _val=''
+        _error=''
+        if [[ ${OPTION[$_opt]} ]]; then
+            local _IFS_Prev=$IFS
             IFS=','
-            for param in ${OPTION[$opt]}; do
-                case $param in
-                    value=*)
-                        if [[ $param == "value=string" ]]; then
+            for _param in ${OPTION[$_opt]}; do
+                _dest=$_opt
+                case $_param in
+                    dest:*)
+                        _dest=${_param#*:}
+                        ;;
+                    eval:*)
+                        eval ${_param#*:}
+                        ;;
+                    value:*)
+                        if [[ $_param == "value:string" ]]; then
                             if [[ -n $2 && ! $2 =~ ^- ]]; then
-                                val=$2
+                                _val=$2
                                 shift
                             else
-                                optionError $opt
-                                error=1
+                                optionError $_opt
+                                _error=1
                                 continue
                             fi
-                        elif [[ $param == "value=bool" ]]; then # can be removed
-                            val="true"
+                        elif [[ $_param == "value:bool" ]]; then # can be removed
+                            _val="true"
                         fi
                         ;;
-                    with=*)
-                        local deps=${param#*=}
-                        for o in ${deps//,/ }; do
-                            must["$o"]=$opt
+                    with:*)
+                        _deps=${_param#*:}
+                        for _o in ${_deps//,/ }; do
+                            _with["$_o"]=$_opt
                         done
                         ;;
-                    eval=*)
-                        eval ${param#*=}
+                    without:*)
+                        _deps==${_param#*:}
+                        for _o in ${_deps//,/ }; do
+                            _without["$_o"]=$_opt
+                        done
                         ;;
-                    metavar=*|help=*)
+                    metavar:*|help:*)
                         ;;
                     *)
-                        LOG W "invalid parameter $param defined in option \`$opt'"
-                        error=1
+                        LOG W "invalid parameter $_param defined in option \`$_opt'"
+                        _error=1
                         continue
                         ;;
                 esac
             done
-            IFS=$IFS_Prev
-            if [[ $val ]]; then
-                VALUES[$opt]=$val
+            IFS=$_IFS_Prev
+            if [[ $_val ]]; then
+                VALUES[$_dest]=$_val
             fi
         elif [[ $1 =~ ^- ]]; then
-            LOG I "ignoring unknown option \`$opt'"
+            LOG I "ignoring unknown option \`$_opt'"
         else
-            pos+=" $opt"
+            _pos+=" $_opt"
         fi
         shift
     done
-    if [[ -n $pos ]]; then
-        VALUES[$POS_NAME]="$pos"
+    if [[ -n $_pos ]]; then
+        VALUES[$POS_NAME]="$_pos"
         echo ""
     fi
 
@@ -233,17 +250,24 @@ parseCmdLine() {
         usage
     fi
 
-    for o in ${!must[@]}; do
-        if [[ -z ${VALUES[$o]} ]]; then
-            LOG E "option\[s\] $o is missing needed by ${must[$o]}"
-            optionError ${must[$o]}
+    for _o in ${!_with[@]}; do
+        if [[ -z ${VALUES[$_o]} ]]; then
+            LOG E "option\[s\] $_o is missing needed by ${_with[$_o]}"
+            optionError ${_with[$_o]}
+        fi
+    done
+    
+    for _o in ${!_without[@]}; do
+        if [[ ${VALUES[$_o]} ]]; then
+            LOG E "can not combine $_o with ${_without[$_o]}"
+            optionError ${_without[$_o]}
         fi
     done
     
     [[ $EXITCODE -ne 0 ]] && EXIT
 
     echo "Options: "
-    for i in ${!VALUES[@]}; do
-        echo -e "    $i: ${VALUES[$i]}"
+    for _i in ${!VALUES[@]}; do
+        echo -e "    $_i: ${VALUES[$_i]}"
     done
 }

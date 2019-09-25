@@ -88,6 +88,12 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
+      - run:
+          name: Memory Checks
+          command: |
+              cd ~/cygnus
+              source sourceme
+              cyregress -a -d tests --mem-check 2>&1 | tee logs/mem-checks.log
       - persist_to_workspace:
           root: ~/cygnus
           paths:
