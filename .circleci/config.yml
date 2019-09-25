@@ -176,7 +176,7 @@ workflows:
             - checkout
       - test-coverge:
           requires:
-            - build-release
+            - checkout
       - lint-checks:
           requires:
             - checkout
