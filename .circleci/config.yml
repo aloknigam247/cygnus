@@ -25,15 +25,9 @@ jobs:
               source sourceme
               cybuild --strict --release 2>&1 | tee build.log
       - persist_to_workspace:
-          root: ~/cygnus
+          root: ~/
           paths:
-            - reports
-      - store_artifacts:
-          path: ~/cygnus/build.log
-          destination: Build log
-      - store_artifacts:
-          path: ~/cygnus/reports/warnings/warns
-          destination: Warnings
+            - cygnus
 
   func-tests:
     docker:
@@ -46,10 +40,11 @@ jobs:
           command: |
             cd ~/cygnus
             source sourceme
-            cyregress -d tests -a 2>&1 | tee unittest.log
-      - store_artifacts:
-          path: ~/cygnus/cyregress.log
-          destination: unit-test-log
+            cyregress -f -d tests 2>&1 | tee unittest.log
+      - persist_to_workspace:
+          root: ~/cygnus
+          paths:
+            - reports
   
   unit-tests:
     docker:
@@ -62,10 +57,11 @@ jobs:
           command: |
             cd ~/cygnus
             source sourceme
-            cyregress -d tests -a 2>&1 | tee unittest.log
-      - store_artifacts:
-          path: ~/cygnus/cyregress.log
-          destination: unit-test-log
+            cyregress -u -d tests 2>&1 | tee unittest.log
+      - persist_to_workspace:
+          root: ~/cygnus
+          paths:
+            - reports
   
   perf-checks:
     docker:
@@ -73,6 +69,10 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
+      - persist_to_workspace:
+          root: ~/cygnus
+          paths:
+            - reports
 
   mem-checks:
     docker:
@@ -80,6 +80,10 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
+      - persist_to_workspace:
+          root: ~/cygnus
+          paths:
+            - reports
 
   unit-cov:
     docker:
@@ -92,14 +96,11 @@ jobs:
           command: |
               cd ~/cygnus
               source sourceme
-              cyregress -a -d tests --coverage
+              cyregress -u -d tests --coverage
       - persist_to_workspace:
           root: ~/cygnus
           paths:
             - reports
-      - store_artifacts:
-          path: ~/cygnus/reports/cov
-          destination: Coverage data
 
   func-cov:
     docker:
@@ -112,14 +113,11 @@ jobs:
           command: |
               cd ~/cygnus
               source sourceme
-              cyregress -a -d tests --coverage
+              cyregress -f -d tests --coverage
       - persist_to_workspace:
           root: ~/cygnus
           paths:
             - reports
-      - store_artifacts:
-          path: ~/cygnus/reports/cov
-          destination: Coverage data
 
   lint-checks:
     docker:
@@ -130,6 +128,10 @@ jobs:
       - run:
           name: Lint Run
           command: echo "Disabled"
+      - persist_to_workspace:
+          root: ~/cygnus
+          paths:
+            - reports
 
   docs-checks:
     docker:
@@ -147,12 +149,6 @@ jobs:
           root: ~/cygnus
           paths:
             - reports
-      - store_artifacts:
-          path: ~/cygnus/docs
-          destination: Docs
-      - store_artifacts:
-          path: ~/cygnus/reports/docs/undocumented
-          destination: Doc Coverage
 
   code-style:
     docker:
@@ -160,6 +156,10 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
+      - persist_to_workspace:
+          root: ~/cygnus
+          paths:
+            - reports
 
   report-gen:
     docker:
@@ -173,6 +173,12 @@ jobs:
               cd ~
               source cygnus/sourceme
               gen-report | tee report.log
+      - store_artifacts:
+          path: ~/cygnus/docs
+          destination: Docs
+      - store_artifacts:
+          path: ~/cygnus/reports
+          destination: Reports
 
 workflows:
   version: 2
