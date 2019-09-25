@@ -11,6 +11,7 @@ OPTION['--coverage']="value:bool,eval:OPT_MODE=coverage,help:create coverage bui
 OPTION['--debug']="value:bool,eval:OPT_MODE=debug,help:create debug build"
 OPTION['--memory']="value:bool,eval:OPT_MODE=memory,help:use lint tool along with compilation"
 OPTION['--lint']="value:bool,eval:BUILD_MODE=lint,help:use lint tool along with compilation"
+OPTION['--perf']="value:bool,eval:OPT_MODE=perf;BUILD_MODE=perf,help:create performance build"
 OPTION['--release']="value:bool,eval:OPT_MODE=release,help:create release build"
 OPTION['--strict']="value:bool,eval:BUILD_MODE=strict,help:use strict options for compilation"
 
@@ -28,6 +29,10 @@ lintRun() {
     scan-build-8 --status-bugs -stats -o reports/lint make MODE=$OPT_MODE STRICT=yes CPP_FLAGS=-Werror
 }
 
+perfBuild() {
+    MAKE
+}
+
 strictBuild() {
     mkdir -p reports/warnings
     MAKE -q && MAKE clean
@@ -42,12 +47,15 @@ strictBuild() {
 
 main() {
     parseCmdLine $@
-    case $BUILD_MODE in
+    case $BUILD_MODE in # TODO: need to revisit this section
         memory)
             memoryBuild
             ;;
         lint)
             lintRun
+            ;;
+        perf)
+            perfBuild
             ;;
         strict)
             strictBuild

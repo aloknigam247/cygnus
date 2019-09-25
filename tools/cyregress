@@ -17,6 +17,7 @@ OPTION['-o']='value:string,metavar:dir,help:output directory of test run'
 OPTION['-u']='value:bool,with:-d,without:-a,help:run functional tests only'
 OPTION['--coverage']='value:bool,eval:TEST_MODE=coverage,help:run coverage tests'
 OPTION['--mem-check']='value:bool,eval:TEST_MODE=mem-check,help:run mem-check tests'
+OPTION['--perf']='value:bool,eval:TEST_MODE=perf,help:run mem-check tests'
 OPTION['POS']='dest:test_list,count:0+'
 
 validateTests() {
@@ -85,7 +86,7 @@ runFuncTest() {
     echo "[RUN] $testcase"
     makeRunDir "func/$testcase"
     cd $OUT_DIR/$testcase_dir
-    ${valgrind} ./runme
+    ${tool} ./runme
 }
 
 runUnitTest() {
@@ -108,7 +109,7 @@ runUnitTest() {
         make --no-print-directory -C $OUT_DIR/$testcase_dir $TEST_MODE 2>&1 | tee $OUT_DIR/$testcase_dir/make.log
         #sed 's|\x1b\[[;0-9]*m\x1b\[K||g' $OUT_DIR/$testcase_dir/make.log.color > $OUT_DIR/$testcase_dir/make.log
         cd $OUT_DIR/$testcase_dir
-        ${valgrind} ./test
+        ${tool} ./test
         status=$?
     } > $run_log 2>&1
     #sed 's|\x1b\[[;0-9]*m\x1b\[K||g' $run_log_color > $run_log
@@ -148,6 +149,10 @@ main() {
             OUT_DIR="$OUT_DIR/mem-check"
             mkdir -p reports/mem-check
             ;;
+        perf)
+            OUT_DIR="$OUT_DIR/perf"
+            mkdir -p reports/perf
+            ;;
         *)
             ;;
     esac
@@ -162,7 +167,11 @@ main() {
             genhtml reports/cov/coverage.info --output-directory reports/cov/lcov --demangle-cpp
             ;;
         mem-check)
-            valgrind=valgrind
+            tool=valgrind
+            ;;
+        perf)
+            # TODO: collect reports
+            tool=gprof
             ;;
         *)
     esac
