@@ -212,10 +212,11 @@ workflows:
       - report-generation:
           requires:
             - functional-tests
+            - coverage-functional
             - unit-tests
             - performance-checks
             - memory-checks
-            - test-coverage
+            - coverage-unit
             - lint-checks
             - docs-checks
             - code-style
