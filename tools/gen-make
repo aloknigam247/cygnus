@@ -62,7 +62,9 @@ def printMakefile(opt, target, h_deps, cc_deps):
                             "############# Targets #############\n" +
                             "all: $(OBJ_DIR) " + target + "\n\n" +
                             "coverage: COMP_FLAGS += --coverage\n" +
-                            "coverage: all\n")
+                            "coverage: all\n\n" +
+                            "mem-check: COMP_FLAGS += -g\n" +
+                            "mem-check: all\n")
     
     # Target rules
     IO.fileAppend(makefile, target + ": ", '')

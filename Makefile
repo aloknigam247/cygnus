@@ -8,6 +8,8 @@ ifeq ($(MODE),coverage)
 CPP_FLAGS 	+= --coverage -g
 else ifeq ($(MODE),debug)
 CPP_FLAGS 	+= -g
+else ifeq ($(MODE),memory)
+CPP_FLAGS 	+= -g
 else ifeq ($(MODE),release)
 CPP_FLAGS 	+= -O
 else ifndef MODE

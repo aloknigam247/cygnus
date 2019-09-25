@@ -4,68 +4,58 @@ source $CYGNUS_HOME/tools/funcs.bash    # source common functions
 
 declare -a valid_list
 declare -a valid_tests
-declare MAKE_TARGET=all
 
 # DEFAULTS
-test_dir='.'
-out_dir='test_run'
+TEST_DIR='.'
+declare OUT_DIR='test_run'
+declare TEST_MODE=''
 
-OPTION['-a']='value=bool,with=-d,help=run all testcases in this directory'
-OPTION['-d']='value=string,metavar=dir,help=test case directory'
-OPTION['-f']='value=bool,with=-d,without=-a,help=run unit tests only'
-OPTION['-o']='value=string,metavar=dir,help=output directory of test run'
-OPTION['-u']='value=bool,with=-d,without=-a,help=run functional tests only'
-OPTION['--coverage']='value=bool,eval=preCoverage,help=run coverage tests'
-OPTION['POS']='dest=test_list,count=0+'
-
-preCoverage() {
-    MAKE_TARGET='coverage'
-    out_dir='test_cov'
-    mkdir -p reports/cov
-}
-
-postCoverage() {
-    lcov --capture --directory test_cov --no-external --output-file reports/cov/coverage.info --directory src --directory include
-    genhtml reports/cov/coverage.info --output-directory reports/cov/lcov --demangle-cpp
-}
+OPTION['-a']='value:bool,with:-d,help:run all testcases in this directory'
+OPTION['-d']='value:string,metavar:dir,help:test case directory'
+OPTION['-f']='value:bool,with:-d,without:-a,help:run unit tests only'
+OPTION['-o']='value:string,metavar:dir,help:output directory of test run'
+OPTION['-u']='value:bool,with:-d,without:-a,help:run functional tests only'
+OPTION['--coverage']='value:bool,eval:TEST_MODE=coverage,help:run coverage tests'
+OPTION['--mem-check']='value:bool,eval:TEST_MODE=mem-check,help:run mem-check tests'
+OPTION['POS']='dest:test_list,count:0+'
 
 validateTests() {
     if [[ ${VALUES["-a"]} ]]; then
         if [[ ${VALUES["test_list"]} ]]; then
             LOG I "-a is given, ignoring ${VALUES["test_list"]}"
         fi
-        test -d $test_dir && cd $test_dir
+        test -d $TEST_DIR && cd $TEST_DIR
         valid_tests=`find -type f -path "./unit*.cyt" -o -path "./func*.cyt" | sed 's|^./||'`
         cd - > /dev/null
         if [[ -z $valid_tests ]]; then
-            LOG W "no testcases found in directory: $test_dir"
+            LOG W "no testcases found in directory: $TEST_DIR"
             EXIT
         fi
     elif [[ ${VALUES["-f"]} ]]; then
         if [[ ${VALUES["test_list"]} ]]; then
             LOG I "-f is given, ignoring ${VALUES["test_list"]}"
         fi
-        test -d $test_dir && cd $test_dir
+        test -d $TEST_DIR && cd $TEST_DIR
         valid_tests=`find -type f -path "./func*.cyt" | sed 's|^./||'`
         cd - > /dev/null
         if [[ -z $valid_tests ]]; then
-            LOG W "no testcases found in directory: $test_dir"
+            LOG W "no testcases found in directory: $TEST_DIR"
             EXIT
         fi
     elif [[ ${VALUES["-u"]} ]]; then
         if [[ ${VALUES["test_list"]} ]]; then
             LOG I "-u is given, ignoring ${VALUES["test_list"]}"
         fi
-        test -d $test_dir && cd $test_dir
+        test -d $TEST_DIR && cd $TEST_DIR
         valid_tests=`find -type f -path "./unit*.cyt" | sed 's|^./||'`
         cd - > /dev/null
         if [[ -z $valid_tests ]]; then
-            LOG W "no testcases found in directory: $test_dir"
+            LOG W "no testcases found in directory: $TEST_DIR"
             EXIT
         fi
     else
         for test in ${VALUES["test_list"]}; do
-            if [[ $test =~ unit.*\.cyt || $test =~ func.*\.cyt && -a $test_dir/$test ]]; then
+            if [[ $test =~ unit.*\.cyt || $test =~ func.*\.cyt && -a $TEST_DIR/$test ]]; then
                 valid_tests+=" $test"
             else
                 LOG W "[invalid testcase] $test"
@@ -81,44 +71,44 @@ validateTests() {
 
 makeRunDir(){
     local testcase=$1
-    local test_out=$out_dir/`dirname $testcase`
+    local test_out=$OUT_DIR/`dirname $testcase`
     rm -rf $test_out
     mkdir -p $test_out
-    ln -rs $test_dir/`dirname $testcase`/* $test_out/
+    ln -rs $TEST_DIR/`dirname $testcase`/* $test_out/
 }
 
 runFuncTest() {
     local testcase=$1
     local testcase_dir=`dirname $testcase`
-    local run_log=$out_dir/$testcase_dir/unit_test.log
+    local run_log=$OUT_DIR/$testcase_dir/unit_test.log
 
     echo "[RUN] $testcase"
-    makeRunDir $testcase
-    cd $out_dir/$testcase_dir
-    ./runme
+    makeRunDir "func/$testcase"
+    cd $OUT_DIR/$testcase_dir
+    ${valgrind} ./runme
 }
 
 runUnitTest() {
     local testcase=$1
     local testcase_dir=`dirname $testcase`
-    local run_log=$out_dir/$testcase_dir/unit_test.log
-    #run_log_color=$out_dir/$testcase_dir/.run.log
+    local run_log=$OUT_DIR/$testcase_dir/unit_test.log
+    #run_log_color=$OUT_DIR/$testcase_dir/.run.log
 
     echo "[RUN] $testcase"
     
-    makeRunDir $testcase
+    makeRunDir "$testcase"
     {
         LOG I "Run directory created"
-        if [[ ! -a $test_dir/$testcase_dir/Makefile ]]; then
-            gen-make -d $out_dir/$testcase_dir -i $CYGNUS_HOME/include -i $CYGNUS_HOME/tests/utils/include test.cc
+        if [[ ! -a $TEST_DIR/$testcase_dir/Makefile ]]; then
+            gen-make -d $OUT_DIR/$testcase_dir -i $CYGNUS_HOME/include -i $CYGNUS_HOME/tests/utils/include test.cc
         fi
         if [[ $? -ne 0 ]]; then
             EXIT 1
         fi
-        make --no-print-directory -C $out_dir/$testcase_dir $MAKE_TARGET 2>&1 | tee $out_dir/$testcase_dir/make.log
-        #sed 's|\x1b\[[;0-9]*m\x1b\[K||g' $out_dir/$testcase_dir/make.log.color > $out_dir/$testcase_dir/make.log
-        cd $out_dir/$testcase_dir
-        ./test
+        make --no-print-directory -C $OUT_DIR/$testcase_dir $TEST_MODE 2>&1 | tee $OUT_DIR/$testcase_dir/make.log
+        #sed 's|\x1b\[[;0-9]*m\x1b\[K||g' $OUT_DIR/$testcase_dir/make.log.color > $OUT_DIR/$testcase_dir/make.log
+        cd $OUT_DIR/$testcase_dir
+        ${valgrind} ./test
         status=$?
     } > $run_log 2>&1
     #sed 's|\x1b\[[;0-9]*m\x1b\[K||g' $run_log_color > $run_log
@@ -137,26 +127,44 @@ runTest() {
 
 main() {
     parseCmdLine $@
-    test_dir=${VALUES['-d']:-$test_dir}
-    out_dir=${VALUES['-o']:-$out_dir} 
-    echo test_dir: $test_dir
-    echo out_dir : $out_dir
+    TEST_DIR=${VALUES['-d']:-$TEST_DIR}
+    OUT_DIR=${VALUES['-o']:-$OUT_DIR} 
+    echo "TEST_DIR: $TEST_DIR"
+    echo "OUT_DIR : $OUT_DIR"
 
-    test -d $test_dir || LOG E "directory \`$test_dir' does not exit"
-    if [[ $test_out == $out_dir ]]; then
+    test -d $TEST_DIR || LOG E "directory \`$TEST_DIR' does not exit"
+    if [[ $test_out == $OUT_DIR ]]; then
         LOG E "test directory and out directory cannot be same"
         EXIT
     fi
     validateTests
 
+    case $TEST_MODE in
+        coverage)
+            OUT_DIR="$OUT_DIR/coverage"
+            mkdir -p reports/coverage
+            ;;
+        mem-check)
+            OUT_DIR="$OUT_DIR/mem-check"
+            mkdir -p reports/mem-check
+            ;;
+        *)
+            ;;
+    esac
+
     for test in $valid_tests; do
         runTest $test
     done
 
-    case $MAKE_TARGET in
+    case $TEST_MODE in
         coverage)
-            postCoverage
+            lcov --capture --directory test_cov --no-external --output-file reports/cov/coverage.info --directory src --directory include
+            genhtml reports/cov/coverage.info --output-directory reports/cov/lcov --demangle-cpp
             ;;
+        mem-check)
+            valgrind=valgrind
+            ;;
+        *)
     esac
     return 0
 }
