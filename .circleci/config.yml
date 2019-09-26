@@ -147,7 +147,10 @@ jobs:
           at: ~/
       - run:
           name: Lint Run
-          command: echo "Disabled"
+          command: |
+              cd ~/cygnus
+              source sourceme
+              cppcheck --enable=all -I include src 2>&1 | tee reports/lint
       - persist_to_workspace:
           root: ~/cygnus
           paths:
