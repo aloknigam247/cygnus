@@ -241,7 +241,7 @@ workflows:
       - docs-checks:
           requires:
             - checkout
-      - code-style:
+      - style-check:
           requires:
             - checkout
       - report-gen:
@@ -254,4 +254,4 @@ workflows:
             - mem-checks
             - lint-checks
             - docs-checks
-            - code-style
+            - style-check
