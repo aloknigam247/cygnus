@@ -173,12 +173,18 @@ jobs:
           paths:
             - reports
 
-  code-style:
+  style-check:
     docker:
       - image: aloknigam247/cygnus
     steps:
       - attach_workspace:
           at: ~/
+      - run:
+          name: Source Code Style Check
+          command: |
+              cd ~/cygnus
+              source sourceme
+              style-check src | tee reports/style
       - persist_to_workspace:
           root: ~/cygnus
           paths:

@@ -1,0 +1,23 @@
+#!/usr/bin/python
+
+import argparse
+import sys
+
+class Args:
+    __parser = argparse.ArgumentParser()
+
+    def __init__(self):
+        self.__parser.add_argument("dir", metavar="dir", default=".", help="directory to scan for source files")
+
+    def parse(self):
+        return self.__parser.parse_args()
+
+
+def main():
+    args = Args()
+    opt = args.parse()
+    
+
+if __name__ == "__main__":
+    ret = main()
+    sys.exit(ret)
