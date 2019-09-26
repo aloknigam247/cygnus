@@ -1,5 +1,3 @@
-#include"cystructs.h"
-
 template <typename T>
 Tree<T>::~Tree() {
     if(root)

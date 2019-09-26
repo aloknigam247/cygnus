@@ -7,8 +7,6 @@ class Tree {
         Tree() : root(nullptr) {}
         ~Tree();
         void insert(const T pi_t);
-        //size_t size() const;
-        //T search(T) const;
     private:
         struct Node {
             T data;
@@ -19,5 +17,8 @@ class Tree {
         
         Node* root;
 };
+
+#include "cystructs.tcc"
+
 }
 #endif
