@@ -2,7 +2,7 @@
 name: Issue Template
 about: Recommended template for issues
 title: ''
-labels: ''
+labels: issue-bucket
 assignees: aloknigam247
 
 ---
