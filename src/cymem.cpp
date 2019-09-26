@@ -18,12 +18,10 @@ void* operator new[](const std::size_t pi_s) {
     return p;
 }
 
-void operator delete(void*& pio_ptr) {
+void operator delete(void* pio_ptr) {
     std::free(pio_ptr);
-    pio_ptr = nullptr;
 }
 
-void operator delete[](void*& pio_ptr) {
+void operator delete[](void* pio_ptr) {
     std::free(pio_ptr);
-    pio_ptr = nullptr;
 }
