@@ -41,7 +41,7 @@ sanitizeBuild() {
 strictBuild() {
     mkdir -p reports/warnings
     MAKE -q && MAKE clean
-    MAKE STRICT=yes 2>reports/warnings/warns
+    MAKE STRICT=yes 2>reports/warnings/${OPT_MODE}-warnings
     warning_num=`grep -c "warning:" reports/warnings/warns`
     echo "Warnings: $warning_num"
     if [[ $warning_num -gt 0 ]]; then
