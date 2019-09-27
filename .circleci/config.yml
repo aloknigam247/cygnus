@@ -257,7 +257,7 @@ workflows:
             - mem-checks
             - sanitization
             - coverage
-            - performace
+            - performance
             - lint-checks
             - docs-checks
             - style-checks
