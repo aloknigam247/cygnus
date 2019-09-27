@@ -13,6 +13,7 @@ OPTION['--memory']="value:bool,eval:OPT_MODE=memory,help:use lint tool along wit
 OPTION['--lint']="value:bool,eval:BUILD_MODE=lint,help:use lint tool along with compilation"
 OPTION['--perf']="value:bool,eval:OPT_MODE=perf;BUILD_MODE=perf,help:create performance build"
 OPTION['--release']="value:bool,eval:OPT_MODE=release,help:create release build"
+OPTION['--sanitize']="value:bool,eval:BUILD_MODE=sanitize,help:create sanitized build"
 OPTION['--strict']="value:bool,eval:BUILD_MODE=strict,help:use strict options for compilation"
 
 MAKE() {
@@ -27,6 +28,10 @@ lintRun() {
     mkdir -p reports/lint
     MAKE -q && MAKE clean
     scan-build-8 --status-bugs -stats -o reports/lint make MODE=$OPT_MODE STRICT=yes CPP_FLAGS=-Werror
+}
+
+perfBuild() {
+    MAKE
 }
 
 perfBuild() {
@@ -56,6 +61,9 @@ main() {
             ;;
         perf)
             perfBuild
+            ;;
+        sanitize)
+            sanitizeBuild
             ;;
         strict)
             strictBuild

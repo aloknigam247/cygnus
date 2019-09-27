@@ -18,7 +18,7 @@ jobs:
           paths:
             - cygnus
 
-  comp-warnings:
+  release-warnings:
     docker:
       - image: aloknigam247/cygnus
     steps:
@@ -29,13 +29,13 @@ jobs:
           command: |
               cd ~/cygnus
               source sourceme
-              cybuild --strict --release 2>&1 | tee logs/warnings.log
+              cybuild --strict --release 2>&1 | tee logs/release_warnings.log
       - persist_to_workspace:
           root: ~/
           paths:
             - cygnus
 
-  func-tests:
+  tests:
     docker:
       - image: aloknigam247/cygnus
     steps:
@@ -46,47 +46,29 @@ jobs:
           command: |
             cd ~/cygnus
             source sourceme
-            cyregress -f -d tests 2>&1 | tee logs/func_test.log
+            cyregress -a -d tests 2>&1 | tee reports/tests.log
       - persist_to_workspace:
           root: ~/cygnus
           paths:
-            - reports
             - logs
-  
-  unit-tests:
+            - reports
+
+  debug-warnings:
     docker:
       - image: aloknigam247/cygnus
     steps:
       - attach_workspace:
           at: ~/
       - run:
-          name: Run Unit Test
-          command: |
-            cd ~/cygnus
-            source sourceme
-            cyregress -u -d tests 2>&1 | tee unit_test.log
-      - persist_to_workspace:
-          root: ~/cygnus
-          paths:
-            - reports
-            - logs
-  
-  performance:
-    docker:
-      - image: aloknigam247/cygnus
-    steps:
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Memory Checks
+          name: Compiler Warnings on strict mode
           command: |
               cd ~/cygnus
               source sourceme
-              cyregress -a -d tests --perf 2>&1 | tee logs/perf.log
+              cybuild --strict --debug 2>&1 | tee logs/debug_warnings.log
       - persist_to_workspace:
-          root: ~/cygnus
+          root: ~/
           paths:
-            - reports
+            - cygnus
 
   mem-checks:
     docker:
@@ -99,13 +81,34 @@ jobs:
           command: |
               cd ~/cygnus
               source sourceme
-              cyregress -a -d tests --mem-check 2>&1 | tee logs/mem-checks.log
+              cybuild --memory 2>&1 | tee logs/memory_build.log
+              cyregress -a -d tests --mem-check 2>&1 | tee reports/mem-checks.log
       - persist_to_workspace:
           root: ~/cygnus
           paths:
+            - logs
             - reports
-
-  unit-cov:
+  
+  sanitization:
+    docker:
+      - image: aloknigam247/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Memory Checks
+          command: |
+              cd ~/cygnus
+              source sourceme
+              cybuild --sanitize 2>&1 | tee logs/sanitize_build.log
+              cyregress -a -d tests --sanitize 2>&1 | tee reports/sanitization.log
+      - persist_to_workspace:
+          root: ~/cygnus
+          paths:
+            - logs
+            - reports
+  
+  coverage:
     docker:
       - image: aloknigam247/cygnus
     steps:
@@ -116,27 +119,31 @@ jobs:
           command: |
               cd ~/cygnus
               source sourceme
-              cyregress -u -d tests --coverage
+              cybuild --coverage 2>&1 | tee logs/coverage_build.log
+              cyregress -a -d tests --coverage 2>&1 | tee reports/coverage.log 
       - persist_to_workspace:
           root: ~/cygnus
           paths:
+            - logs
             - reports
 
-  func-cov:
+  performance:
     docker:
       - image: aloknigam247/cygnus
     steps:
       - attach_workspace:
           at: ~/
       - run:
-          name: Coverage Run
+          name: Memory Checks
           command: |
               cd ~/cygnus
               source sourceme
-              cyregress -f -d tests --coverage
+              cybuild --perf 2>&1 | tee logs/perf_build.log
+              cyregress -a -d tests --perf 2>&1 | tee reports/perf.log
       - persist_to_workspace:
           root: ~/cygnus
           paths:
+            - logs
             - reports
 
   lint-checks:
@@ -214,25 +221,25 @@ workflows:
   Commit-Regression:
     jobs:
       - checkout
-      - comp-warnings:
+      - release-warnings:
           requires:
             - checkout
-      - func-tests:
+      - tests:
           requires:
-            - comp-warnings
-      - func-cov:
-          requires:
-            - checkout
-      - unit-tests:
-          requires:
-            - checkout
-      - performance:
+            - release-warnings
+      - debug-warnings:
           requires:
             - checkout
       - mem-checks:
           requires:
+            - debug-warnings
+      - sanitization:
+          requires:
             - checkout
-      - unit-cov:
+      - coverage:
+          requires:
+            - checkout
+      - performance:
           requires:
             - checkout
       - lint-checks:
@@ -241,17 +248,16 @@ workflows:
       - docs-checks:
           requires:
             - checkout
-      - style-check:
+      - style-checks:
           requires:
             - checkout
       - report-gen:
           requires:
-            - func-tests
-            - func-cov
-            - unit-tests
-            - unit-cov
-            - performance
+            - tests
             - mem-checks
+            - sanitization
+            - coverage
+            - performace
             - lint-checks
             - docs-checks
-            - style-check
+            - style-checks
