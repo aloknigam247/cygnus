@@ -13,6 +13,7 @@ OPTION['--memory']="value:bool,eval:OPT_MODE=memory,help:use lint tool along wit
 OPTION['--lint']="value:bool,eval:BUILD_MODE=lint,help:use lint tool along with compilation"
 OPTION['--perf']="value:bool,eval:OPT_MODE=perf;BUILD_MODE=perf,help:create performance build"
 OPTION['--release']="value:bool,eval:OPT_MODE=release,help:create release build"
+OPTION['--sanitize']="value:bool,eval:BUILD_MODE=sanitize,help:create sanitized build"
 OPTION['--strict']="value:bool,eval:BUILD_MODE=strict,help:use strict options for compilation"
 
 MAKE() {
@@ -33,10 +34,14 @@ perfBuild() {
     MAKE
 }
 
+sanitizeBuild() {
+    MAKE
+}
+
 strictBuild() {
     mkdir -p reports/warnings
     MAKE -q && MAKE clean
-    MAKE STRICT=yes 2>reports/warnings/warns
+    MAKE STRICT=yes 2>reports/warnings/${OPT_MODE}-warnings
     warning_num=`grep -c "warning:" reports/warnings/warns`
     echo "Warnings: $warning_num"
     if [[ $warning_num -gt 0 ]]; then
@@ -56,6 +61,9 @@ main() {
             ;;
         perf)
             perfBuild
+            ;;
+        sanitize)
+            sanitizeBuild
             ;;
         strict)
             strictBuild

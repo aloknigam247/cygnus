@@ -18,59 +18,93 @@ jobs:
           paths:
             - cygnus
 
-  comp-warnings:
+  release-tests:
     docker:
       - image: aloknigam247/cygnus
     steps:
       - attach_workspace:
           at: ~/
       - run:
-          name: Compiler Warnings on strict mode
+          name: Release Build (Strict)
+          command: |
+            cd ~/cygnus
+            source sourceme
+            cybuild --strict --release 2>&1 | tee logs/release_warnings.log
+      - run:
+          name: Run Tests
+          command: |
+            cd ~/cygnus
+            source sourceme
+            cyregress -a -d tests 2>&1 | tee reports/tests.log
+      - persist_to_workspace:
+          root: ~/cygnus
+          paths:
+            - logs
+            - reports
+
+  mem-checks:
+    docker:
+      - image: aloknigam247/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Debug Build (Strict)
           command: |
               cd ~/cygnus
               source sourceme
-              cybuild --strict --release 2>&1 | tee logs/warnings.log
+              cybuild --strict --debug 2>&1 | tee logs/debug_warnings.log
+      - run:
+          name: Memory Checks
+          command: |
+              cd ~/cygnus
+              source sourceme
+              cybuild --memory 2>&1 | tee logs/memory_build.log
+              cyregress -a -d tests --mem-check 2>&1 | tee reports/mem-checks.log
       - persist_to_workspace:
-          root: ~/
+          root: ~/cygnus
           paths:
-            - cygnus
+            - logs
+            - reports
+  
+  sanitization:
+    docker:
+      - image: aloknigam247/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Memory Checks
+          command: |
+              cd ~/cygnus
+              source sourceme
+              cybuild --sanitize 2>&1 | tee logs/sanitize_build.log
+              cyregress -a -d tests --sanitize 2>&1 | tee reports/sanitization.log
+      - persist_to_workspace:
+          root: ~/cygnus
+          paths:
+            - logs
+            - reports
+  
+  coverage:
+    docker:
+      - image: aloknigam247/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Coverage Run
+          command: |
+              cd ~/cygnus
+              source sourceme
+              cybuild --coverage 2>&1 | tee logs/coverage_build.log
+              cyregress -a -d tests --coverage 2>&1 | tee reports/coverage.log 
+      - persist_to_workspace:
+          root: ~/cygnus
+          paths:
+            - logs
+            - reports
 
-  func-tests:
-    docker:
-      - image: aloknigam247/cygnus
-    steps:
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Run Unit Test
-          command: |
-            cd ~/cygnus
-            source sourceme
-            cyregress -f -d tests 2>&1 | tee logs/func_test.log
-      - persist_to_workspace:
-          root: ~/cygnus
-          paths:
-            - reports
-            - logs
-  
-  unit-tests:
-    docker:
-      - image: aloknigam247/cygnus
-    steps:
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Run Unit Test
-          command: |
-            cd ~/cygnus
-            source sourceme
-            cyregress -u -d tests 2>&1 | tee unit_test.log
-      - persist_to_workspace:
-          root: ~/cygnus
-          paths:
-            - reports
-            - logs
-  
   performance:
     docker:
       - image: aloknigam247/cygnus
@@ -82,61 +116,12 @@ jobs:
           command: |
               cd ~/cygnus
               source sourceme
-              cyregress -a -d tests --perf 2>&1 | tee logs/perf.log
+              cybuild --perf 2>&1 | tee logs/perf_build.log
+              cyregress -a -d tests --perf 2>&1 | tee reports/perf.log
       - persist_to_workspace:
           root: ~/cygnus
           paths:
-            - reports
-
-  mem-checks:
-    docker:
-      - image: aloknigam247/cygnus
-    steps:
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Memory Checks
-          command: |
-              cd ~/cygnus
-              source sourceme
-              cyregress -a -d tests --mem-check 2>&1 | tee logs/mem-checks.log
-      - persist_to_workspace:
-          root: ~/cygnus
-          paths:
-            - reports
-
-  unit-cov:
-    docker:
-      - image: aloknigam247/cygnus
-    steps:
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Coverage Run
-          command: |
-              cd ~/cygnus
-              source sourceme
-              cyregress -u -d tests --coverage
-      - persist_to_workspace:
-          root: ~/cygnus
-          paths:
-            - reports
-
-  func-cov:
-    docker:
-      - image: aloknigam247/cygnus
-    steps:
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Coverage Run
-          command: |
-              cd ~/cygnus
-              source sourceme
-              cyregress -f -d tests --coverage
-      - persist_to_workspace:
-          root: ~/cygnus
-          paths:
+            - logs
             - reports
 
   lint-checks:
@@ -150,7 +135,7 @@ jobs:
           command: |
               cd ~/cygnus
               source sourceme
-              cppcheck --enable=all -I include src 2>&1 | tee reports/lint
+              cppcheck --enable=all -I include src 2>&1 | tee reports/lint.log
       - persist_to_workspace:
           root: ~/cygnus
           paths:
@@ -173,7 +158,7 @@ jobs:
           paths:
             - reports
 
-  style-check:
+  style-checks:
     docker:
       - image: aloknigam247/cygnus
     steps:
@@ -184,7 +169,7 @@ jobs:
           command: |
               cd ~/cygnus
               source sourceme
-              style-check src | tee reports/style
+              style-check src | tee reports/style.log
       - persist_to_workspace:
           root: ~/cygnus
           paths:
@@ -201,7 +186,7 @@ jobs:
           command: |
               cd ~
               source cygnus/sourceme
-              gen-report | tee report.log
+              gen-report | tee reports/report.log
       - store_artifacts:
           path: ~/logs
           destination: Logs
@@ -214,25 +199,19 @@ workflows:
   Commit-Regression:
     jobs:
       - checkout
-      - comp-warnings:
-          requires:
-            - checkout
-      - func-tests:
-          requires:
-            - comp-warnings
-      - func-cov:
-          requires:
-            - checkout
-      - unit-tests:
-          requires:
-            - checkout
-      - performance:
+      - release-tests:
           requires:
             - checkout
       - mem-checks:
           requires:
             - checkout
-      - unit-cov:
+      - sanitization:
+          requires:
+            - checkout
+      - coverage:
+          requires:
+            - checkout
+      - performance:
           requires:
             - checkout
       - lint-checks:
@@ -241,17 +220,16 @@ workflows:
       - docs-checks:
           requires:
             - checkout
-      - style-check:
+      - style-checks:
           requires:
             - checkout
       - report-gen:
           requires:
-            - func-tests
-            - func-cov
-            - unit-tests
-            - unit-cov
-            - performance
+            - release-tests
             - mem-checks
+            - sanitization
+            - coverage
+            - performance
             - lint-checks
             - docs-checks
-            - style-check
+            - style-checks
