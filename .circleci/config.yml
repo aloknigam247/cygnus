@@ -18,31 +18,20 @@ jobs:
           paths:
             - cygnus
 
-  release-warnings:
+  release-tests:
     docker:
       - image: aloknigam247/cygnus
     steps:
       - attach_workspace:
           at: ~/
       - run:
-          name: Compiler Warnings on strict mode
+          name: Release Build (Strict)
           command: |
-              cd ~/cygnus
-              source sourceme
-              cybuild --strict --release 2>&1 | tee logs/release_warnings.log
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - cygnus
-
-  tests:
-    docker:
-      - image: aloknigam247/cygnus
-    steps:
-      - attach_workspace:
-          at: ~/
+            cd ~/cygnus
+            source sourceme
+            cybuild --strict --release 2>&1 | tee logs/release_warnings.log
       - run:
-          name: Run Unit Test
+          name: Run Tests
           command: |
             cd ~/cygnus
             source sourceme
@@ -53,29 +42,18 @@ jobs:
             - logs
             - reports
 
-  debug-warnings:
-    docker:
-      - image: aloknigam247/cygnus
-    steps:
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Compiler Warnings on strict mode
-          command: |
-              cd ~/cygnus
-              source sourceme
-              cybuild --strict --debug 2>&1 | tee logs/debug_warnings.log
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - cygnus
-
   mem-checks:
     docker:
       - image: aloknigam247/cygnus
     steps:
       - attach_workspace:
           at: ~/
+      - run:
+          name: Debug Build (Strict)
+          command: |
+              cd ~/cygnus
+              source sourceme
+              cybuild --strict --debug 2>&1 | tee logs/debug_warnings.log
       - run:
           name: Memory Checks
           command: |
@@ -221,18 +199,12 @@ workflows:
   Commit-Regression:
     jobs:
       - checkout
-      - release-warnings:
-          requires:
-            - checkout
-      - tests:
-          requires:
-            - release-warnings
-      - debug-warnings:
+      - release-tests:
           requires:
             - checkout
       - mem-checks:
           requires:
-            - debug-warnings
+            - checkout
       - sanitization:
           requires:
             - checkout
@@ -253,7 +225,7 @@ workflows:
             - checkout
       - report-gen:
           requires:
-            - tests
+            - release-tests
             - mem-checks
             - sanitization
             - coverage
