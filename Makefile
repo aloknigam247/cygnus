@@ -15,7 +15,7 @@ CPP_FLAGS 	+= -pg
 else ifeq ($(MODE),release)
 CPP_FLAGS 	+= -O
 else ifeq ($(MODE),sanitize)
-CPP_FLAGS 	+= -g -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -fsanitize=address -fsanitize-address-use-after-scope -fsanitize-coverage=trace-pc -fsanitize=float-cast-overflow -fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error
+CPP_FLAGS 	+= -g -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow -fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error
 else ifndef MODE
 CPP_FLAGS 	+= -g
 $(info debug as defaut mode)

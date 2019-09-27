@@ -1,3 +1,4 @@
 build
+logs
 reports
-test_*
+test_run

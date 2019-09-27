@@ -2,76 +2,64 @@
 
 source $CYGNUS_HOME/tools/funcs.bash    # source common functions
 
-declare BUILD_MODE
-declare OPT_MODE=debug
-declare MAKE_TARGET
+declare BUILD_MODE=debug
 
-OPTION['--clean']="value:bool,eval:MAKE_TARGET=clean,help:clean generated files"
-OPTION['--coverage']="value:bool,eval:OPT_MODE=coverage,help:create coverage build"
-OPTION['--debug']="value:bool,eval:OPT_MODE=debug,help:create debug build"
-OPTION['--memory']="value:bool,eval:OPT_MODE=memory,help:use lint tool along with compilation"
-OPTION['--lint']="value:bool,eval:BUILD_MODE=lint,help:use lint tool along with compilation"
-OPTION['--perf']="value:bool,eval:OPT_MODE=perf;BUILD_MODE=perf,help:create performance build"
-OPTION['--release']="value:bool,eval:OPT_MODE=release,help:create release build"
+OPTION['--clean']="value:bool,eval:BUILD_MODE=clean,help:clean generated files"
+OPTION['--coverage']="value:bool,eval:BUILD_MODE=coverage,help:create coverage build"
+OPTION['--debug']="value:bool,eval:BUILD_MODE=debug,help:create debug build"
+OPTION['--memory']="value:bool,eval:BUILD_MODE=memory,help:use lint tool along with compilation"
+OPTION['--perf']="value:bool,eval:BUILD_MODE=perf;BUILD_MODE=perf,help:create performance build"
+OPTION['--release']="value:bool,eval:BUILD_MODE=release,help:create release build"
 OPTION['--sanitize']="value:bool,eval:BUILD_MODE=sanitize,help:create sanitized build"
-OPTION['--strict']="value:bool,eval:BUILD_MODE=strict,help:use strict options for compilation"
+OPTION['--strict']="value:bool,eval:STRICT=yes,help:use strict options for compilation"
 
 MAKE() {
-    make MODE=$OPT_MODE $@
-}
-
-memoryBuild() {
-    MAKE
-}
-
-lintRun() {
-    mkdir -p reports/lint
-    MAKE -q && MAKE clean
-    scan-build-8 --status-bugs -stats -o reports/lint make MODE=$OPT_MODE STRICT=yes CPP_FLAGS=-Werror
-}
-
-perfBuild() {
-    MAKE
-}
-
-sanitizeBuild() {
-    MAKE
-}
-
-strictBuild() {
+    {
     mkdir -p reports/warnings
-    MAKE -q && MAKE clean
-    MAKE STRICT=yes 2>reports/warnings/${OPT_MODE}-warnings
-    warning_num=`grep -c "warning:" reports/warnings/warns`
-    echo "Warnings: $warning_num"
-    if [[ $warning_num -gt 0 ]]; then
-        return 1;
+    if [[ ${VALUES['--strict']} ]]; then
+        make -q && make clean
+        make MODE=$1 STRICT=yes 2> reports/warnings/${BUILD_MODE}-errors
+    else
+        make MODE=$1 2> reports/warnings/${BUILD_MODE}-errors
     fi
     
+    errors=`grep -c "error:|warning:" reports/warnings/${BUILD_MODE}-errors`
+    if [[ $errors -gt 0 ]]; then
+        echo "Errors|Warnings: $errors"
+        return 1;
+    fi
+    } | tee logs/cybuild-${BUILD_MODE}.log
 }
 
 main() {
     parseCmdLine $@
-    case $BUILD_MODE in # TODO: need to revisit this section
-        memory)
-            memoryBuild
+    case $BUILD_MODE in
+        clean)
+            make clean
             ;;
-        lint)
-            lintRun
+        coverage)
+            MAKE coverage
+            ;;
+        debug)
+            MAKE debug
+            ;;
+        memory)
+            MAKE memory
             ;;
         perf)
-            perfBuild
+            MAKE perf
+            ;;
+        release)
+            MAKE release
             ;;
         sanitize)
-            sanitizeBuild
-            ;;
-        strict)
-            strictBuild
+            MAKE sanitize
             ;;
         *)
-            MAKE $MAKE_TARGET
+            MAKE debug
             ;;
     esac
 }
 
+mkdir -p logs
 main $@
