@@ -180,7 +180,7 @@ jobs:
           paths:
             - reports
 
-  style-check:
+  style-checks:
     docker:
       - image: aloknigam247/cygnus
     steps:

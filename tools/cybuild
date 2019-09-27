@@ -34,7 +34,7 @@ perfBuild() {
     MAKE
 }
 
-perfBuild() {
+sanitizeBuild() {
     MAKE
 }
 
