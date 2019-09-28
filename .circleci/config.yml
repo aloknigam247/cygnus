@@ -135,7 +135,7 @@ jobs:
           command: |
             cd ~/cygnus
             source sourceme
-            cppcheck --enable=all src 2>&1 | tee reports/lint.log
+            #cppcheck --enable=all src 2>&1 | tee reports/lint.log
       - persist_to_workspace:
           root: ~/cygnus
           paths:
