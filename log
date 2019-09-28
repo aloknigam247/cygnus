@@ -1,9 +1,0 @@
-Options: 
-g++ -g -std=c++11 -I ../include -MM -MF /home/alok/Project/cygnus/build/dep/debug/main.d -MT /home/alok/Project/cygnus/build/obj/debug/main.o main.cc
-g++ -g -std=c++11 -I ../include -MM -MF /home/alok/Project/cygnus/build/dep/debug/CyStream.d -MT /home/alok/Project/cygnus/build/obj/debug/CyStream.o CyStream.cc
-g++ -g -std=c++11 -I ../include -MM -MF /home/alok/Project/cygnus/build/dep/debug/cyMem.d -MT /home/alok/Project/cygnus/build/obj/debug/cyMem.o cyMem.cc
-g++ -g -std=c++11 -I ../include -c -o /home/alok/Project/cygnus/build/obj/debug/main.o main.cc
-g++ -g -std=c++11 -I ../include -c -o /home/alok/Project/cygnus/build/obj/debug/CyStream.o CyStream.cc
-g++ -g -std=c++11 -I ../include -c -o /home/alok/Project/cygnus/build/obj/debug/cyMem.o cyMem.cc
-g++ -g -std=c++11 -o /home/alok/Project/cygnus/build/bin/debug/cygnus-debug /home/alok/Project/cygnus/build/obj/debug/main.o /home/alok/Project/cygnus/build/obj/debug/CyStream.o /home/alok/Project/cygnus/build/obj/debug/cyMem.o
-ln -sfr /home/alok/Project/cygnus/build/bin/debug/cygnus-debug /home/alok/Project/cygnus/build/bin/cygnus
