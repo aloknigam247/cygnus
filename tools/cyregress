@@ -76,18 +76,18 @@ makeRunDir(){
     local test_out=$OUT_DIR/`dirname $testcase`
     rm -rf $test_out
     mkdir -p $test_out
+    pwd
     ln -rs $TEST_DIR/`dirname $testcase`/* $test_out/
 }
 
 runFuncTest() {
     local testcase=$1
     local testcase_dir=`dirname $testcase`
-    local run_log=$OUT_DIR/$testcase_dir/unit_test.log
 
     echo "[RUN] $testcase"
-    makeRunDir "func/$testcase"
+    makeRunDir $testcase
     cd $OUT_DIR/$testcase_dir
-    ${tool} ./runme
+    ${tool} ./runme | tee -a $CYGNUS_HOME/reports/func/func_test.log
 }
 
 runUnitTest() {
@@ -97,8 +97,9 @@ runUnitTest() {
     #run_log_color=$OUT_DIR/$testcase_dir/.run.log
 
     echo "[RUN] $testcase"
+    pwd
     
-    makeRunDir "$testcase"
+    makeRunDir $testcase
     {
         LOG I "Run directory created"
         if [[ ! -a $TEST_DIR/$testcase_dir/Makefile ]]; then
@@ -112,10 +113,10 @@ runUnitTest() {
         cd $OUT_DIR/$testcase_dir
         ${tool} ./test
         status=$?
-    } > $run_log 2>&1
+    } 2>&1 | tee $run_log
+    cat $run_log >> reports/unit/unit_test.log
     #sed 's|\x1b\[[;0-9]*m\x1b\[K||g' $run_log_color > $run_log
-    [[ $status -eq 0 ]] && echo " --PASS--" || echo " --FAIL-- "
-    cd - > /dev/null
+    [[ $status -eq 0 ]] && echo " --PASS--" || echo " --FAIL--"
 }
 
 runTest() {
@@ -124,7 +125,6 @@ runTest() {
     else
         runUnitTest $1
     fi
-    echo ""
 }
 
 main() {
@@ -140,6 +140,12 @@ main() {
         EXIT
     fi
     validateTests
+
+    tc_cnt=0
+    for test in $valid_tests; do
+        tc_cnt=$((tc_cnt + 1))
+    done
+    echo -e "\nGenerated Testcase: $tc_cnt\n"
 
     case $TEST_MODE in
         coverage)
@@ -162,7 +168,10 @@ main() {
             ;;
     esac
 
+    rm -rf reports/func reports/unit
+    mkdir -p reports/func reports/unit
     for test in $valid_tests; do
+        cd $CYGNUS_HOME
         runTest $test
     done
 
