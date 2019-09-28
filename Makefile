@@ -15,8 +15,9 @@ CPP_FLAGS 	+= -pg
 else ifeq ($(MODE),release)
 CPP_FLAGS 	+= -O
 else ifeq ($(MODE),sanitize)
-CPP_FLAGS 	+= -g -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow -fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error
+CPP_FLAGS 	+= -g -D_FORTIFY_SOURCE=2 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow -fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error
 else ifndef MODE
+MODE=debug
 CPP_FLAGS 	+= -g
 $(info debug as defaut mode)
 else
@@ -37,7 +38,7 @@ export OBJ DEP
 #---------- Compile Flags ----------# 
 export CPP_FLAGS += -std=c++11
 ifdef STRICT
-	CPP_FLAGS += -Wall -Walloc-zero -Wduplicated-branches -Weffc++ -Wextra -Wformat -Winline -Wmissing-include-dirs -Woverloaded-virtual -Wstrict-overflow=5 -Wstringop-overflow -Wsuggest-attribute=const -Wswitch-default -Wswitch-enum -Wunused -Wunused-macros
+	CPP_FLAGS += -pedantic -Wall -Walloc-zero -Wcast-align -Wcast-qual -Wconversion -Wduplicated-branches -Wduplicated-cond -Weffc++ -Wextra -Wfloat-equal -Wformat=2 -Winline -Wlogical-op -Wmissing-include-dirs -Woverloaded-virtual -Wshadow -Wstrict-overflow=5 -Wstringop-overflow=2 -Wsuggest-attribute=const -Wswitch-default -Wswitch-enum -Wunused -Wunused-macros
 endif
 export CPP_COMPILE := $(CXX) $(CPP_FLAGS)
 
@@ -62,4 +63,5 @@ $(MOD_EXE):  $(addprefix $(OBJ)/,$(notdir $(subst .cc,.o,$(wildcard src/*.cc))))
 	$(CPP_COMPILE) -o $@ $^
 
 clean:
+	$Qecho "cleaning ..."
 	rm -rf $(BLD_DIR)

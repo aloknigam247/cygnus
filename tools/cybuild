@@ -7,6 +7,7 @@ declare BUILD_MODE=debug
 OPTION['--clean']="value:bool,eval:BUILD_MODE=clean,help:clean generated files"
 OPTION['--coverage']="value:bool,eval:BUILD_MODE=coverage,help:create coverage build"
 OPTION['--debug']="value:bool,eval:BUILD_MODE=debug,help:create debug build"
+OPTION['--force']="value:bool,help:forcefully remake"
 OPTION['--memory']="value:bool,eval:BUILD_MODE=memory,help:use lint tool along with compilation"
 OPTION['--perf']="value:bool,eval:BUILD_MODE=perf;BUILD_MODE=perf,help:create performance build"
 OPTION['--release']="value:bool,eval:BUILD_MODE=release,help:create release build"
@@ -16,6 +17,10 @@ OPTION['--strict']="value:bool,eval:STRICT=yes,help:use strict options for compi
 MAKE() {
     {
     mkdir -p reports/warnings
+    if [[ ${VALUES['--force']} ]]; then
+        make clean
+    fi
+
     if [[ ${VALUES['--strict']} ]]; then
         make -q && make clean
         make MODE=$1 STRICT=yes 2> reports/warnings/${BUILD_MODE}-errors
