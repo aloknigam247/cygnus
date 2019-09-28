@@ -10,9 +10,9 @@ jobs:
       - run:
           name: Initial setup
           command: |
-              cd ~/cygnus
-              mkdir logs
-              mkdir reports
+            cd ~/cygnus
+            mkdir logs
+            mkdir reports
       - persist_to_workspace:
           root: ~/
           paths:
@@ -36,6 +36,7 @@ jobs:
             cd ~/cygnus
             source sourceme
             cyregress -a -d tests
+            return 1
       - persist_to_workspace:
           root: ~/cygnus
           paths:
@@ -51,16 +52,17 @@ jobs:
       - run:
           name: Debug Build (Strict)
           command: |
-              cd ~/cygnus
-              source sourceme
-              cybuild --strict --debug
+            cd ~/cygnus
+            source sourceme
+            cybuild --strict --debug
       - run:
           name: Memory Checks
           command: |
-              cd ~/cygnus
-              source sourceme
-              cybuild --memory
-              cyregress -a -d tests --mem-check 2>&1 | tee reports/mem-checks.log
+            cd ~/cygnus
+            source sourceme
+            cybuild --memory
+            cyregress -a -d tests --mem-check 2>&1 | tee reports/mem-checks.log
+            return 1
       - persist_to_workspace:
           root: ~/cygnus
           paths:
@@ -76,10 +78,11 @@ jobs:
       - run:
           name: Memory Checks
           command: |
-              cd ~/cygnus
-              source sourceme
-              cybuild --sanitize
-              cyregress -a -d tests --sanitize 2>&1 | tee reports/sanitization.log
+            cd ~/cygnus
+            source sourceme
+            cybuild --sanitize
+            cyregress -a -d tests --sanitize 2>&1 | tee reports/sanitization.log
+            return 1
       - persist_to_workspace:
           root: ~/cygnus
           paths:
@@ -95,10 +98,11 @@ jobs:
       - run:
           name: Coverage Run
           command: |
-              cd ~/cygnus
-              source sourceme
-              cybuild --coverage
-              cyregress -a -d tests --coverage 2>&1 | tee reports/coverage.log 
+            cd ~/cygnus
+            source sourceme
+            cybuild --coverage
+            cyregress -a -d tests --coverage 2>&1 | tee reports/coverage.log 
+            return 1
       - persist_to_workspace:
           root: ~/cygnus
           paths:
@@ -114,10 +118,11 @@ jobs:
       - run:
           name: Memory Checks
           command: |
-              cd ~/cygnus
-              source sourceme
-              cybuild --perf
-              cyregress -a -d tests --perf 2>&1 | tee reports/perf.log
+            cd ~/cygnus
+            source sourceme
+            cybuild --perf
+            cyregress -a -d tests --perf 2>&1 | tee reports/perf.log
+            return 1
       - persist_to_workspace:
           root: ~/cygnus
           paths:
@@ -133,9 +138,9 @@ jobs:
       - run:
           name: Lint Run
           command: |
-              cd ~/cygnus
-              source sourceme
-              cppcheck --enable=all -I include src 2>&1 | tee reports/lint.log
+            cd ~/cygnus
+            source sourceme
+            cppcheck --enable=all src 2>&1 | tee reports/lint.log
       - persist_to_workspace:
           root: ~/cygnus
           paths:
@@ -167,9 +172,9 @@ jobs:
       - run:
           name: Source Code Style Check
           command: |
-              cd ~/cygnus
-              source sourceme
-              style-check src | tee reports/style.log
+            cd ~/cygnus
+            source sourceme
+            style-check src | tee reports/style.log
       - persist_to_workspace:
           root: ~/cygnus
           paths:
