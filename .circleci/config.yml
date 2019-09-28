@@ -29,7 +29,7 @@ jobs:
           command: |
             cd ~/cygnus
             source sourceme
-            cybuild --strict --release 2>&1 | tee logs/release_warnings.log
+            cybuild --strict --release
       - run:
           name: Run Tests
           command: |
@@ -53,7 +53,7 @@ jobs:
           command: |
               cd ~/cygnus
               source sourceme
-              cybuild --strict --debug 2>&1 | tee logs/debug_warnings.log
+              cybuild --strict --debug
       - run:
           name: Memory Checks
           command: |
@@ -78,7 +78,7 @@ jobs:
           command: |
               cd ~/cygnus
               source sourceme
-              cybuild --sanitize 2>&1 | tee logs/sanitize_build.log
+              cybuild --sanitize
               cyregress -a -d tests --sanitize 2>&1 | tee reports/sanitization.log
       - persist_to_workspace:
           root: ~/cygnus
@@ -97,7 +97,7 @@ jobs:
           command: |
               cd ~/cygnus
               source sourceme
-              cybuild --coverage 2>&1 | tee logs/coverage_build.log
+              cybuild --coverage
               cyregress -a -d tests --coverage 2>&1 | tee reports/coverage.log 
       - persist_to_workspace:
           root: ~/cygnus
@@ -116,7 +116,7 @@ jobs:
           command: |
               cd ~/cygnus
               source sourceme
-              cybuild --perf 2>&1 | tee logs/perf_build.log
+              cybuild --perf
               cyregress -a -d tests --perf 2>&1 | tee reports/perf.log
       - persist_to_workspace:
           root: ~/cygnus
