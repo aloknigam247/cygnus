@@ -36,7 +36,7 @@ jobs:
             cd ~/cygnus
             source sourceme
             cyregress -a -d tests
-            exit 1
+            exit 0
       - persist_to_workspace:
           root: ~/cygnus
           paths:
@@ -62,7 +62,7 @@ jobs:
             source sourceme
             cybuild --memory
             cyregress -a -d tests --mem-check 2>&1 | tee reports/mem-checks.log
-            exit 1
+            exit 0
       - persist_to_workspace:
           root: ~/cygnus
           paths:
@@ -82,7 +82,7 @@ jobs:
             source sourceme
             cybuild --sanitize
             cyregress -a -d tests --sanitize 2>&1 | tee reports/sanitization.log
-            exit 1
+            exit 0
       - persist_to_workspace:
           root: ~/cygnus
           paths:
@@ -102,7 +102,7 @@ jobs:
             source sourceme
             cybuild --coverage
             cyregress -a -d tests --coverage 2>&1 | tee reports/coverage.log 
-            exit 1
+            exit 0
       - persist_to_workspace:
           root: ~/cygnus
           paths:
@@ -122,7 +122,7 @@ jobs:
             source sourceme
             cybuild --perf
             cyregress -a -d tests --perf 2>&1 | tee reports/perf.log
-            exit 1
+            exit 0
       - persist_to_workspace:
           root: ~/cygnus
           paths:
