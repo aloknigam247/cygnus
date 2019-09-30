@@ -241,7 +241,7 @@ parseCmdLine() {
         fi
         shift
     done
-    if [[ -n $_pos ]]; then
+    if [[ -n $_pos && -n $POS_NAME ]]; then
         VALUES[$POS_NAME]="$_pos"
         echo ""
     fi

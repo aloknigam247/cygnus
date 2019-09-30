@@ -2,6 +2,13 @@
 
 source $CYGNUS_HOME/tools/funcs.bash    # source common functions
 
+covReport() {
+    echo "Coverage Report::"
+    echo "    Funtional Coverage: `egrep -m 1 "headerCovTableEntryHi" reports/coverage/func/html/index.html | sed -r 's/[^0-9.]//g'`"
+    echo "    Unit Coverage: `egrep -m 1 "headerCovTableEntryHi" reports/coverage/unit/html/index.html | sed -r 's/[^0-9.]//g'`i"
+    echo
+}
+
 docsReport() {
     echo "DOCS::"
     echo "Status:"
@@ -27,11 +34,6 @@ warnReport() {
 
 lintReport() {
     echo "Lint Report::"
-    echo ""
-}
-
-covReport() {
-    echo "Coverage Report::"
     echo ""
 }
 

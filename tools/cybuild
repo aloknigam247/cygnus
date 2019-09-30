@@ -27,6 +27,11 @@ MAKE() {
     else
         make MODE=$1 2> reports/warnings/${BUILD_MODE}-errors
     fi
+
+    if [[ -s reports/warnings/${BUILD_MODE}-errors ]]; then
+        echo -e "\e[1;31mERRORS:\e[m"
+        cat reports/warnings/${BUILD_MODE}-errors
+    fi
     
     errors=`grep -c "error:|warning:" reports/warnings/${BUILD_MODE}-errors`
     if [[ $errors -gt 0 ]]; then

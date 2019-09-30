@@ -93,12 +93,14 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          name: Coverage Run
+          name: Coverage Build
           command: |
             cd ~/cygnus
             source sourceme
             cybuild --coverage
-            cyregress -a -d tests --coverage 2>&1 | tee reports/coverage.log 
+      - run:
+          name: Coverage Run
+          command: cyregress -a -d tests --coverage
       - persist_to_workspace:
           root: ~/cygnus
           paths:

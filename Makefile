@@ -6,6 +6,7 @@ Q	:= @
 #---------- Modes ----------# 
 ifeq ($(MODE),coverage)
 CPP_FLAGS 	+= --coverage -g
+CXX          = g++-7
 else ifeq ($(MODE),debug)
 CPP_FLAGS 	+= -g
 else ifeq ($(MODE),memory)
@@ -59,7 +60,7 @@ $(EXE): $(MOD_EXE)
 	ln -sfr $< $@
 
 $(MOD_EXE):  INCLUDE_DIR=''
-$(MOD_EXE):  $(addprefix $(OBJ)/,$(notdir $(subst .cc,.o,$(wildcard src/*.cc))))
+$(MOD_EXE):  $(addprefix $(OBJ)/,$(notdir $(subst .cpp,.o,$(wildcard src/*.cpp))))
 	$(CPP_COMPILE) -o $@ $^
 
 clean:

@@ -103,7 +103,7 @@ runUnitTest() {
     {
         LOG I "Run directory created"
         if [[ ! -a $TEST_DIR/$testcase_dir/Makefile ]]; then
-            gen-make -d $OUT_DIR/$testcase_dir -i $CYGNUS_HOME/include -i $CYGNUS_HOME/tests/utils/include test.cc
+            gen-make -d $OUT_DIR/$testcase_dir -i $CYGNUS_HOME/include -i $CYGNUS_HOME/tests/utils/include test.cpp
         fi
         if [[ $? -ne 0 ]]; then
             EXIT 1
@@ -171,14 +171,22 @@ main() {
     rm -rf reports/func reports/unit
     mkdir -p reports/func reports/unit
     for test in $valid_tests; do
-        cd $CYGNUS_HOME
         runTest $test
+        cd $CYGNUS_HOME
     done
 
     case $TEST_MODE in
         coverage)
-            lcov --capture --directory test_cov --no-external --output-file reports/cov/coverage.info --directory src --directory include
-            genhtml reports/cov/coverage.info --output-directory reports/cov/lcov --demangle-cpp
+            if [[ ${VALUES['-a']} || ${VALUES['-f']} ]]; then
+                mkdir -p reports/coverage/func
+                lcov --gcov-tool=gcov-7 --capture --directory build/obj/coverage  --no-external --output-file reports/coverage/func/coverage.info
+                genhtml reports/coverage/func/coverage.info --output-directory reports/coverage/func/html --demangle-cpp
+            fi
+            if [[ ${VALUES['-a']} || ${VALUES['-u']} ]]; then
+                mkdir -p reports/coverage/unit
+                lcov --gcov-tool=gcov-7 --capture --directory ${OUT_DIR} --no-external --output-file reports/coverage/unit/coverage.info
+                genhtml reports/coverage/unit/coverage.info --output-directory reports/coverage/unit/html --demangle-cpp
+            fi
             ;;
         mem-check)
             tool=valgrind
