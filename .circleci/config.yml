@@ -100,7 +100,10 @@ jobs:
             cybuild --coverage
       - run:
           name: Coverage Run
-          command: cyregress -a -d tests --coverage
+          command: |
+            cd ~/cygnus
+            source sourceme
+            cyregress -a -d tests --coverage
       - persist_to_workspace:
           root: ~/cygnus
           paths:

@@ -5,6 +5,7 @@ RUN apt-get upgrade -y
 
 RUN apt-get install -y cppcheck
 RUN apt-get install -y doxygen
+RUN apt-get install -y g++-7
 RUN apt-get install -y graphviz
 RUN apt-get install -y lcov
 RUN apt-get install -y python3.7
