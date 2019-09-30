@@ -28,6 +28,11 @@ docsReport() {
     echo
 }
 
+lintReport() {
+    echo "Lint Report::"
+    echo "    Errors: $(($(cat reports/lint.log | wc -l)-1))"
+}
+
 memReport() {
     echo "Memory Report::"
     test -f reports/mem-check/func/errors && echo "    Functional: $(adder $(egrep -o "[0-9] errors" reports/mem-check/func/errors | sed 's/ errors//'))" || echo "    Functional: -1"
@@ -61,11 +66,6 @@ unitReport() {
     echo "Unit Test::"
     echo "Log:"
     test -f unittest.log && cat unittest.log
-    echo ""
-}
-
-lintReport() {
-    echo "Lint Report::"
     echo ""
 }
 
