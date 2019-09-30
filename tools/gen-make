@@ -66,7 +66,9 @@ def printMakefile(opt, target, h_deps, cpp_deps):
                             "coverage: COMP_FLAGS += --coverage\n" +
                             "coverage: all\n\n" +
                             "mem-check: COMP_FLAGS += -g\n" +
-                            "mem-check: all\n")
+                            "mem-check: all\n\n" +
+                            "sanitize: COMP_FLAGS += -g -D_FORTIFY_SOURCE=2 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow -fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error\n" +
+                            "sanitize: all\n")
     
     # Target rules
     IO.fileAppend(makefile, target + ": ", '')

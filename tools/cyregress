@@ -87,7 +87,7 @@ runFuncTest() {
     makeRunDir $testcase
     cd $OUT_DIR/$testcase_dir
     echo "[CMD] $tool `cat runme`"
-    $tool `cat runme` | tee -a $CYGNUS_HOME/reports/func/func_test.log
+    $tool `cat runme` 2>&1 | tee run.log
 }
 
 runUnitTest() {
@@ -111,7 +111,7 @@ runUnitTest() {
         #sed 's|\x1b\[[;0-9]*m\x1b\[K||g' $OUT_DIR/$testcase_dir/make.log.color > $OUT_DIR/$testcase_dir/make.log
         cd $OUT_DIR/$testcase_dir
         echo "[CMD] $tool ./test"
-        $tool ./test
+        $tool ./test 2>&1 | tee run.log
         status=$?
     } 2>&1 | tee $run_log
     cat $run_log >> reports/unit/unit_test.log
@@ -162,8 +162,8 @@ main() {
             mkdir -p reports/perf
             ;;
         sanitize)
-            OUT_DIR="$OUT_DIR/san"
-            mkdir -p reports/san
+            OUT_DIR="$OUT_DIR/sanitize"
+            mkdir -p reports/sanitize
             ;;
         *)
             ;;
