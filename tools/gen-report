@@ -20,8 +20,8 @@ covReport() {
 
 memReport() {
     echo "Memory Report::"
-    echo "    Functional: $(adder $(egrep -o "[0-9] errors" reports/mem-check/func/errors | sed 's/ errors//'))"
-    echo "    Unit: $(adder $(egrep -o "[0-9] errors" reports/mem-check/unit/errors | sed 's/ errors//'))"
+    test -f reports/mem-check/func/errors && echo "    Functional: $(adder $(egrep -o "[0-9] errors" reports/mem-check/func/errors | sed 's/ errors//'))" || echo "    Functional: -1"
+    test -f reports/mem-check/unit/errors && echo "    Unit: $(adder $(egrep -o "[0-9] errors" reports/mem-check/unit/errors | sed 's/ errors//'))" || echo "   Unit: -1"
     echo
 }
 

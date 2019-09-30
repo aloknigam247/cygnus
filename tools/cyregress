@@ -193,11 +193,11 @@ main() {
             rm -rf reports/mem-check
             if [[ ${VALUES['-a']} || ${VALUES['-f']} ]]; then
                 mkdir -p reports/mem-check/func
-                find $OUT_DIR/func -name "valgrind.out" | xargs egrep "[0-9] errors" >> reports/mem-check/func/errors
+                find $OUT_DIR/func -name "valgrind.out" | xargs egrep "[0-9]+ errors" >> reports/mem-check/func/errors
             fi
             if [[ ${VALUES['-a']} || ${VALUES['-u']} ]]; then
                 mkdir -p reports/mem-check/unit
-                find $OUT_DIR/unit -name "valgrind.out" | xargs egrep "[0-9] errors" >> reports/mem-check/unit/errors
+                find $OUT_DIR/unit -name "valgrind.out" | xargs egrep "[0-9]+ errors" >> reports/mem-check/unit/errors
             fi
             ;;
         perf)
