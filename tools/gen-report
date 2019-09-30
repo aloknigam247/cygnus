@@ -2,10 +2,26 @@
 
 source $CYGNUS_HOME/tools/funcs.bash    # source common functions
 
+adder() {
+    local sum=0
+    while [[ $1 ]]; do
+        sum=$((sum+$1))
+        shift
+    done
+    echo $sum
+}
+
 covReport() {
     echo "Coverage Report::"
-    echo "    Funtional Coverage: `egrep -m 1 "headerCovTableEntryHi" reports/coverage/func/html/index.html | sed -r 's/[^0-9.]//g'`"
-    echo "    Unit Coverage: `egrep -m 1 "headerCovTableEntryHi" reports/coverage/unit/html/index.html | sed -r 's/[^0-9.]//g'`i"
+    test -f reports/coverage/func/html/index.html && echo "    Funtional Coverage: $(egrep -m 1 "headerCovTableEntryHi" reports/coverage/func/html/index.html | sed -r 's/[^0-9.]//g')%" || echo "    Functional Coverage: 0%"
+    test -f reports/coverage/unit/html/index.html && echo "    Unit Coverage: $(egrep -m 1 "headerCovTableEntryHi" reports/coverage/unit/html/index.html | sed -r 's/[^0-9.]//g')%" || echo "    Unit Coverage: 0%"
+    echo
+}
+
+memReport() {
+    echo "Memory Report::"
+    echo "    Functional: $(adder $(egrep -o "[0-9] errors" reports/mem-check/func/errors | sed 's/ errors//'))"
+    echo "    Unit: $(adder $(egrep -o "[0-9] errors" reports/mem-check/unit/errors | sed 's/ errors//'))"
     echo
 }
 
@@ -34,11 +50,6 @@ warnReport() {
 
 lintReport() {
     echo "Lint Report::"
-    echo ""
-}
-
-memReport() {
-    echo "Memory Report::"
     echo ""
 }
 
