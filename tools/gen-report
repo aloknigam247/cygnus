@@ -25,6 +25,13 @@ memReport() {
     echo
 }
 
+warnReport() {
+    echo "Compiler Warnings::"
+    test -f reports/warnings/debug-errors && echo "    Debug: $(egrep -c "warning: " reports/warnings/debug-errors)" || echo "    Debug: -1" 
+    test -f reports/warnings/release-errors && echo "    Release: $(egrep -c "warning: " reports/warnings/release-errors)" || echo "    Release: -1" 
+    echo ""
+}
+
 docsReport() {
     echo "DOCS::"
     echo "Status:"
@@ -39,12 +46,6 @@ unitReport() {
     echo "Unit Test::"
     echo "Log:"
     test -f unittest.log && cat unittest.log
-    echo ""
-}
-
-warnReport() {
-    echo "Compiler Warnings::"
-    test -f reports/warnings/warns
     echo ""
 }
 
