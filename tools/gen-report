@@ -20,23 +20,31 @@ covReport() {
 
 docsReport() {
     echo "DOCS::"
-    echo "Status:"
-    test -f reports/docs/status && cat reports/docs/status
-    echo ""
-    echo "Undocumented:"
-    test -f reports/docs/undoc && cat reports/docs/undoc
+    echo "    Status: $(cat reports/docs/status)"
+    echo "    Undocumented: $(cat reports/docs/undoc)"
     echo
 }
 
 lintReport() {
     echo "Lint Report::"
     echo "    Errors: $(($(cat reports/lint.log | wc -l)-1))"
+    echo
 }
 
 memReport() {
     echo "Memory Report::"
     test -f reports/mem-check/func/errors && echo "    Functional: $(adder $(egrep -o "[0-9] errors" reports/mem-check/func/errors | sed 's/ errors//'))" || echo "    Functional: -1"
     test -f reports/mem-check/unit/errors && echo "    Unit: $(adder $(egrep -o "[0-9] errors" reports/mem-check/unit/errors | sed 's/ errors//'))" || echo "   Unit: -1"
+    echo
+}
+
+perfReport() {
+    echo "Performace Report::"
+    echo
+}
+
+releaseTestReport() {
+    echo "Unit Test::"
     echo
 }
 
@@ -59,19 +67,7 @@ warnReport() {
     echo "Compiler Warnings::"
     test -f reports/warnings/debug-errors && echo "    Debug: $(egrep -c "warning: " reports/warnings/debug-errors)" || echo "    Debug: -1" 
     test -f reports/warnings/release-errors && echo "    Release: $(egrep -c "warning: " reports/warnings/release-errors)" || echo "    Release: -1" 
-    echo ""
-}
-
-unitReport() {
-    echo "Unit Test::"
-    echo "Log:"
-    test -f unittest.log && cat unittest.log
-    echo ""
-}
-
-perfReport() {
-    echo "Performace Report::"
-    echo ""
+    echo
 }
 
 main() {
@@ -81,8 +77,8 @@ main() {
     lintReport
     memReport
     perfReport
+    relaseTestReport
     sanitizationReport
-    unitReport
     warnReport
     EXIT
 }
