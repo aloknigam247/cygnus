@@ -88,6 +88,12 @@ runFuncTest() {
     cd $OUT_DIR/$testcase_dir
     echo "[CMD] $tool `cat runme`"
     $tool `cat runme` 2>&1 | tee run.log
+    if [[ $TEST_MODE == "perf" ]]; then
+        diff gmon.out gmon.gold
+        if [[ $? -ne 0 ]]; then
+            echo "TESTFAIL" > testfail
+        fi
+    fi
 }
 
 runUnitTest() {
@@ -113,6 +119,12 @@ runUnitTest() {
         echo "[CMD] $tool ./test"
         $tool ./test 2>&1 | tee run.log
         status=$?
+        if [[ $TEST_MODE == "perf" ]]; then
+            diff gmon.out gmon.gold
+            if [[ $? -ne 0 ]]; then
+                echo "TESTFAIL" > testfail
+            fi
+        fi
     } 2>&1 | tee $run_log
     cat $run_log >> reports/unit/unit_test.log
     #sed 's|\x1b\[[;0-9]*m\x1b\[K||g' $run_log_color > $run_log

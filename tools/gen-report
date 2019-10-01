@@ -40,6 +40,16 @@ memReport() {
 
 perfReport() {
     echo "Performace Report::"
+    if [[ $(find test_run/perf/func -name "testfail" | wc -l ) -eq 0 ]]; then
+        echo "    Functional: PASS"
+    else
+        echo "    Functional: FAIL"
+    fi
+    if [[ $(find test_run/perf/unit -name "testfail" | wc -l ) -eq 0 ]]; then
+        echo "    Unit: PASS"
+    else
+        echo "    Unit: FAIL"
+    fi
     echo
 }
 
