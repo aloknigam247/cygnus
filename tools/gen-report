@@ -20,7 +20,7 @@ covReport() {
 
 docsReport() {
     echo "DOCS::"
-    echo "    Status: $(cat reports/docs/status)"
+    echo "    Status: $(egrep -o "yes|no" reports/docs/status)"
     echo "    Undocumented: $(cat reports/docs/undoc | wc -l)"
     echo
 }
