@@ -21,7 +21,7 @@ covReport() {
 docsReport() {
     echo "DOCS::"
     echo "    Status: $(cat reports/docs/status)"
-    echo "    Undocumented: $(cat reports/docs/undoc)"
+    echo "    Undocumented: $(cat reports/docs/undoc | wc -l)"
     echo
 }
 

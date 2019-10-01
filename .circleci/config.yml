@@ -117,11 +117,16 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          name: Memory Checks
+          name: Performance Build
           command: |
             cd ~/cygnus
             source sourceme
             cybuild --perf
+      - run:
+          name: Performance Checks
+          command: |
+            cd ~/cygnus
+            source sourceme
             cyregress -a -d tests --perf 2>&1 | tee reports/perf.log
       - persist_to_workspace:
           root: ~/cygnus
