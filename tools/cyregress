@@ -76,6 +76,7 @@ makeRunDir(){
     local test_out=$OUT_DIR/`dirname $testcase`
     rm -rf $test_out
     mkdir -p $test_out
+    pwd
     ln -rs $TEST_DIR/`dirname $testcase`/* $test_out/
 }
 
@@ -103,6 +104,7 @@ runUnitTest() {
     #run_log_color=$OUT_DIR/$testcase_dir/.run.log
 
     echo "[RUN] $testcase"
+    pwd
     
     makeRunDir $testcase
     {
@@ -184,6 +186,7 @@ main() {
     rm -rf reports/func reports/unit
     mkdir -p reports/func reports/unit
     for test in $valid_tests; do
+        cd $CYGNUS_HOME
         runTest $test
         cd $CYGNUS_HOME
     done
