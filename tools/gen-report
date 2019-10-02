@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source $CYGNUS_HOME/tools/funcs.bash    # source common functions
+declare EXITCODE=0
 
 adder() {
     local sum=0
@@ -12,48 +12,87 @@ adder() {
 }
 
 covReport() {
+    local func_cov=-1
+    local unit_cov=-1
+
+    test -f reports/coverage/func/html/index.html && func_cov=$(egrep -m 1 "headerCovTableEntryHi" reports/coverage/func/html/index.html | sed -r 's/[^0-9.]//g')
+    test -f reports/coverage/unit/html/index.html && unit_cov=$(egrep -m 1 "headerCovTableEntryHi" reports/coverage/unit/html/index.html | sed -r 's/[^0-9.]//g')
+    
+    if [[ $func_cov -lt 100 || $unit_cov -lt 100 ]]; then
+        EXITCODE=1
+    fi
+    
     echo "Coverage Report::"
-    test -f reports/coverage/func/html/index.html && echo "    Funtional Coverage: $(egrep -m 1 "headerCovTableEntryHi" reports/coverage/func/html/index.html | sed -r 's/[^0-9.]//g')%" || echo "    Functional Coverage: 0%"
-    test -f reports/coverage/unit/html/index.html && echo "    Unit Coverage: $(egrep -m 1 "headerCovTableEntryHi" reports/coverage/unit/html/index.html | sed -r 's/[^0-9.]//g')%" || echo "    Unit Coverage: 0%"
+    echo "    Funtional Coverage: ${func_cov}%"
+    echo "    Unit Coverage: ${func_cov}%"
     echo
 }
 
 docsReport() {
+    local undoc_count=$(cat reports/docs/undoc | wc -l)
+    local need_update=$(egrep -o "yes|no" reports/docs/status)
+
+    if [[ $undoc_count -gt 0 || $need_update == 'yes' ]]; then
+        EXITCODE=1
+    fi
+
     echo "DOCS::"
-    echo "    $(egrep "Need to update" reports/docs/status)"
-    echo "    Undocumented: $(cat reports/docs/undoc | wc -l)"
+    echo "    Needs Update: $need_update"
+    echo "    Undocumented: $undoc_count"
     echo
 }
 
 lintReport() {
+    local lint_error=$(($(cat reports/lint.log | wc -l)-1))
+
+    if [[ $lint_error -gt 0 ]]; then
+        EXITCODE=1
+    fi
+
     echo "Lint Report::"
-    echo "    Errors: $(($(cat reports/lint.log | wc -l)-1))"
+    echo "    Errors: $lint_error"
     echo
 }
 
 memReport() {
+    local func_error=-1
+    local unit_error=-1
+
+    test -f reports/mem-check/func/errors && func_error=$(adder $(egrep -o "[0-9] errors" reports/mem-check/func/errors | sed 's/ errors//'))
+    test -f reports/mem-check/unit/errors && unit_error=$(adder $(egrep -o "[0-9] errors" reports/mem-check/unit/errors | sed 's/ errors//'))
+
+    if [[ $func_error -ne 0 || $unit_error -ne 0 ]]; then
+        EXITCODE=1
+    fi
+
     echo "Memory Report::"
-    test -f reports/mem-check/func/errors && echo "    Functional: $(adder $(egrep -o "[0-9] errors" reports/mem-check/func/errors | sed 's/ errors//'))" || echo "    Functional: -1"
-    test -f reports/mem-check/unit/errors && echo "    Unit: $(adder $(egrep -o "[0-9] errors" reports/mem-check/unit/errors | sed 's/ errors//'))" || echo "   Unit: -1"
+    echo "    Functional: $func_error"
+    echo "    Unit: $unit_error"
     echo
 }
 
 perfReport() {
+    local func_perf=$(find test_run/perf/func -name "testfail" | wc -l )
+    local unit_perf=$(find test_run/perf/unit -name "testfail" | wc -l )
+
     echo "Performace Report::"
-    if [[ $(find test_run/perf/func -name "testfail" | wc -l ) -eq 0 ]]; then
+    if [[ $func_perf -eq 0 ]]; then
         echo "    Functional: PASS"
     else
+        EXITCODE=1
         echo "    Functional: FAIL"
     fi
-    if [[ $(find test_run/perf/unit -name "testfail" | wc -l ) -eq 0 ]]; then
+    if [[ $unit_perf -eq 0 ]]; then
         echo "    Unit: PASS"
     else
+        EXITCODE=1
         echo "    Unit: FAIL"
     fi
     echo
 }
 
 releaseTestReport() {
+    EXITCODE=1
     echo "Unit Test::"
     echo
 }
@@ -63,20 +102,31 @@ sanitizationReport() {
     if [[  $(find test_run/sanitize/func -name "run.log" | xargs egrep -c "ERROR: ") -eq 0 ]]; then
         echo "    Functioncal: PASS"
     else
+        EXITCODE=1
         echo "    Functional: FAIL"
     fi
     if [[  $(find test_run/sanitize/unit -name "run.log" | xargs egrep -c "ERROR: ") -eq 0 ]]; then
         echo "    Unit: PASS"
     else
+        EXITCODE=1
         echo "    Unit: FAIL"
     fi
     echo
 }
 
 warnReport() {
+    local debug_warn=-1
+    local release_warn=-1
+
+    test -f reports/warnings/debug-errors && debug_warn=$(egrep -c "warning: " reports/warnings/debug-errors) 
+    test -f reports/warnings/release-errors && release_warn=$(egrep -c "warning: " reports/warnings/release-errors)
+    
+    if [[ $debug_warn -ne 0 || $release_warn -ne 0 ]]; then
+        EXITCODE=1
+    fi
     echo "Compiler Warnings::"
-    test -f reports/warnings/debug-errors && echo "    Debug: $(egrep -c "warning: " reports/warnings/debug-errors)" || echo "    Debug: -1" 
-    test -f reports/warnings/release-errors && echo "    Release: $(egrep -c "warning: " reports/warnings/release-errors)" || echo "    Release: -1" 
+    echo "    Debug: $debug_warn"
+    echo "    Release: $release_warn"
     echo
 }
 
@@ -90,7 +140,7 @@ main() {
     relaseTestReport
     sanitizationReport
     warnReport
-    EXIT
+    exit #$EXITCODE
 }
 
 main $@
