@@ -93,7 +93,9 @@ perfReport() {
 
 releaseTestReport() {
     EXITCODE=1
-    echo "Unit Test::"
+    echo "Test Cases::"
+    echo "    Functional Test: -1"
+    echo "    Unit Test: -1"
     echo
 }
 
