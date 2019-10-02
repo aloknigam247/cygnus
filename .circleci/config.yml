@@ -185,7 +185,7 @@ jobs:
           paths:
             - reports
 
-  gen-reports:
+  gen-report:
     docker:
       - image: aloknigam247/cygnus
     steps:
