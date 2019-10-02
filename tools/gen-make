@@ -45,15 +45,16 @@ class Args:
 
 
 ######################### FUNCTIONS ########################
-def printMakefile(opt, target, h_deps, cc_deps):
+def printMakefile(opt, target, h_deps, cpp_deps):
     o_deps = []
     makefile = open("Makefile", "w")
 
     IO.fileAppend(makefile, "############# Configs #############")
     
     # Common rules
-    IO.fileAppend(makefile, "CY_COMP = g++ -std=c++11 $(COMP_FLAGS) $(INC)\n\n" +  # tempo fix for c++11
-            "INC := ", '')
+    IO.fileAppend(makefile, "CXX     = g++\n" +
+                            "CY_COMP = $(CXX) -std=c++11 $(COMP_FLAGS) $(INC)\n\n" +
+                            "INC := ", '')
     for i in opt.incDir:
         IO.fileAppend(makefile, " \\\n    -I " + i, '')
     IO.fileAppend(makefile,'\n')
@@ -61,26 +62,31 @@ def printMakefile(opt, target, h_deps, cc_deps):
     IO.fileAppend(makefile, "OBJ_DIR := " + os.path.relpath("obj", opt.cDir[opt.cDir.rfind("unit/"):]) + "\n\n" +
                             "############# Targets #############\n" +
                             "all: $(OBJ_DIR) " + target + "\n\n" +
+                            "coverage: CXX = g++-7\n" +
                             "coverage: COMP_FLAGS += --coverage\n" +
                             "coverage: all\n\n" +
                             "mem-check: COMP_FLAGS += -g\n" +
-                            "mem-check: all\n")
+                            "mem-check: all\n\n" +
+                            "perf: COMP_FLAGS += -pg\n" +
+                            "perf: all\n\n" +
+                            "sanitize: COMP_FLAGS += -g -D_FORTIFY_SOURCE=2 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow -fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error\n" +
+                            "sanitize: all\n")
     
     # Target rules
     IO.fileAppend(makefile, target + ": ", '')
-    for dep in cc_deps:
+    for dep in cpp_deps:
         ind = dep.find("/src")
         if(ind > 0):
-            obj = "$(OBJ_DIR)" + dep[ind+4:].replace(".cc", ".o")
+            obj = "$(OBJ_DIR)" + dep[ind+4:].replace(".cpp", ".o")
         else:
-            obj = dep.replace(".cc", ".o")
+            obj = dep.replace(".cpp", ".o")
         o_deps.append(obj)
         IO.fileAppend(makefile, obj, ' ')
 
     IO.fileAppend(makefile, "\n\t$(CY_COMP) -o $@ $^\n")
 
     for dep in o_deps:
-        IO.fileAppend(makefile, dep + ": " + cc_deps.pop(0) + " " + h_deps.pop(0) + '\n' +
+        IO.fileAppend(makefile, dep + ": " + cpp_deps.pop(0) + " " + h_deps.pop(0) + '\n' +
                                 "\t$(CY_COMP) -c $< -o $@\n")
 
     IO.fileAppend(makefile, "$(OBJ_DIR):\n" +
@@ -98,7 +104,7 @@ def main():
     args = Args()
     opt = args.parse()
     h_deps = []
-    cc_deps = []
+    cpp_deps = []
     
     os.chdir(opt.cDir)
     
@@ -126,7 +132,7 @@ def main():
     
     line = stdout.decode("utf-8").split(' ')
     target = line.pop(0).strip(".o:")
-    cc_deps.append(line.pop(0)) # this file is test.cc
+    cpp_deps.append(line.pop(0)) # this file is test.cpp
     h_deps.append(line.pop(0))  # this file is test.h
     
     for dep in line:
@@ -134,9 +140,9 @@ def main():
         if dep == "\\":
             continue
         h_deps.append(dep)
-        cc_deps.append(dep.replace("include", "src").replace(".h", ".cc"))
+        cpp_deps.append(dep.replace("include", "src").replace(".h", ".cpp"))
 
-    printMakefile(opt, target, h_deps, cc_deps)
+    printMakefile(opt, target, h_deps, cpp_deps)
 
 if __name__ == "__main__":
     ret = main()

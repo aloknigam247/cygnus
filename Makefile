@@ -6,6 +6,7 @@ Q	:= @
 #---------- Modes ----------# 
 ifeq ($(MODE),coverage)
 CPP_FLAGS 	+= --coverage -g
+CXX          = g++-7	# Using ver 7 as lcov does not support ver 9 gcno file dump
 else ifeq ($(MODE),debug)
 CPP_FLAGS 	+= -g
 else ifeq ($(MODE),memory)
@@ -19,7 +20,6 @@ CPP_FLAGS 	+= -g -D_FORTIFY_SOURCE=2 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC 
 else ifndef MODE
 MODE=debug
 CPP_FLAGS 	+= -g
-$(info debug as defaut mode)
 else
 $(error unknown MODE '$(MODE)')
 endif
@@ -59,7 +59,7 @@ $(EXE): $(MOD_EXE)
 	ln -sfr $< $@
 
 $(MOD_EXE):  INCLUDE_DIR=''
-$(MOD_EXE):  $(addprefix $(OBJ)/,$(notdir $(subst .cc,.o,$(wildcard src/*.cc))))
+$(MOD_EXE):  $(addprefix $(OBJ)/,$(notdir $(subst .cpp,.o,$(wildcard src/*.cpp))))
 	$(CPP_COMPILE) -o $@ $^
 
 clean:

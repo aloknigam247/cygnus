@@ -74,7 +74,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          name: Memory Checks
+          name: Sanitization Checks
           command: |
             cd ~/cygnus
             source sourceme
@@ -93,12 +93,17 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          name: Coverage Run
+          name: Coverage Build
           command: |
             cd ~/cygnus
             source sourceme
             cybuild --coverage
-            cyregress -a -d tests --coverage 2>&1 | tee reports/coverage.log 
+      - run:
+          name: Coverage Run
+          command: |
+            cd ~/cygnus
+            source sourceme
+            cyregress -a -d tests --coverage
       - persist_to_workspace:
           root: ~/cygnus
           paths:
@@ -112,11 +117,16 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          name: Memory Checks
+          name: Performance Build
           command: |
             cd ~/cygnus
             source sourceme
             cybuild --perf
+      - run:
+          name: Performance Checks
+          command: |
+            cd ~/cygnus
+            source sourceme
             cyregress -a -d tests --perf 2>&1 | tee reports/perf.log
       - persist_to_workspace:
           root: ~/cygnus
@@ -135,7 +145,7 @@ jobs:
           command: |
             cd ~/cygnus
             source sourceme
-            #cppcheck --enable=all src 2>&1 | tee reports/lint.log
+            cppcheck --enable=all src 2>&1 | tee reports/lint.log
       - persist_to_workspace:
           root: ~/cygnus
           paths:
@@ -175,7 +185,7 @@ jobs:
           paths:
             - reports
 
-  report-gen:
+  gen-report:
     docker:
       - image: aloknigam247/cygnus
     steps:
@@ -223,7 +233,7 @@ workflows:
       - style-checks:
           requires:
             - checkout
-      - report-gen:
+      - gen-report:
           requires:
             - release-tests
             - mem-checks

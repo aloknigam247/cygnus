@@ -7,9 +7,9 @@
 # Wrapper for exit             #
 # Usage: EXIT <return-code>    #
 ################################
-declare EXITCODE=0
+declare _EXITCODE=0
 EXIT(){
-    exit ${1:-$EXITCODE}
+    exit ${1:-$_EXITCODE}
 }
 
 ############################
@@ -21,7 +21,7 @@ LOG(){
     case $1 in
         E)
             echo "[ERROR] $_msg"
-            EXITCODE=1
+            _EXITCODE=1
             ;;
         I)
             echo "[INFO] $_msg"
@@ -241,7 +241,7 @@ parseCmdLine() {
         fi
         shift
     done
-    if [[ -n $_pos ]]; then
+    if [[ -n $_pos && -n $POS_NAME ]]; then
         VALUES[$POS_NAME]="$_pos"
         echo ""
     fi
@@ -264,7 +264,7 @@ parseCmdLine() {
         fi
     done
     
-    [[ $EXITCODE -ne 0 ]] && EXIT
+    [[ $_EXITCODE -ne 0 ]] && EXIT
 
     echo "Options: "
     for _i in ${!VALUES[@]}; do

@@ -87,7 +87,14 @@ runFuncTest() {
     echo "[RUN] $testcase"
     makeRunDir $testcase
     cd $OUT_DIR/$testcase_dir
-    ${tool} ./runme | tee -a $CYGNUS_HOME/reports/func/func_test.log
+    echo "[CMD] $tool `cat runme`"
+    $tool `cat runme` 2>&1 | tee run.log
+    if [[ $TEST_MODE == "perf" ]]; then
+        diff gmon.out gmon.gold
+        if [[ $? -ne 0 ]]; then
+            echo "TESTFAIL" > testfail
+        fi
+    fi
 }
 
 runUnitTest() {
@@ -103,7 +110,7 @@ runUnitTest() {
     {
         LOG I "Run directory created"
         if [[ ! -a $TEST_DIR/$testcase_dir/Makefile ]]; then
-            gen-make -d $OUT_DIR/$testcase_dir -i $CYGNUS_HOME/include -i $CYGNUS_HOME/tests/utils/include test.cc
+            gen-make -d $OUT_DIR/$testcase_dir -i $CYGNUS_HOME/include -i $CYGNUS_HOME/tests/utils/include test.cpp
         fi
         if [[ $? -ne 0 ]]; then
             EXIT 1
@@ -111,8 +118,15 @@ runUnitTest() {
         make --no-print-directory -C $OUT_DIR/$testcase_dir $TEST_MODE 2>&1 | tee $OUT_DIR/$testcase_dir/make.log
         #sed 's|\x1b\[[;0-9]*m\x1b\[K||g' $OUT_DIR/$testcase_dir/make.log.color > $OUT_DIR/$testcase_dir/make.log
         cd $OUT_DIR/$testcase_dir
-        ${tool} ./test
+        echo "[CMD] $tool ./test"
+        $tool ./test 2>&1 | tee run.log
         status=$?
+        if [[ $TEST_MODE == "perf" ]]; then
+            diff gmon.out gmon.gold
+            if [[ $? -ne 0 ]]; then
+                echo "TESTFAIL" > testfail
+            fi
+        fi
     } 2>&1 | tee $run_log
     cat $run_log >> reports/unit/unit_test.log
     #sed 's|\x1b\[[;0-9]*m\x1b\[K||g' $run_log_color > $run_log
@@ -155,14 +169,15 @@ main() {
         mem-check)
             OUT_DIR="$OUT_DIR/mem-check"
             mkdir -p reports/mem-check
+            tool="valgrind --leak-check=full --log-file=valgrind.out"
             ;;
         perf)
             OUT_DIR="$OUT_DIR/perf"
             mkdir -p reports/perf
             ;;
         sanitize)
-            OUT_DIR="$OUT_DIR/san"
-            mkdir -p reports/san
+            OUT_DIR="$OUT_DIR/sanitize"
+            mkdir -p reports/sanitize
             ;;
         *)
             ;;
@@ -173,15 +188,32 @@ main() {
     for test in $valid_tests; do
         cd $CYGNUS_HOME
         runTest $test
+        cd $CYGNUS_HOME
     done
 
     case $TEST_MODE in
         coverage)
-            lcov --capture --directory test_cov --no-external --output-file reports/cov/coverage.info --directory src --directory include
-            genhtml reports/cov/coverage.info --output-directory reports/cov/lcov --demangle-cpp
+            if [[ ${VALUES['-a']} || ${VALUES['-f']} ]]; then
+                mkdir -p reports/coverage/func
+                lcov --gcov-tool=gcov-7 --capture --directory build/obj/coverage  --no-external --output-file reports/coverage/func/coverage.info
+                genhtml reports/coverage/func/coverage.info --output-directory reports/coverage/func/html --demangle-cpp
+            fi
+            if [[ ${VALUES['-a']} || ${VALUES['-u']} ]]; then
+                mkdir -p reports/coverage/unit
+                lcov --gcov-tool=gcov-7 --capture --directory $OUT_DIR --no-external --output-file reports/coverage/unit/coverage.info
+                genhtml reports/coverage/unit/coverage.info --output-directory reports/coverage/unit/html --demangle-cpp
+            fi
             ;;
         mem-check)
-            tool=valgrind
+            rm -rf reports/mem-check
+            if [[ ${VALUES['-a']} || ${VALUES['-f']} ]]; then
+                mkdir -p reports/mem-check/func
+                find $OUT_DIR/func -name "valgrind.out" | xargs egrep "[0-9]+ errors" >> reports/mem-check/func/errors
+            fi
+            if [[ ${VALUES['-a']} || ${VALUES['-u']} ]]; then
+                mkdir -p reports/mem-check/unit
+                find $OUT_DIR/unit -name "valgrind.out" | xargs egrep "[0-9]+ errors" >> reports/mem-check/unit/errors
+            fi
             ;;
         perf)
             # TODO: collect reports
