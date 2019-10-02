@@ -185,7 +185,7 @@ jobs:
           paths:
             - reports
 
-  report-gen:
+  gen-reports:
     docker:
       - image: aloknigam247/cygnus
     steps:
@@ -233,7 +233,7 @@ workflows:
       - style-checks:
           requires:
             - checkout
-      - report-gen:
+      - gen-report:
           requires:
             - release-tests
             - mem-checks
