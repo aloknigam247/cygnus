@@ -142,7 +142,7 @@ main() {
     relaseTestReport
     sanitizationReport
     warnReport
-    exit #$EXITCODE
+    exit $EXITCODE
 }
 
 main $@
