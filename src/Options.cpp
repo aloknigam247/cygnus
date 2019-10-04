@@ -22,18 +22,8 @@
  * SOFTWARE.                                                                        *
  ************************************************************************************/
 
-#ifndef _OPTIONS_H
-#define _OPTIONS_H
+#include "Options.h"
 
-#include <forward_list>
-#include <string>
-
-class Options {
-    public:
-        const std::forward_list<std::string>& get_positional() const;
-
-    private:
-        std::forward_list<std::string> pos_args;
-};
-
-#endif
+const std::forward_list<std::string>& Options::get_positional() const {
+    return pos_args;
+}

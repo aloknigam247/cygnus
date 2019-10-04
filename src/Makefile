@@ -1,4 +1,4 @@
-INCLUDE_DIR += -I ../include
+export INCLUDE_DIR += -I ../include
 
 .INTERMEDIATE : $(DEP_FILES)
 
