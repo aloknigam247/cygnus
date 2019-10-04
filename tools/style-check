@@ -62,7 +62,7 @@ class StyleGuide:
     upper_camel_case='[A-Z][a-zA-Z]*'
     snake_case='[^_][a-z_]+'
     type_name='([a-z]*|'+upper_camel_case+')'
-    type_mod='(\* +|& +)'
+    type_mod='(\* +|& +)?'
     func_name=lower_camel_case
     #var_name=
     type='('+StylePattern.type_qualifier+')?'+type_name+type_mod
@@ -127,6 +127,9 @@ def checkFuncNames(file):
             # Check function return type
             return_type = re.search(StylePattern.type, func_proto.group(0)[:func_temp.start()])
             if(not re.match(StyleGuide.type, return_type.group(0))):
+                print("adding error")
+                print(return_type)
+                print(StyleGuide.type)
                 error_list.append(Error("function return type should be like <type>(*|&| )",
                                 file,
                                 line.rstrip(),
@@ -239,6 +242,35 @@ def checkLineLength(file):
                         )
     return error_list
 
+def checkSpaces(file):
+    error_list = []
+    lineno=0
+    for line in open(file, 'r').readlines():
+        lineno = lineno+1
+        # Check leading space
+        leading_space = re.match(' +', line)
+        if(leading_space != None and leading_space.end()%4):
+            error_list.append(Error("leading space is not multiple of 4",
+                            file,
+                            line.rstrip(),
+                            lineno,
+                            int(leading_space.end()/4)*4,
+                            leading_space.end()%4
+                            )
+                        )
+        # Check trailing space
+        trailing_space = re.search(' +$', line)
+        if(trailing_space):
+            error_list.append(Error("trailing spaces are not allowed",
+                            file,
+                            line.rstrip(),
+                            lineno,
+                            trailing_space.start(),
+                            len(trailing_space.group(0))
+                            )
+                        )
+    return error_list
+
 #--------------------------------------------------------------------------------------------------
 def main():
     args = Args()
@@ -251,7 +283,8 @@ def main():
                         checkLicense,
                         checkBraceStyle,
                         checkFuncNames,
-                        checkLineLength
+                        checkLineLength,
+                        checkSpaces
                         ]
 
     for dir in opt.dir:
