@@ -120,9 +120,13 @@ styleReport() {
     local errors=-1
 
     test -f reports/style.log && errors=$(egrep -c "error: " reports/style.log)
+    if [[ $errors -gt 0 ]]; then
+        EXITCODE=1
+    fi
 
     echo "Style Report::"
     echo "    errors: $errors"
+    echo
 
 }
 
