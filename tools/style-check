@@ -35,7 +35,7 @@ class Error:
             print(self.lineno, end = ':')
             if(self.begin > -1):
                 print(self.begin - 3, end = ':')
-        print(' ' + self.desc)
+        print(' error: ' + self.desc)
         if(self.line):
             print(' '*4 + self.line)
             if(self.begin > -1):
