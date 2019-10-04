@@ -103,18 +103,18 @@ def checkLicense(file):
  * SOFTWARE.                                                                        *
  ************************************************************************************/\
 """.split('\n')
-    lineno=0
+    lineno=1
     for line in open(file, 'r').readlines():
+        lineno = lineno+1
         if(lineno >= len(lic)):
             break
         if(lic[lineno] != line.rstrip()):
             error_list.append(Error("LICENSE is missing", file))
             break
-        lineno = lineno+1
 
     return error_list
 
-def checkNames(file):
+def checkFuncNames(file):
     error_list=[]
     lineno=0
     for line in open(file, 'r').readlines():
@@ -222,6 +222,23 @@ def checkBraceStyle(file):
                             )
 
     return error_list
+
+def checkLineLength(file):
+    error_list = []
+    lineno=0
+    for line in open(file, 'r').readlines():
+        lineno=lineno+1
+        if(len(line.rstrip()) > 100):
+            error_list.append(Error("line length is more than 100",
+                            file,
+                            line.rstrip(),
+                            lineno,
+                            101,
+                            len(line.rstrip())-100
+                            )
+                        )
+    return error_list
+
 #--------------------------------------------------------------------------------------------------
 def main():
     args = Args()
@@ -233,7 +250,8 @@ def main():
     common_rule_list = [
                         checkLicense,
                         checkBraceStyle,
-                        checkNames
+                        checkFuncNames,
+                        checkLineLength
                         ]
 
     for dir in opt.dir:
