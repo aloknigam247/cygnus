@@ -116,6 +116,20 @@ sanitizationReport() {
     echo
 }
 
+styleReport() {
+    local errors=-1
+
+    test -f reports/style.log && errors=$(egrep -c "error: " reports/style.log)
+    if [[ $errors -gt 0 ]]; then
+        EXITCODE=1
+    fi
+
+    echo "Style Report::"
+    echo "    errors: $errors"
+    echo
+
+}
+
 warnReport() {
     local debug_warn=-1
     local release_warn=-1
@@ -141,6 +155,7 @@ main() {
     perfReport
     relaseTestReport
     sanitizationReport
+    styleReport
     warnReport
     exit #$EXITCODE
 }
