@@ -70,7 +70,7 @@ jobs:
           command: |
             cd ~/cygnus
             source sourceme
-            cppcheck --enable=all src include 2>&1 | tee reports/lint.log
+            cppcheck --enable=all --check-config src -I include -I include/utils/ --template='{file}:{line}: linterror: ({severity},{id}): {message}'
       - persist_to_workspace:
           root: ~/cygnus
           paths:

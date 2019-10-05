@@ -43,7 +43,7 @@ docsReport() {
 }
 
 lintReport() {
-    local lint_error=$(($(cat reports/lint.log | wc -l)-1))
+    local lint_error=$($(egrep 'linterror: ' reports/lint.log | egrep -v 'Cppcheck does not need standard library headers to get proper results' | wc -l))
 
     if [[ $lint_error -gt 0 ]]; then
         EXITCODE=1
