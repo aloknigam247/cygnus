@@ -1,0 +1,5 @@
+todo:
+  keyword: TODO
+  autoAssign: true
+  blobLines: 2
+  reopenClosed: true
