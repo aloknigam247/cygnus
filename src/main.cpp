@@ -22,8 +22,13 @@
  * SOFTWARE.                                                                        *
  ************************************************************************************/
 
+#include "Log.h"
 #include "Options.h"
 
 int main(const int pi_argc, const char* pi_argv[]) {
+    Options opt;
+    opt.parse(pi_argc, pi_argv);
+    std::string file = opt.get_positional();
+    Log::d(file);
     return 0;
 }

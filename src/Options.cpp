@@ -24,6 +24,13 @@
 
 #include "Options.h"
 
-const std::forward_list<std::string>& Options::get_positional() const {
+#include "Log.h"
+
+const std::string& Options::get_positional() const {
     return pos_args;
+}
+
+void Options::parse(const int pi_argc, const char* pi_argv[]) {
+    if(pi_argc > 1)
+        pos_args = pi_argv[1];
 }

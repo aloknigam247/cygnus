@@ -25,15 +25,15 @@
 #ifndef _OPTIONS_H
 #define _OPTIONS_H
 
-#include <forward_list>
 #include <string>
 
 class Options {
     public:
-        const std::forward_list<std::string>& get_positional() const;
+    const std::string& get_positional() const;
+    void parse(const int pi_argc, const char* argv[]);
 
     private:
-        std::forward_list<std::string> pos_args;
+    std::string pos_args;
 };
 
 #endif

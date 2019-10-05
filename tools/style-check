@@ -166,6 +166,7 @@ def checkFuncNames(file):
                                     )
 
                     # Check paramter name
+                    # TODO: add rule to check pi_ is with const
                     param_name = param[param_type.end():].replace('[','').replace(']','')
                     if(not re.match('pi_|po_|pio_', param_name)):
                         error_list.append(Error("parameter name should start with pi_|po_|pio_",
