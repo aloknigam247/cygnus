@@ -147,13 +147,12 @@ warnReport() {
 }
 
 main() {
-    parseCmdLine $@
     covReport
     docsReport
     lintReport
     memReport
     perfReport
-    relaseTestReport
+    releaseTestReport
     sanitizationReport
     styleReport
     warnReport
