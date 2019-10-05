@@ -25,6 +25,7 @@
 #include "Log.h"
 #include "Options.h"
 
+// TODO: check
 int main(const int pi_argc, const char* pi_argv[]) {
     Options opt;
     opt.parse(pi_argc, pi_argv);
