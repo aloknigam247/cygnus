@@ -195,12 +195,12 @@ main() {
         coverage)
             if [[ ${VALUES['-a']} || ${VALUES['-f']} ]]; then
                 mkdir -p reports/coverage/func
-                lcov --gcov-tool=gcov-7 --capture --directory build/obj/coverage  --no-external --output-file reports/coverage/func/coverage.info
+                lcov --gcov-tool=gcov-7 -b src -c -d build/obj/coverage -d include --no-external -o reports/coverage/func/coverage.info 
                 genhtml reports/coverage/func/coverage.info --output-directory reports/coverage/func/html --demangle-cpp
             fi
             if [[ ${VALUES['-a']} || ${VALUES['-u']} ]]; then
                 mkdir -p reports/coverage/unit
-                lcov --gcov-tool=gcov-7 --capture --directory $OUT_DIR --no-external --output-file reports/coverage/unit/coverage.info
+                lcov --gcov-tool=gcov-7 -b src -c -d $OUT_DIR -d include --no-external -o reports/coverage/unit/coverage.info
                 genhtml reports/coverage/unit/coverage.info --output-directory reports/coverage/unit/html --demangle-cpp
             fi
             ;;

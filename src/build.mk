@@ -7,7 +7,7 @@ objs: $(OBJ_FILES)
 $(OBJ_FILES):
 	$(CPP_COMPILE) $(INCLUDE_DIR) -c -o $@ $<
 ifeq ($(MODE),coverage)
-	ln -sr $< $(OBJ)/
+	ln -fsr $< $(OBJ)/
 endif
 
 include $(DEP_FILES)
