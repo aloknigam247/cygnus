@@ -1,13 +1,27 @@
+#ifndef _LOG_H
+#define _LOG_H
+
 #include <iostream>
 
 class Log {
     public:
-    template <typename T>
-    static void d(const T pi_msg) { std::cout << "|DEBUG| " << pi_msg << '\n'; }
-    template <typename T>
-    static void e(const T pi_msg) { std::cout << "|ERROR| " << pi_msg << '\n'; }
-    template <typename T>
-    static void i(const T pi_msg) { std::cout << "|INFO| " << pi_msg << '\n';  }
-    template <typename T>
-    static void w(const T pi_msg) { std::cout << "|WARN| " << pi_msg << '\n';  }
+    template <typename... Args>
+    static void d(const Args... args) { std::cout << "|DEBUG| "; display(args...); }
+    template <typename... Args>
+    static void e(const Args... args) { std::cout << "|ERROR| "; display(args...); }
+    template <typename... Args>
+    static void i(const Args... args) { std::cout << "|INFO| "; display(args...); }
+    template <typename... Args>
+    static void w(const Args... args) { std::cout << "|WARN| "; display(args...); }
+
+    private:
+    template <typename T, typename... Args>
+    static void display(T first, Args... args) {
+        std::cout << first;
+        display(args...);
+    }
+    
+    static void display() { std::cout << std::endl; }
 };
+
+#endif

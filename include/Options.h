@@ -27,12 +27,54 @@
 
 #include <string>
 
+#include "cystructs.h"
+
+
+class Option {
+    union Value;
+
+    public:
+    enum Type {
+        BOOL,
+        CHAR,
+        INT,
+        STRING
+    };
+
+    Option(const std::string pi_name, Type pi_type) : name(pi_name), type(pi_type), value(0) {}
+    Value get_value();
+    Type get_type() { return type; }
+    void set_value(const bool  pi_value) { value.b = pi_value; }
+    void set_value(const char  pi_value) { value.c = pi_value; }
+    void set_value(const int   pi_value) { value.i = pi_value; }
+    void set_value(const char* pi_value) { value.s = pi_value; }
+    bool operator>(const Option& pi_opt) { return name > pi_opt.name; }
+    bool operator>(const char* pi_opt)   { return name > pi_opt; }
+    bool operator==(const char* pi_opt)  { return name == pi_opt }
+    
+    private:
+    union Value {
+        bool b;
+        char c;
+        int i;
+        const char* s;
+        Value(const int pi_i) : s(nullptr) {}
+    };
+
+    std::string name;
+    Type type;
+    Value value;
+};
+
 class Options {
     public:
-    const std::string& get_positional() const;
-    void parse(const int pi_argc, const char* argv[]);
+    void addOption(const std::string pi_option_name, Option::Type);
+    bool parse(const int pi_argc, const char* argv[]);
+    const std::string& get_positional() const { return pos_args; }
+    
 
     private:
+    cystructs::Tree<Option*> option_list;
     std::string pos_args;
 };
 

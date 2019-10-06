@@ -238,6 +238,15 @@ def checkLineLength(file):
                             )
                         )
     return error_list
+    
+    
+    
+    
+    
+    
+    
+    
+
 
 def checkSpaces(file):
     error_list = []
@@ -286,6 +295,7 @@ def main():
 
     for dir in opt.dir:
         cppList += (collectFiles(dir, "cpp"))
+        cppList += (collectFiles(dir, "tcc"))
         hList += (collectFiles(dir, "h"))
 
     for file in cppList+hList:
@@ -296,3 +306,7 @@ def main():
 if __name__ == "__main__":
     ret = main()
     sys.exit(ret)
+
+# TODO: rule to check }; ends with /* class|struct|namespace <name> */
+# TODO: check tabs in source code
+# TODO: check if style and function style for spaces

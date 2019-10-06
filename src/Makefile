@@ -1,4 +1,4 @@
-export INCLUDE_DIR += -I ../include -I ../include/utils
+export INCLUDE_DIR += -I . -I ../include -I ../include/utils
 
 .INTERMEDIATE : $(DEP_FILES)
 
