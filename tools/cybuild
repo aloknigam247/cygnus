@@ -69,7 +69,9 @@ main() {
             MAKE debug
             ;;
     esac
+    return $?
 }
 
 mkdir -p logs
 main $@
+return $?

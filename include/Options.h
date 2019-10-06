@@ -26,9 +26,9 @@
 #define _OPTIONS_H
 
 #include <string>
+#include <vector>
 
 #include "cystructs.h"
-
 
 class Option {
     union Value;
@@ -50,7 +50,7 @@ class Option {
     void set_value(const char* pi_value) { value.s = pi_value; }
     bool operator>(const Option& pi_opt) { return name > pi_opt.name; }
     bool operator>(const char* pi_opt)   { return name > pi_opt; }
-    bool operator==(const char* pi_opt)  { return name == pi_opt }
+    bool operator==(const char* pi_opt)  { return name == pi_opt; }
     
     private:
     union Value {
@@ -70,12 +70,11 @@ class Options {
     public:
     void addOption(const std::string pi_option_name, Option::Type);
     bool parse(const int pi_argc, const char* argv[]);
-    const std::string& get_positional() const { return pos_args; }
-    
+    const std::vector<std::string>& get_positional() const { return pos_args; }
 
     private:
     cystructs::Tree<Option*> option_list;
-    std::string pos_args;
+    std::vector<std::string> pos_args;
 };
 
 #endif

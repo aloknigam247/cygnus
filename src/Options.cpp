@@ -85,7 +85,7 @@ bool Options::parse(const int pi_argc, const char* pi_argv[]) {
                 Log::w("ignoring unknown option ", opt);
         }
         else {
-            // TODO: positional arguments
+            pos_args.push_back(std::string(opt));
         }
     }
     return result;
