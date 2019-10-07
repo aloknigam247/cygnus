@@ -76,7 +76,6 @@ makeRunDir(){
     local test_out=$OUT_DIR/`dirname $testcase`
     rm -rf $test_out
     mkdir -p $test_out
-    pwd
     ln -rs $TEST_DIR/`dirname $testcase`/* $test_out/
 }
 
@@ -84,17 +83,23 @@ runFuncTest() {
     local testcase=$1
     local testcase_dir=`dirname $testcase`
 
-    echo "[RUN] $testcase"
+    echo "|TESTCASE| $testcase"
     makeRunDir $testcase
     cd $OUT_DIR/$testcase_dir
-    echo "[CMD] $tool `cat runme`"
-    $tool `cat runme` 2>&1 | tee run.log
-    if [[ $TEST_MODE == "perf" ]]; then
-        diff gmon.out gmon.gold
-        if [[ $? -ne 0 ]]; then
-            echo "TESTFAIL" > testfail
-        fi
-    fi
+    
+    source `basename $testcase`
+    for i in ${!CASE[@]}; do
+        echo "|CASE $((i+1))| ${CASE[$i]}"
+        ${tool} ${CASE[$i]} | sed 's/.*/>   &/'
+        echo
+    done
+    
+    #if [[ $TEST_MODE == "perf" ]]; then
+    #    diff gmon.out gmon.gold
+    #    if [[ $? -ne 0 ]]; then
+    #        echo "TESTFAIL" > testfail
+    #    fi
+    #fi
 }
 
 runUnitTest() {
@@ -195,13 +200,13 @@ main() {
         coverage)
             if [[ ${VALUES['-a']} || ${VALUES['-f']} ]]; then
                 mkdir -p reports/coverage/func
-                lcov --gcov-tool=gcov-7 -b src -c -d build/obj/coverage -d include --no-external -o reports/coverage/func/coverage.info 
-                genhtml reports/coverage/func/coverage.info --output-directory reports/coverage/func/html --demangle-cpp
+                lcov --gcov-tool=gcov-7 -b src -c -d build/obj/coverage -d include --no-external -o reports/coverage/func/coverage.info -q
+                genhtml reports/coverage/func/coverage.info --output-directory reports/coverage/func/html --demangle-cpp | tee reports/coverage/func/genhtml.log
             fi
             if [[ ${VALUES['-a']} || ${VALUES['-u']} ]]; then
                 mkdir -p reports/coverage/unit
-                lcov --gcov-tool=gcov-7 -b src -c -d $OUT_DIR -d include --no-external -o reports/coverage/unit/coverage.info
-                genhtml reports/coverage/unit/coverage.info --output-directory reports/coverage/unit/html --demangle-cpp
+                lcov --gcov-tool=gcov-7 -b src -c -d $OUT_DIR -d include --no-external -o reports/coverage/unit/coverage.info -q
+                genhtml reports/coverage/unit/coverage.info --output-directory reports/coverage/unit/html --demangle-cpp | tee reports/coverage/unit/lcov.log
             fi
             ;;
         mem-check)
