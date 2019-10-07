@@ -12,19 +12,33 @@ adder() {
 }
 
 covReport() {
-    local func_cov=-1
-    local unit_cov=-1
+    local func_cov_line=-1
+    local func_cov_func=-1
+    local func_log="reports/coverage/func/genhtml.log"
+    local unit_cov_line=-1
+    local unit_cov_func=-1
+    local unit_log="reports/coverage/unit/genhtml.log"
 
-    test -f reports/coverage/func/html/index.html && func_cov=$(egrep -m 1 "headerCovTableEntryHi" reports/coverage/func/html/index.html | sed -r 's/[^0-9.]//g')
-    test -f reports/coverage/unit/html/index.html && unit_cov=$(egrep -m 1 "headerCovTableEntryHi" reports/coverage/unit/html/index.html | sed -r 's/[^0-9.]//g')
-    
-    if [[ $func_cov -lt 100 || $unit_cov -lt 100 ]]; then
+    if [[ -f reports/coverage/func/genhtml.log ]]; then 
+        func_cov_line=$(egrep 'lines......: ' $func_log | sed 's/.*lines......: //')
+        func_cov_func=$(egrep 'functions..: ' $func_log | sed 's/.*functions..: //')
+    fi
+    if [[ -f reports/coverage/unit/genhtml.log ]]; then 
+        unit_cov_line=$(egrep 'lines......: ' $unit_log | sed 's/.*lines......: //')
+        unit_cov_func=$(egrep 'functions..: ' $unit_log | sed 's/.*functions..: //')
+    fi
+    if [[ $func_cov_line -lt 100 || $func_cov_func -lt 100 ||\
+          $unit_cov_line -lt 100 || $unit_cov_func -lt 100 ]]; then
         EXITCODE=1
     fi
     
     echo "Coverage Report::"
-    echo "    Funtional Coverage: ${func_cov}%"
-    echo "    Unit Coverage: ${func_cov}%"
+    echo "    Funtional Coverage:"
+    echo "        Lines......: $func_cov_line"
+    echo "        Functions..: $func_cov_func"
+    echo "    Unit Coverage:"
+    echo "        Lines......: $unit_cov_line"
+    echo "        Functions..: $unit_cov_func"
     echo
 }
 
@@ -56,10 +70,12 @@ lintReport() {
 
 memReport() {
     local func_error=-1
+    local f_file="reports/mem-check/func/errors"
     local unit_error=-1
+    local u_file="reports/mem-check/unit/errors"
 
-    test -f reports/mem-check/func/errors && func_error=$(adder $(egrep -o "[0-9] errors" reports/mem-check/func/errors | sed 's/ errors//'))
-    test -f reports/mem-check/unit/errors && unit_error=$(adder $(egrep -o "[0-9] errors" reports/mem-check/unit/errors | sed 's/ errors//'))
+    test -f $f_file && func_error=$(adder $(egrep -o "[0-9] errors" $f_file | sed 's/ errors//'))
+    test -f $u_file && unit_error=$(adder $(egrep -o "[0-9] errors" $u_file | sed 's/ errors//'))
 
     if [[ $func_error -ne 0 || $unit_error -ne 0 ]]; then
         EXITCODE=1
@@ -132,10 +148,12 @@ styleReport() {
 
 warnReport() {
     local debug_warn=-1
+    local debug_file="reports/warnings/debug-errors"
     local release_warn=-1
+    local release_file="reports/warnings/release-errors"
 
-    test -f reports/warnings/debug-errors && debug_warn=$(egrep -c "warning: " reports/warnings/debug-errors) 
-    test -f reports/warnings/release-errors && release_warn=$(egrep -c "warning: " reports/warnings/release-errors)
+    test -f reports/warnings/debug-errors && debug_warn=$(egrep -c "warning: " $debug_file) 
+    test -f reports/warnings/release-errors && release_warn=$(egrep -c "warning: " $release_file)
     
     if [[ $debug_warn -ne 0 || $release_warn -ne 0 ]]; then
         EXITCODE=1
