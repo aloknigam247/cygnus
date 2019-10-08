@@ -1,21 +1,39 @@
 #ifndef _CYSTRUCTS_H
 #define _CYSTRUCTS_H
 
+#include <stack>
+
 #include "Log.h"
 namespace cystructs {
 
-typedef bool Result;
-
 template <typename T>
 class Tree {
+    struct Node;
+
     public:
-    Tree() : root(nullptr), last_result(nullptr) {}
+    class iterator {
+        public:
+        iterator() {}
+        iterator(Node* pi_node) { st.push(pi_node); }
+        T operator*() const;
+        bool operator==(const iterator& pi_iter) const;
+        bool operator!=(const iterator& pi_iter) const;
+        T operator->() const;
+        iterator& operator++();
+
+        private:
+        std::stack<Node*> st;
+        friend iterator& Tree<T>::begin() const;
+    };
+    
+    Tree() : root(nullptr) {}
     ~Tree();
     void insert(const T pi_t);
     template<typename K>
-    Result search(const K& pi_key);
-    T get_result();
-    
+    iterator& search(const K& pi_key);
+    iterator& begin() const;
+    iterator& end() const;
+
     private:
     struct Node {
         T data;
@@ -25,7 +43,6 @@ class Tree {
     };  /* struct Node */
 
     Node* root;
-    Node* last_result;
     void binaryInsert(Node*& pio_root, const Node* pi_data);
     template <typename K>
     Node* binarySearch(Node* pi_root, K& pi_key) const;

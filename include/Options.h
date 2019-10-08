@@ -41,16 +41,22 @@ class Option {
         STRING
     };
 
-    Option(const std::string pi_name, Type pi_type) : name(pi_name), type(pi_type), value(0) {}
-    Value get_value();
-    Type get_type() { return type; }
+    Option(const std::string pi_name, Type pi_type, std::string pi_help) :
+        name(pi_name), type(pi_type), help(pi_help), value(0) {}
+    
+    std::string get_help() const { return help;  }
+    std::string get_name() const { return name;  }
+    Type get_type() const        { return type;  }
+    Value get_value() const      { return value; }
+    
     void set_value(const bool  pi_value) { value.b = pi_value; }
     void set_value(const char  pi_value) { value.c = pi_value; }
     void set_value(const int   pi_value) { value.i = pi_value; }
     void set_value(const char* pi_value) { value.s = pi_value; }
+    
     bool operator>(const Option& pi_opt) { return name > pi_opt.name; }
-    bool operator>(const char* pi_opt)   { return name > pi_opt; }
-    bool operator==(const char* pi_opt)  { return name == pi_opt; }
+    bool operator>(const char* pi_opt)   { return name > pi_opt;      }
+    bool operator==(const char* pi_opt)  { return name == pi_opt;     }
     
     private:
     union Value {
@@ -61,16 +67,18 @@ class Option {
         Value(const int pi_i) : s(nullptr) {}
     };
 
-    std::string name;
-    Type type;
+    const std::string name, help;
+    const Type type;
     Value value;
 };
 
 class Options {
     public:
-    void addOption(const std::string pi_option_name, Option::Type);
+    Options();
+    void addOption(const std::string pi_option_name, Option::Type, const std::string pi_help);
     bool parse(const int pi_argc, const char* argv[]);
     const std::vector<std::string>& get_positional() const { return pos_args; }
+    void usage() const;
 
     private:
     cystructs::Tree<Option*> option_list;

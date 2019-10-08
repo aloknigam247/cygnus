@@ -28,8 +28,14 @@
 
 #include "Log.h"
 
-void Options::addOption(const std::string pi_option_name, Option::Type pi_type) {
-    option_list.insert(new Option(pi_option_name, pi_type));
+Options::Options() {
+    addOption("-h", Option::BOOL, "print help message");
+}
+
+void Options::addOption(const std::string pi_option_name,
+                        Option::Type pi_type,
+                        const std::string pi_help) {
+    option_list.insert(new Option(pi_option_name, pi_type, pi_help));
 }
 
 bool Options::parse(const int pi_argc, const char* pi_argv[]) {
@@ -40,14 +46,16 @@ bool Options::parse(const int pi_argc, const char* pi_argv[]) {
     for(int i=1; i<pi_argc; ++i) {
         const char* opt = pi_argv[i];
         if(opt[0] == '-') {
-            if(option_list.search(opt)) {
-                switch(option_list.get_result()->get_type()){
+            cystructs::Tree<Option*>::iterator iter;
+            iter = option_list.search(opt);
+            if(iter != option_list.end()) {
+                switch(iter->get_type()){
                     case Option::BOOL:
-                        option_list.get_result()->set_value(true);
+                        iter->set_value(true);
                         break;
                     case Option::CHAR:
                         if(i+1 < pi_argc && strlen(pi_argv[i+1]) == 1)
-                            option_list.get_result()->set_value(*pi_argv[++i]);
+                            iter->set_value(*pi_argv[++i]);
                         else {
                             Log::e("option ", opt, " needs value character value.");
                             result = false;
@@ -56,7 +64,7 @@ bool Options::parse(const int pi_argc, const char* pi_argv[]) {
                     case Option::INT:
                         if(i+1 < pi_argc && pi_argv[i+1][0] != '-')
                             try{
-                                option_list.get_result()->set_value(std::stoi(pi_argv[++i]));
+                                iter->set_value(std::stoi(pi_argv[++i]));
                             }
                             catch (const std::invalid_argument& e) {
                                 Log::e(pi_argv[i], " is not a valid integer.");
@@ -73,7 +81,7 @@ bool Options::parse(const int pi_argc, const char* pi_argv[]) {
                         break;
                     case Option::STRING:
                         if(i+1 < pi_argc && pi_argv[i+1][0] != '-')
-                            option_list.get_result()->set_value(pi_argv[++i]);
+                            iter->set_value(pi_argv[++i]);
                         else {
                             Log::e("option ", opt, " needs value string value.");
                             result = false;
@@ -88,5 +96,19 @@ bool Options::parse(const int pi_argc, const char* pi_argv[]) {
             pos_args.push_back(std::string(opt));
         }
     }
+    cystructs::Tree<Option*>::iterator iter = option_list.search("-h");
+    if(iter != option_list.end()) {
+        usage();
+        result = false;
+    }
     return result;
+}
+
+void Options::usage() const {
+    cystructs::Tree<Option*>::iterator iter;
+    std::cout << "usage: cygnus [options]\n";
+    for(iter = option_list.begin(); iter != option_list.end(); ++iter) {
+        Option* opt = *iter;
+        std::cout << "    " <<opt->get_name() << ": " << opt->get_help() << '\n';
+    }
 }
