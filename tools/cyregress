@@ -89,7 +89,7 @@ runFuncTest() {
     
     source `basename $testcase`
     for i in ${!CASE[@]}; do
-        echo "|CASE $((i+1))| ${CASE[$i]}"
+        echo "|CASE $((i+1))| $(echo ${CASE[$i]} | sed "s|$CYGNUS|cygnus|")"
         ${tool} ${CASE[$i]} | sed 's/.*/>   &/'
         echo
     done
@@ -168,19 +168,23 @@ main() {
 
     case $TEST_MODE in
         coverage)
+            CYGNUS=$CYGNUS_HOME/build/bin/coverage/cygnus-coverage
             OUT_DIR="$OUT_DIR/coverage"
             mkdir -p reports/coverage
             ;;
         mem-check)
+            CYGNUS=$CYGNUS_HOME/build/bin/memory/cygnus-memory
             OUT_DIR="$OUT_DIR/mem-check"
             mkdir -p reports/mem-check
             tool="valgrind --leak-check=full --log-file=valgrind.out"
             ;;
         perf)
+            CYGNUS=$CYGNUS_HOME/build/bin/perf/cygnus-perf
             OUT_DIR="$OUT_DIR/perf"
             mkdir -p reports/perf
             ;;
         sanitize)
+            CYGNUS=$CYGNUS_HOME/build/bin/sanitize/cygnus-sanitize
             OUT_DIR="$OUT_DIR/sanitize"
             mkdir -p reports/sanitize
             ;;
@@ -188,6 +192,10 @@ main() {
             ;;
     esac
 
+    if [[ ${VALUES['-a']} || ${VALUES['-f']} ]] && [[ ! -x $CYGNUS ]]; then
+        LOG E "$CYGNUS does not exist"
+        EXIT
+    fi
     rm -rf reports/func reports/unit
     mkdir -p reports/func reports/unit
     for test in $valid_tests; do
@@ -200,13 +208,15 @@ main() {
         coverage)
             if [[ ${VALUES['-a']} || ${VALUES['-f']} ]]; then
                 mkdir -p reports/coverage/func
-                lcov --gcov-tool=gcov-7 -b src -c -d build/obj/coverage -d include --no-external -o reports/coverage/func/coverage.info -q
-                genhtml reports/coverage/func/coverage.info --output-directory reports/coverage/func/html --demangle-cpp | tee reports/coverage/func/genhtml.log
+                lcov --gcov-tool=gcov-7 -b src -c -d build/obj/coverage -d include --no-external -o reports/coverage/func/coverage.info -q 2> /dev/null
+                genhtml reports/coverage/func/coverage.info --output-directory reports/coverage/func/html --demangle-cpp > reports/coverage/func/genhtml.log 2> /dev/null
+                echo "Functional Coverage:"
+                egrep -A 1 "  lines\.\.\.\.\.\.: " reports/coverage/func/genhtml.log
             fi
             if [[ ${VALUES['-a']} || ${VALUES['-u']} ]]; then
                 mkdir -p reports/coverage/unit
-                lcov --gcov-tool=gcov-7 -b src -c -d $OUT_DIR -d include --no-external -o reports/coverage/unit/coverage.info -q
-                genhtml reports/coverage/unit/coverage.info --output-directory reports/coverage/unit/html --demangle-cpp | tee reports/coverage/unit/lcov.log
+                lcov --gcov-tool=gcov-7 -b src -c -d $OUT_DIR -d include --no-external -o reports/coverage/unit/coverage.info -q 2> /dev/null
+                genhtml reports/coverage/unit/coverage.info --output-directory reports/coverage/unit/html --demangle-cpp | tee reports/coverage/unit/lcov.log 2> /dev/null
             fi
             ;;
         mem-check)

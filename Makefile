@@ -6,7 +6,8 @@ Q	:= @
 #---------- Modes ----------# 
 ifeq ($(MODE),coverage)
 CPP_FLAGS 	+= --coverage -g
-CXX          = g++-7	# Using ver 7 as lcov does not support ver 9 gcno file dump
+# Using ver 7 as lcov does not support ver 9 gcno file dump
+CXX          = g++-7
 else ifeq ($(MODE),debug)
 CPP_FLAGS 	+= -g
 else ifeq ($(MODE),memory)
