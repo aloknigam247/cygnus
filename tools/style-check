@@ -238,15 +238,6 @@ def checkLineLength(file):
                             )
                         )
     return error_list
-    
-    
-    
-    
-    
-    
-    
-    
-
 
 def checkSpaces(file):
     error_list = []
@@ -273,6 +264,18 @@ def checkSpaces(file):
                             lineno,
                             trailing_space.start(),
                             len(trailing_space.group(0))
+                            )
+                        )
+        
+        # Check space only in line
+        line_space = re.match('^ +$', line)
+        if(line_space):
+            error_list.append(Error("empty line have spaces only",
+                            file,
+                            line.rstrip(),
+                            lineno,
+                            line_space.start(),
+                            len(line)
                             )
                         )
     return error_list
@@ -310,4 +313,3 @@ if __name__ == "__main__":
 # TODO: rule to check }; ends with /* class|struct|namespace <name> */
 # TODO: check tabs in source code
 # TODO: check if style and function style for spaces
-# TODO: check line that has only spaces
