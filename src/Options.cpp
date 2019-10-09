@@ -97,7 +97,7 @@ bool Options::parse(const int pi_argc, const char* pi_argv[]) {
         }
     }
     cystructs::Tree<Option*>::iterator iter = option_list.search("-h");
-    if(iter != option_list.end()) {
+    if(iter != option_list.end() && iter->get_bool_value()) {
         usage();
         result = false;
     }

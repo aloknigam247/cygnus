@@ -47,7 +47,11 @@ class Option {
     std::string get_help() const { return help;  }
     std::string get_name() const { return name;  }
     Type get_type() const        { return type;  }
-    Value get_value() const      { return value; }
+    
+    bool  get_bool_value()   const { return value.b; }
+    char  get_char_value()   const { return value.c; }
+    int   get_int_value()    const { return value.i; }
+    const char* get_string_value() const { return value.s; }
     
     void set_value(const bool  pi_value) { value.b = pi_value; }
     void set_value(const char  pi_value) { value.c = pi_value; }
