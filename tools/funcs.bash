@@ -20,14 +20,14 @@ LOG(){
     local _msg=${2:?"message missing."}
     case $1 in
         E)
-            echo "[ERROR] $_msg"
+            echo "|ERROR| $_msg"
             _EXITCODE=1
             ;;
         I)
-            echo "[INFO] $_msg"
+            echo "|INFO| $_msg"
             ;;
         W)
-            echo "[WARN] $_msg"
+            echo "|WARN| $_msg"
             ;;
         *)
             LOG E "unrecognized log type"

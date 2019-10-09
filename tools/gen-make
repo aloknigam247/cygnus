@@ -21,7 +21,7 @@ class IO:
         if(tag == None):
             raise Exception("unknown mode \`" + mode + "' specified")
         
-        print("[%s] %s" %(tag, msg))
+        print("|%s| %s" %(tag, msg))
 
     @staticmethod
     def cmdOut(msg):

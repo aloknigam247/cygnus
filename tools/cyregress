@@ -108,14 +108,14 @@ runUnitTest() {
     local run_log=$OUT_DIR/$testcase_dir/unit_test.log
     #run_log_color=$OUT_DIR/$testcase_dir/.run.log
 
-    echo "[RUN] $testcase"
+    echo "|TESTCASE| $testcase"
     pwd
     
     makeRunDir $testcase
     {
         LOG I "Run directory created"
         if [[ ! -a $TEST_DIR/$testcase_dir/Makefile ]]; then
-            gen-make -d $OUT_DIR/$testcase_dir -i $CYGNUS_HOME/include -i $CYGNUS_HOME/tests/utils/include test.cpp
+            gen-make -d $OUT_DIR/$testcase_dir -i $CYGNUS_HOME/include -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src -i $CYGNUS_HOME/tests/utils/include test.cpp
         fi
         if [[ $? -ne 0 ]]; then
             EXIT 1
