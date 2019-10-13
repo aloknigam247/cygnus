@@ -115,7 +115,7 @@ runUnitTest() {
     {
         LOG I "Run directory created"
 #        if [[ ! -a $TEST_DIR/$testcase_dir/Makefile ]]; then
-            gen-make -d $OUT_DIR/$testcase_dir -i $CYGNUS_HOME/include -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src main.cpp
+            gen-make -d $OUT_DIR/$testcase_dir -i $CYGNUS_HOME/include -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src -s $CYGNUS_HOME/tests/utils/src main.cpp
 #        fi
         if [[ $? -ne 0 ]]; then
             EXIT 1
