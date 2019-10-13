@@ -36,20 +36,20 @@ LOG(){
     esac
 }
 
-####################################################################
-# How to create new option                                         #
-#   * eval:      : action to evaluate when option is found          #
-#   * help:      : create help statement, use . in place of space   #
-#   * metavar:   : string to be displayed for option argument       #
-#   * value:     : type of value                                    #
-#                   bool    - no argument                          #
-#                   string  - option expects single argument       #
-#   * with:      : mention dependency of option                     #
-#   ** POS      : special option to provide positional args        #
-#                                                                  #
-#   OPTION['option-name']="list of above options"                  #
-#   OPTION['POS']="variable-name"                                  #
-####################################################################
+#####################################################################
+# How to create new option                                          #
+#   * eval:     : action to evaluate when option is found           #
+#   * help:     : create help statement, use . in place of space    #
+#   * metavar:  : string to be displayed for option argument        #
+#   * value:    : type of value                                     #
+#                  bool    - no argument                            #
+#               : string  - option expects single argument          #
+#   * with:     : mention dependency of option                      #
+#   ** POS      : special option to provide positional args         #
+#                                                                   #
+#   OPTION['option-name']="list of above options"                   #
+#   OPTION['POS']="variable-name"                                   #
+#####################################################################
 declare -A OPTION
 declare -A VALUES
 declare _POS_NAME
@@ -93,7 +93,7 @@ usage(){
     done
 
     # print usage now
-    echo "Usage: `basename $0` [options] $pos_name"
+    echo "Usage: `basename $0` [options] $_pos_name"
     for opt in `echo ${!OPTION[@]} | sed 's/ /\n/g' | sort | grep -v POS`; do
         _meta=''
         _help=''
@@ -241,8 +241,8 @@ parseCmdLine() {
         fi
         shift
     done
-    if [[ -n $_pos && -n $POS_NAME ]]; then
-        VALUES[$POS_NAME]="$_pos"
+    if [[ -n $_pos && -n $_POS_NAME ]]; then
+        VALUES[$_POS_NAME]="$_pos"
         echo ""
     fi
 
