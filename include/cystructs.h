@@ -2,8 +2,8 @@
 #define _CYSTRUCTS_H
 
 #include <stack>
+#include <stdexcept>
 
-#include "Log.h"
 namespace cystructs {
 
 template <typename T>

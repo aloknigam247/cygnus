@@ -1,4 +1,4 @@
-export INCLUDE_DIR += -I . -I ../include -I ../include/utils
+export INCLUDE_DIR += -I . -I ../include -I ../include/utils -I ../src/tcc
 
 .INTERMEDIATE : $(DEP_FILES)
 
