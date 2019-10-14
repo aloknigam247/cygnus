@@ -126,7 +126,6 @@ usage(){
 # Error message for option
 # Usage: optionError <option>
 optionError(){
-    LOG E "option \`$1' expects argument"
     local _IFS_Prev=$IFS
     local _meta=''
     local _help=''
@@ -135,16 +134,21 @@ optionError(){
     IFS=','
     for _param in ${OPTION[$1]};do
         case $_param in
+            help:*)
+                _help=${_param#*:}
+                ;;
             metavar:*)
                 _meta="<${_param#*:}>"
                 ;;
-            help:*)
-                _help=${_param#*:}
+            value:*)
+                if [[ $_param == "value:string" ]]; then
+                    LOG E "option \`$1' expects argument"
+                fi
                 ;;
             with:*)
                 _with=", with ${_param#*:}"
                 ;;
-            _without:*)
+            without:*)
                 _without=", without ${_param#*:}"
         esac
     done
@@ -252,7 +256,7 @@ parseCmdLine() {
 
     for _o in ${!_with[@]}; do
         if [[ -z ${VALUES[$_o]} ]]; then
-            LOG E "option\[s\] $_o is missing needed by ${_with[$_o]}"
+            LOG E "option $_o is missing needed by ${_with[$_o]}"
             optionError ${_with[$_o]}
         fi
     done

@@ -101,8 +101,8 @@ class Rules:
         for src in self.src_list:
             if(file.startswith(src)):
                 obj_dir = '$(OBJ_COMMON)'
-        doto = obj_dir + '/' + os.path.basename(file).replace(".cpp", ".o")
-        return doto
+        dot_o = obj_dir + '/' + os.path.basename(file).replace(".cpp", ".o")
+        return dot_o
 
     def createRule(self, file):
         if(file in self.node):

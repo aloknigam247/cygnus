@@ -12,6 +12,9 @@ adder() {
 }
 
 covReport() {
+    local comp_cov_line=-1
+    local comp_cov_func=-1
+    local comp_log="reports/coverage/comp/genhtml.log"
     local func_cov_line=-1
     local func_cov_func=-1
     local func_log="reports/coverage/func/genhtml.log"
@@ -19,6 +22,10 @@ covReport() {
     local unit_cov_func=-1
     local unit_log="reports/coverage/unit/genhtml.log"
 
+    if [[ -f reports/coverage/comp/genhtml.log ]]; then 
+        comp_cov_line=$(egrep 'lines......: ' $comp_log | sed 's/.*lines......: //')
+        comp_cov_func=$(egrep 'functions..: ' $comp_log | sed 's/.*functions..: //')
+    fi
     if [[ -f reports/coverage/func/genhtml.log ]]; then 
         func_cov_line=$(egrep 'lines......: ' $func_log | sed 's/.*lines......: //')
         func_cov_func=$(egrep 'functions..: ' $func_log | sed 's/.*functions..: //')
@@ -27,15 +34,21 @@ covReport() {
         unit_cov_line=$(egrep 'lines......: ' $unit_log | sed 's/.*lines......: //')
         unit_cov_func=$(egrep 'functions..: ' $unit_log | sed 's/.*functions..: //')
     fi
-    if [[ ${func_cov_line/\.*/} -lt 72  || ${func_cov_func/\.*/} -lt 84  ]] ||
-       [[ ${unit_cov_line/\.*/} -lt 100 || ${unit_cov_func/\.*/} -lt 100 ]]; then
+    if [[ ${comp_cov_line/\.*/} -lt 72  || ${comp_cov_func/\.*/} -lt 84  ]] ||
+       [[ ${func_cov_line/\.*/} -lt 72  || ${func_cov_func/\.*/} -lt 83  ]] ||
+       [[ ${unit_cov_line/\.*/} -lt 4   || ${unit_cov_func/\.*/} -lt 10 ]]; then
         EXITCODE=1
     fi
     
     echo "Coverage Report::"
+    echo "    Complete Coverage:"
+    echo "        Lines......: $comp_cov_line"
+    echo "        Functions..: $comp_cov_func"
+    echo
     echo "    Funtional Coverage:"
     echo "        Lines......: $func_cov_line"
     echo "        Functions..: $func_cov_func"
+    echo
     echo "    Unit Coverage:"
     echo "        Lines......: $unit_cov_line"
     echo "        Functions..: $unit_cov_func"

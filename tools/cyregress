@@ -9,6 +9,8 @@ declare -a valid_tests
 TEST_DIR='.'
 declare OUT_DIR='test_run'
 declare TEST_MODE=''
+declare HAVE_UNIT=0
+declare HAVE_FUNC=0
 
 OPTION['-a']='value:bool,with:-d,help:run all testcases in this directory'
 OPTION['-d']='value:string,metavar:dir,help:test case directory'
@@ -115,7 +117,7 @@ runUnitTest() {
     {
         LOG I "Run directory created"
 #        if [[ ! -a $TEST_DIR/$testcase_dir/Makefile ]]; then
-            gen-make -d $OUT_DIR/$testcase_dir -i $CYGNUS_HOME/include -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src -s $CYGNUS_HOME/tests/utils/src main.cpp
+            gen-make -d $OUT_DIR/$testcase_dir -i $CYGNUS_HOME/include -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src -s $CYGNUS_HOME/tests/utils/src test.cpp
 #        fi
         if [[ $? -ne 0 ]]; then
             EXIT 1
@@ -140,8 +142,10 @@ runUnitTest() {
 
 runTest() {
     if [[ $1 =~ 'func' ]]; then
+        HAVE_FUNC=1
         runFuncTest $1
     else
+        HAVE_UNIT=1
         runUnitTest $1
     fi
 }
@@ -189,6 +193,7 @@ main() {
             mkdir -p reports/sanitize
             ;;
         *)
+            CYGNUS=$CYGNUS_HOME/build/bin/cygnus
             ;;
     esac
 
@@ -206,17 +211,22 @@ main() {
 
     case $TEST_MODE in
         coverage)
-            if [[ ${VALUES['-a']} || ${VALUES['-f']} ]]; then
+            if [[ $HAVE_FUNC -eq 1 ]]; then
                 mkdir -p reports/coverage/func
                 lcov --gcov-tool=gcov-7 -b src -c -d build/obj/coverage -d include --no-external -o reports/coverage/func/coverage.info -q 2> /dev/null
                 genhtml reports/coverage/func/coverage.info --output-directory reports/coverage/func/html --demangle-cpp > reports/coverage/func/genhtml.log 2> /dev/null
                 echo "Functional Coverage:"
                 egrep -A 1 "  lines\.\.\.\.\.\.: " reports/coverage/func/genhtml.log
             fi
-            if [[ ${VALUES['-a']} || ${VALUES['-u']} ]]; then
+            if [[ $HAVE_UNIT -eq 1 ]]; then
                 mkdir -p reports/coverage/unit
                 lcov --gcov-tool=gcov-7 -b src -c -d $OUT_DIR -d include --no-external -o reports/coverage/unit/coverage.info -q 2> /dev/null
-                genhtml reports/coverage/unit/coverage.info --output-directory reports/coverage/unit/html --demangle-cpp | tee reports/coverage/unit/lcov.log 2> /dev/null
+                genhtml --ignore-errors source reports/coverage/unit/coverage.info --output-directory reports/coverage/unit/html --demangle-cpp | tee reports/coverage/unit/genhtml.log 2> /dev/null
+            fi
+            if [[ ${VALUES['-a']} ]]; then
+                mkdir -p reports/coverage/comp
+                lcov --gcov-tool=gcov-7 -b src -c -d build/obj/coverage -d $OUT_DIR -d include --no-external -o reports/coverage/comp/coverage.info -q 2> /dev/null
+                genhtml --ignore-errors source reports/coverage/comp/coverage.info --output-directory reports/coverage/comp/html --demangle-cpp | tee reports/coverage/comp/genhtml.log 2> /dev/null
             fi
             ;;
         mem-check)
