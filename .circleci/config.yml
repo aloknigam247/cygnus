@@ -94,7 +94,7 @@ jobs:
             cd ~/cygnus
             source sourceme
             cybuild --memory
-            cyregress -a -d tests --mem-check 2>&1 | tee reports/mem-checks.log
+            cyregress -a -d tests --mem-check
       - persist_to_workspace:
           root: ~/cygnus
           paths:

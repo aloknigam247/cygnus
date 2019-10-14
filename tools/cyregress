@@ -135,7 +135,7 @@ runUnitTest() {
             fi
         fi
     } 2>&1 | tee $run_log
-    cat $run_log >> reports/unit/unit_test.log
+    cat $run_log >> reports/unit/unit_test_$TEST_MODE.log
     #sed 's|\x1b\[[;0-9]*m\x1b\[K||g' $run_log_color > $run_log
     [[ $status -eq 0 ]] && echo " --PASS--" || echo " --FAIL--"
 }
