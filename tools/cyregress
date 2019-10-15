@@ -221,11 +221,32 @@ main() {
             if [[ $HAVE_UNIT -eq 1 ]]; then
                 mkdir -p reports/coverage/unit
                 lcov --gcov-tool=gcov-7 -b src -c -d $OUT_DIR -d include --no-external -o reports/coverage/unit/coverage.info -q 2> /dev/null
+
+                # Put missing files in coverage.info
+                mkdir /tmp/cygnus_tmp -p
+                find include src -regex ".*\.cpp\|.*\.h\|.*\.tcc" | egrep -v "main.cpp" | sort | xargs realpath > /tmp/cygnus_tmp/all_files
+                egrep "SF:" reports/coverage/unit/coverage.info  | sed 's/SF://' > /tmp/cygnus_tmp/covered_files
+                comm -23 /tmp/cygnus_tmp/all_files /tmp/cygnus_tmp/covered_files > /tmp/cygnus_tmp/uncovered_files
+                {
+                for file in `cat /tmp/cygnus_tmp/uncovered_files`; do
+                    echo "SF:$file"
+                    cat -ns $file | sed -r -e 's/^[ ]+//' -e 's/\t/ /g' | egrep -v "^[0-9]+ $|[0-9]+ (/|#)|[0-9]+  \*" | egrep -o "^[0-9]+" | sed 's/.*/DA:&,0/'
+                    echo "end_of_record"
+                done
+                } >> reports/coverage/unit/coverage.info
+
+                # remove test.cpp from coverage.info
+                sed -i '/test.cpp$/,/end_of_record/ d' reports/coverage/unit/coverage.info
+
                 genhtml --ignore-errors source reports/coverage/unit/coverage.info --output-directory reports/coverage/unit/html --demangle-cpp | tee reports/coverage/unit/genhtml.log 2> /dev/null
             fi
             if [[ ${VALUES['-a']} ]]; then
                 mkdir -p reports/coverage/comp
                 lcov --gcov-tool=gcov-7 -b src -c -d build/obj/coverage -d $OUT_DIR -d include --no-external -o reports/coverage/comp/coverage.info -q 2> /dev/null
+
+                # remove test.cpp from coverage.info
+                sed -i '/test.cpp$/,/end_of_record/ d' reports/coverage/comp/coverage.info
+
                 genhtml --ignore-errors source reports/coverage/comp/coverage.info --output-directory reports/coverage/comp/html --demangle-cpp | tee reports/coverage/comp/genhtml.log 2> /dev/null
             fi
             ;;

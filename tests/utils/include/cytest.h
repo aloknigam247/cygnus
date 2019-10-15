@@ -31,6 +31,6 @@ class Testcase {
         std::vector<caseType> case_list;
     public:
         void add(caseType p);
-        int run();
+        void run();
 };
 }
