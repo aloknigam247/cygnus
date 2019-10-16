@@ -36,7 +36,7 @@ covReport() {
     fi
     if [[ ${comp_cov_line/\.*/} -lt 72  || ${comp_cov_func/\.*/} -lt 84  ]] ||
        [[ ${func_cov_line/\.*/} -lt 72  || ${func_cov_func/\.*/} -lt 83  ]] ||
-       [[ ${unit_cov_line/\.*/} -lt 4   || ${unit_cov_func/\.*/} -lt 10 ]]; then
+       [[ ${unit_cov_line/\.*/} -lt 100 || ${unit_cov_func/\.*/} -lt 100 ]]; then
         EXITCODE=1
     fi
     

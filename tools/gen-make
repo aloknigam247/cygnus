@@ -146,7 +146,8 @@ def main():
     
     # Print Makefile
     rule.write("CXX     = g++\n" +
-                "CY_COMP = $(CXX) -std=c++11 $(COMP_FLAGS) $(INC)\n\n" +
+                "COMP_FLAGS = -fdiagnostics-color\n"+
+                "CY_COMP    = $(CXX) -std=c++11 $(COMP_FLAGS) $(INC)\n\n" +
                 "INC := ", '')
     for i in opt.incDir:
         rule.write(" \\\n    -I " + i, '')

@@ -26,9 +26,9 @@ OPTION['POS']='dest:test_list,count:0+'
 validateTests() {
     if [[ ${VALUES['-a']} || ${VALUES['-f']} || ${VALUES['-u']} ]]; then
         if [[ ${VALUES['-f']} ]]; then
-            valid_tests=$(find $TEST_DIR -type f -path "func*.cyt" | xargs realpath)
+            valid_tests=$(find $TEST_DIR -type f -path "*func*.cyt" | xargs realpath)
         elif [[ ${VALUES['-u']} ]]; then
-            valid_tests=$(find $TEST_DIR -type f -name "unit*.cyt" | xargs realpath)
+            valid_tests=$(find $TEST_DIR -type f -path "*unit*.cyt" | xargs realpath)
         else
             valid_tests=$(find $TEST_DIR -type f -name "*.cyt" | xargs realpath)
         fi
@@ -191,7 +191,7 @@ main() {
 
                 # Put missing files in coverage.info
                 mkdir /tmp/cygnus_tmp -p
-                find include src -regex ".*\.cpp\|.*\.h\|.*\.tcc" | egrep -v "main.cpp" | sort | xargs realpath > /tmp/cygnus_tmp/all_files
+                find include src -regex ".*\.cpp\|.*\.tcc" | egrep -v "main.cpp|cymem.cpp" | sort | xargs realpath > /tmp/cygnus_tmp/all_files
                 egrep "SF:" reports/coverage/unit/coverage.info  | sed 's/SF://' > /tmp/cygnus_tmp/covered_files
                 comm -23 /tmp/cygnus_tmp/all_files /tmp/cygnus_tmp/covered_files > /tmp/cygnus_tmp/uncovered_files
                 {
