@@ -24,72 +24,42 @@ OPTION['--sanitize']='value:bool,eval:TEST_MODE=sanitize,help:run sanitization t
 OPTION['POS']='dest:test_list,count:0+'
 
 validateTests() {
-    if [[ ${VALUES["-a"]} ]]; then
-        if [[ ${VALUES["test_list"]} ]]; then
-            LOG I "-a is given, ignoring ${VALUES["test_list"]}"
-        fi
-        test -d $TEST_DIR && cd $TEST_DIR
-        valid_tests=`find -type f -path "./unit*.cyt" -o -path "./func*.cyt" | sed 's|^./||'`
-        cd - > /dev/null
-        if [[ -z $valid_tests ]]; then
-            LOG W "no testcases found in directory: $TEST_DIR"
-            EXIT
-        fi
-    elif [[ ${VALUES["-f"]} ]]; then
-        if [[ ${VALUES["test_list"]} ]]; then
-            LOG I "-f is given, ignoring ${VALUES["test_list"]}"
-        fi
-        test -d $TEST_DIR && cd $TEST_DIR
-        valid_tests=`find -type f -path "./func*.cyt" | sed 's|^./||'`
-        cd - > /dev/null
-        if [[ -z $valid_tests ]]; then
-            LOG W "no testcases found in directory: $TEST_DIR"
-            EXIT
-        fi
-    elif [[ ${VALUES["-u"]} ]]; then
-        if [[ ${VALUES["test_list"]} ]]; then
-            LOG I "-u is given, ignoring ${VALUES["test_list"]}"
-        fi
-        test -d $TEST_DIR && cd $TEST_DIR
-        valid_tests=`find -type f -path "./unit*.cyt" | sed 's|^./||'`
-        cd - > /dev/null
-        if [[ -z $valid_tests ]]; then
-            LOG W "no testcases found in directory: $TEST_DIR"
-            EXIT
+    if [[ ${VALUES['-a']} || ${VALUES['-f']} || ${VALUES['-u']} ]]; then
+        if [[ ${VALUES['-f']}]]; then
+            valid_tests=$(find $TEST_DIR -type f -path "func*.cyt" | xargs realpath)
+        elif [[ ${VALUES['-u']}]]; then
+            valid_tests=$(find $TEST_DIR -type f -name "unit*.cyt" | xargs realpath)
+        else
+            valid_tests=$(find $TEST_DIR -type f -name "*.cyt" | xargs realpath)
         fi
     else
         for test in ${VALUES["test_list"]}; do
-            if [[ $test =~ unit.*\.cyt || $test =~ func.*\.cyt && -a $TEST_DIR/$test ]]; then
-                valid_tests+=" $test"
+            abs_test=$(realpath $test)
+            if [[ $abs_test =~ unit.*\.cyt || $abs_test =~ func.*\.cyt && -a $abs_test ]]; then
+                valid_tests+=" $abs_test"
             else
-                LOG W "[invalid testcase] $test"
+                LOG W "[invalid testcase] $abs_test"
                 continue
             fi
         done
-        if [[ -z $valid_tests ]]; then
-          LOG E "testcases missing"
-          EXIT
-        fi
+    fi
+    if [[ -z $valid_tests ]]; then
+      LOG E "no valid testcases found"
+      EXIT
     fi
 }
 
 makeRunDir(){
-    local testcase=$1
+    local testcase_dir=$1
+    local testcase=$2
     local test_out=$OUT_DIR/`dirname $testcase`
     rm -rf $test_out
     mkdir -p $test_out
-    ln -rs $TEST_DIR/`dirname $testcase`/* $test_out/
+    ln -rs $testcase_dir/`dirname $testcase`/* $test_out/
 }
 
 runFuncTest() {
-    local testcase=$1
-    local testcase_dir=`dirname $testcase`
-
-    echo "|TESTCASE| $testcase"
-    makeRunDir $testcase
-    cd $OUT_DIR/$testcase_dir
-    
-    source `basename $testcase`
+    source `basename $1`
     for i in ${!CASE[@]}; do
         echo "|CASE $((i+1))| $(echo ${CASE[$i]} | sed "s|$CYGNUS|cygnus|")"
         ${tool} ${CASE[$i]} | sed 's/.*/>   &/'
@@ -105,49 +75,29 @@ runFuncTest() {
 }
 
 runUnitTest() {
-    local testcase=$1
-    local testcase_dir=`dirname $testcase`
-    local run_log=$OUT_DIR/$testcase_dir/unit_test.log
     #run_log_color=$OUT_DIR/$testcase_dir/.run.log
-
-    echo "|TESTCASE| $testcase"
-    pwd
-
-    makeRunDir $testcase
     {
-        LOG I "Run directory created"
 #        if [[ ! -a $TEST_DIR/$testcase_dir/Makefile ]]; then
-            gen-make -d $OUT_DIR/$testcase_dir -i $CYGNUS_HOME/include -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src -s $CYGNUS_HOME/tests/utils/src test.cpp
+            gen-make -i $CYGNUS_HOME/include -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src -s $CYGNUS_HOME/tests/utils/src test.cpp
 #        fi
         if [[ $? -ne 0 ]]; then
             EXIT 1
         fi
-        make --no-print-directory -C $OUT_DIR/$testcase_dir $TEST_MODE 2>&1 | tee $OUT_DIR/$testcase_dir/make.log
+        make --no-print-directory $TEST_MODE 2>&1 | tee make.log
         #sed 's|\x1b\[[;0-9]*m\x1b\[K||g' $OUT_DIR/$testcase_dir/make.log.color > $OUT_DIR/$testcase_dir/make.log
-        cd $OUT_DIR/$testcase_dir
         echo "[CMD] $tool ./test"
         $tool ./test 2>&1 | tee run.log
         status=$?
-        if [[ $TEST_MODE == "perf" ]]; then
-            diff gmon.out gmon.gold
-            if [[ $? -ne 0 ]]; then
-                echo "TESTFAIL" > testfail
-            fi
-        fi
-    } 2>&1 | tee $run_log
-    cat $run_log >> reports/unit/unit_test_$TEST_MODE.log
+        #if [[ $TEST_MODE == "perf" ]]; then
+        #    diff gmon.out gmon.gold
+        #    if [[ $? -ne 0 ]]; then
+        #        echo "TESTFAIL" > testfail
+        #    fi
+        #fi
+    } 2>&1 | tee $unit_test.log
+    cat unit_test.log >> $CYGNUS_HOME/reports/unit/unit_test_$TEST_MODE.log
     #sed 's|\x1b\[[;0-9]*m\x1b\[K||g' $run_log_color > $run_log
     [[ $status -eq 0 ]] && echo " --PASS--" || echo " --FAIL--"
-}
-
-runTest() {
-    if [[ $1 =~ 'func' ]]; then
-        HAVE_FUNC=1
-        runFuncTest $1
-    else
-        HAVE_UNIT=1
-        runUnitTest $1
-    fi
 }
 
 main() {
@@ -204,9 +154,26 @@ main() {
     rm -rf reports/func reports/unit
     mkdir -p reports/func reports/unit
     for test in $valid_tests; do
-        cd $CYGNUS_HOME
-        runTest $test
-        cd $CYGNUS_HOME
+        if [[ $test =~ func.*cyt ]]; then
+            local testcase=$(echo $test | egrep -o "func.*cyt")
+            local testcase_dir=${test%/$testcase}
+            HAVE_FUNC=1
+            makeRunDir $testcase_dir $testcase
+            cd $OUT_DIR/`dirname $testcase`
+
+            echo "|TESTCASE| $testcase"
+            runFuncTest $testcase
+        else
+            local testcase=$(echo $test | egrep -o "unit.*cyt")
+            local testcase_dir=${test%/$testcase}
+            HAVE_UNIT=1
+            makeRunDir $testcase_dir $testcase
+            cd $OUT_DIR/`dirname $testcase`
+
+            echo "|TESTCASE| $testcase"
+            runUnitTest $testcase
+        fi
+        cd - > /dev/null
     done
 
     case $TEST_MODE in
