@@ -25,9 +25,9 @@ OPTION['POS']='dest:test_list,count:0+'
 
 validateTests() {
     if [[ ${VALUES['-a']} || ${VALUES['-f']} || ${VALUES['-u']} ]]; then
-        if [[ ${VALUES['-f']}]]; then
+        if [[ ${VALUES['-f']} ]]; then
             valid_tests=$(find $TEST_DIR -type f -path "func*.cyt" | xargs realpath)
-        elif [[ ${VALUES['-u']}]]; then
+        elif [[ ${VALUES['-u']} ]]; then
             valid_tests=$(find $TEST_DIR -type f -name "unit*.cyt" | xargs realpath)
         else
             valid_tests=$(find $TEST_DIR -type f -name "*.cyt" | xargs realpath)
