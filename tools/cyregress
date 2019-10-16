@@ -191,8 +191,8 @@ main() {
 
                 # Put missing files in coverage.info
                 mkdir /tmp/cygnus_tmp -p
-                find include src -regex ".*\.cpp\|.*\.tcc" | egrep -v "main.cpp|cymem.cpp" | sort | xargs realpath > /tmp/cygnus_tmp/all_files
-                egrep "SF:" reports/coverage/unit/coverage.info  | sed 's/SF://' > /tmp/cygnus_tmp/covered_files
+                find include src -regex ".*\.cpp\|.*\.h\|.*\.tcc" | egrep -v "main.cpp|cymem.cpp" | sort -u | xargs realpath > /tmp/cygnus_tmp/all_files
+                egrep "SF:" reports/coverage/unit/coverage.info  | sed 's/SF://' | sort -u > /tmp/cygnus_tmp/covered_files
                 comm -23 /tmp/cygnus_tmp/all_files /tmp/cygnus_tmp/covered_files > /tmp/cygnus_tmp/uncovered_files
                 {
                 for file in `cat /tmp/cygnus_tmp/uncovered_files`; do
