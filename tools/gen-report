@@ -34,7 +34,7 @@ covReport() {
         unit_cov_line=$(egrep 'lines......: ' $unit_log | sed 's/.*lines......: //')
         unit_cov_func=$(egrep 'functions..: ' $unit_log | sed 's/.*functions..: //')
     fi
-    if [[ ${comp_cov_line/\.*/} -lt 72  || ${comp_cov_func/\.*/} -lt 84  ]] ||
+    if [[ ${comp_cov_line/\.*/} -lt 95  || ${comp_cov_func/\.*/} -lt 98  ]] ||
        [[ ${func_cov_line/\.*/} -lt 72  || ${func_cov_func/\.*/} -lt 83  ]] ||
        [[ ${unit_cov_line/\.*/} -lt 100 || ${unit_cov_func/\.*/} -lt 100 ]]; then
         EXITCODE=1
