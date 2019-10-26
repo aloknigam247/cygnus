@@ -22,6 +22,15 @@
  * SOFTWARE.                                                                        *
  ************************************************************************************/
 
+/**
+ * @file Options.h
+ * @brief Command line parser
+ *
+ * Parses command line option and perform error handling for command line
+ *
+ * @author Alok Nigam
+ */
+
 #ifndef _OPTIONS_H
 #define _OPTIONS_H
 
@@ -30,10 +39,25 @@
 
 #include "cystructs.h"
 
+/**
+ * @class Option
+ * @brief Single option entity
+ *
+ * Represents single option and is supposed to handle one option at a time
+ */
 class Option {
     union Value;
 
     public:
+    /**
+     * @enum Type
+     * Option types
+     * Valid types are:
+     * * BOOL
+     * * CHAR
+     * * INT
+     * * STRING
+     */
     enum Type {
         BOOL,
         CHAR,
@@ -41,34 +65,134 @@ class Option {
         STRING
     };
 
+    /**
+     * Paranetrised constructor
+     *
+     * @param[in] pi_name name of option
+     * @param[in] pi_type type of option
+     * @param[in] pi_help help of option
+     */
     Option(const std::string pi_name, Type pi_type, std::string pi_help) :
-        name(pi_name), type(pi_type), help(pi_help), value(0) {}
-    
+        name(pi_name), type(pi_type), help(pi_help), value() {}
+
+    /**
+     * Get help
+     *
+     * @returns help
+     */
     std::string get_help() const { return help;  }
+
+    /**
+     * Get option name
+     *
+     * @returns option name
+     */
     std::string get_name() const { return name;  }
-    Type get_type() const        { return type;  }
+
+    /**
+     * Get option type
+     *
+     * @returns option type
+     */
+    Type get_type() const { return type;  }
     
-    bool  get_bool_value()   const { return value.b; }
-    char  get_char_value()   const { return value.c; }
-    int   get_int_value()    const { return value.i; }
+
+    /**
+     * Get bool value
+     *
+     * @returns bool value
+     */
+    bool  get_bool_value() const { return value.b; }
+
+    /**
+     * Get char value
+     *
+     * @returns char value
+     */
+    char  get_char_value() const { return value.c; }
+
+    /**
+     * Get int value
+     *
+     * @returns int value
+     */
+    int   get_int_value() const { return value.i; }
+
+    /**
+     * Get string value
+     *
+     * @returns string value
+     */
     const char* get_string_value() const { return value.s; }
-    
+
+    /**
+     * Set bool value
+     *
+     * @param[in] pi_value bool value
+     */
     void set_value(const bool  pi_value) { value.b = pi_value; }
+
+    /**
+     * Set char value
+     *
+     * @param[in] pi_value char value
+     */
     void set_value(const char  pi_value) { value.c = pi_value; }
+
+    /**
+     * Set int value
+     *
+     * @param[in] pi_value int value
+     */
     void set_value(const int   pi_value) { value.i = pi_value; }
+
+    /**
+     * Set string value
+     *
+     * @param[in] pi_value string value
+     */
     void set_value(const char* pi_value) { value.s = pi_value; }
-    
+
+   /**
+    * Operator>
+    *
+    * @param[in] pi_opt Option to compare
+    * @returns true if left Option is greater than right Option are equal
+    */
     bool operator>(const Option& pi_opt) { return name > pi_opt.name; }
-    bool operator>(const char* pi_opt)   { return name > pi_opt;      }
-    bool operator==(const char* pi_opt)  { return name == pi_opt;     }
+
+    /**
+     * Operator>
+     *
+     * @param[in] pi_opt string to compare
+     * @returns true if Option name is greater than string on the right
+     */
+    bool operator>(const char* pi_opt)   { return name > pi_opt; }
+
+    /**
+     * Operator==
+     *
+     * @param[in] pi_opt Option to compare
+     * @returns true if both options are equal
+     */
+    bool operator==(const char* pi_opt)  { return name == pi_opt; }
     
     private:
+    /**
+     * @union Value
+     *
+     * Stores value of different types in a single union
+     */
     union Value {
         bool b;
         char c;
         int i;
         const char* s;
-        Value(const int pi_i) : s(nullptr) {}
+
+        /**
+         * Default constructor
+         */
+        Value() : s(nullptr) {}
     };
 
     const std::string name, help;
@@ -76,12 +200,47 @@ class Option {
     Value value;
 };
 
+/**
+ * @class Options
+ * @brief Option parser
+ *
+ * Collection of Option and process all quesries and error handling on command line parsing
+ */
 class Options {
     public:
+    /**
+     * Default constructor
+     */
     Options();
-    void addOption(const std::string pi_option_name, Option::Type, const std::string pi_help);
-    bool parse(const int pi_argc, const char* argv[]);
+
+    /**
+     * Adds Option to option list
+     *
+     * @param[in] pi_option_name name of option
+     * @param[in] pi_type type of option
+     * @param[in] pi_help option help
+     */
+    void addOption(const std::string pi_option_name, Option::Type pi_type, const std::string pi_help);
+
+    /**
+     * Parses command line
+     *
+     * @param[in] pi_argc number of arguments
+     * @param[in] pi_argv array of arguments
+     * @returns true if command line is parsed without error
+     */
+    bool parse(const int pi_argc, const char* pi_argv[]);
+
+    /**
+     * Get positional arguments
+     *
+     * @returns list of positional arguments if any
+     */
     const std::vector<std::string>& get_positional() const { return pos_args; }
+
+    /**
+     * Autogenerated Usage
+     */
     void usage() const;
 
     private:
