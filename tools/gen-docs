@@ -9,7 +9,9 @@ sed -i '/\(variable\)/ d' reports/docs/undoc
 cat reports/docs/undoc
 undoc=$(cat reports/docs/undoc | wc -l)
 
-tar fu docs.tar docs
+if [[ $(tar -df docs.tar docs | egrep -v "Mod time differs") ]]; then
+    tar uf docs.tar docs
+fi
 
 if [[ $(git status docs.tar | tail -1) == "nothing to commit, working tree clean" ]]; then
     doc_diff=no

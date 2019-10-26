@@ -53,7 +53,7 @@ class Tree {
          * @returns data pointed by iterator
          * @throws underflow_error if iterator points nowhere
          */
-        T operator*() const throw;
+        T operator*() const;
 
         /**
          * Operator==
