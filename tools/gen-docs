@@ -9,7 +9,7 @@ sed -i '/\(variable\)/ d' reports/docs/undoc
 cat reports/docs/undoc
 undoc=$(cat reports/docs/undoc | wc -l)
 
-if [[ $(tar -df docs.tar docs | egrep -v "Mod time differs") ]]; then
+if [[ $(tar -df docs.tar docs | egrep -v "Mod time differs|Mode differs") ]]; then
     tar uf docs.tar docs
 fi
 
