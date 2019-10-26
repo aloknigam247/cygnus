@@ -72,10 +72,12 @@ typename Tree<T>::iterator& Tree<T>::end() const {
     return iter;
 }
 
+/** @cond */
 template <typename T>
 static T& ref_of(T &o) {return o;}
 template <typename T>
 static T& ref_of(T *o) {return *o;}
+/** @endcond */
 
 template <typename T>
 void Tree<T>::binaryInsert(Node*& pio_root, const Node* pi_data) {
