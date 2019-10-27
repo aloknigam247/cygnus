@@ -130,7 +130,7 @@ main() {
             CYGNUS=$CYGNUS_HOME/build/bin/memory/cygnus-memory
             OUT_DIR="$OUT_DIR/mem-check"
             mkdir -p reports/mem-check
-            tool="valgrind --leak-check=full --log-file=valgrind.out"
+            tool="valgrind --track-origins=yes --errors-for-leak-kinds=all --show-leak-kinds=all --leak-check=full --log-file=valgrind.out"
             ;;
         perf)
             CYGNUS=$CYGNUS_HOME/build/bin/perf/cygnus-perf
@@ -173,6 +173,20 @@ main() {
             echo "|TESTCASE| $testcase"
             runUnitTest $testcase
         fi
+        case $TEST_MODE in
+            mem-check)
+                sed -nr -e 's/^=+[0-9]+=+ //' -e '/HEAP SUMMARY/,/LEAK SUMMARY/ p' valgrind.out | sed -e '/HEAP SUMMARY:\|LEAK SUMMARY:/,/^$/ d'  | \
+                while IFS= read line; do
+                    if [[ $line == "" ]]; then
+                        checksum=$(echo $error | md5sum | egrep -o "[0-Z]+")
+                        echo "CHECKSUM: $checksum" >> mem.err
+                        echo -e "$error" >> mem.err
+                        error=""
+                        continue
+                    fi
+                    error="    ${line/#   /}\n$error"
+                done
+        esac
         cd - > /dev/null
     done
 
@@ -221,11 +235,11 @@ main() {
             rm -rf reports/mem-check
             if [[ ${VALUES['-a']} || ${VALUES['-f']} ]]; then
                 mkdir -p reports/mem-check/func
-                find $OUT_DIR/func -name "valgrind.out" | xargs egrep "[0-9]+ errors" >> reports/mem-check/func/errors
+                find $OUT_DIR/func -name "mem.err" | xargs egrep -h "CHECKSUM" | sort -u | wc -l >> reports/mem-check/func/errors
             fi
             if [[ ${VALUES['-a']} || ${VALUES['-u']} ]]; then
                 mkdir -p reports/mem-check/unit
-                find $OUT_DIR/unit -name "valgrind.out" | xargs egrep "[0-9]+ errors" >> reports/mem-check/unit/errors
+                find $OUT_DIR/unit -name "mem.err" | xargs egrep -h "CHECKSUM" | sort -u | wc -l >> reports/mem-check/unit/errors
             fi
             ;;
         perf)

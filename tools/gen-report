@@ -87,8 +87,8 @@ memReport() {
     local unit_error=-1
     local u_file="reports/mem-check/unit/errors"
 
-    test -f $f_file && func_error=$(adder $(egrep -o "[0-9] errors" $f_file | sed 's/ errors//'))
-    test -f $u_file && unit_error=$(adder $(egrep -o "[0-9] errors" $u_file | sed 's/ errors//'))
+    test -f $f_file && func_error=$(cat $f_file)
+    test -f $u_file && unit_error=$(cat $u_file)
 
     if [[ $func_error -ne 0 || $unit_error -ne 0 ]]; then
         EXITCODE=1
