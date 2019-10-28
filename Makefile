@@ -43,8 +43,8 @@ export CPP_FLAGS += -std=c++11 -fdiagnostics-color
 ifdef STRICT
 	CPP_FLAGS += -pedantic -Wall -Walloc-zero -Wcast-align -Wcast-qual -Wconversion\
 				-Wduplicated-branches -Wduplicated-cond -Weffc++ -Wextra -Wfloat-equal -Wformat=2\
-				-Winline -Wlogical-op -Wmissing-include-dirs -Woverloaded-virtual -Wpadded\
-				-Wshadow -Wstrict-overflow=5 -Wstringop-overflow=2 -Wsuggest-attribute=const\
+				-Winline -Wlogical-op -Wmissing-include-dirs -Woverloaded-virtual -Wshadow\
+				-Wstrict-overflow=5 -Wstringop-overflow=2 -Wsuggest-attribute=const\
 				-Wswitch-default -Wswitch-enum -Wunused -Wunused-macros
 endif
 export CPP_COMPILE := $(CXX) $(CPP_FLAGS)
