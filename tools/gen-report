@@ -160,13 +160,14 @@ styleReport() {
 }
 
 warnReport() {
+    local report_dir="reports/compiler"
     local debug_warn=-1
-    local debug_file="reports/warnings/debug-errors"
+    local debug_file="$report_dir/debug-errors"
     local release_warn=-1
-    local release_file="reports/warnings/release-errors"
+    local release_file="$report_dir/release-errors"
 
-    test -f reports/warnings/debug-errors && debug_warn=$(egrep -c "warning: " $debug_file) 
-    test -f reports/warnings/release-errors && release_warn=$(egrep -c "warning: " $release_file)
+    test -f $report_dir/debug-errors && debug_warn=$(egrep -c "warning: " $debug_file) 
+    test -f $report_dir/release-errors && release_warn=$(egrep -c "warning: " $release_file)
     
     if [[ $debug_warn -ne 0 || $release_warn -ne 0 ]]; then
         EXITCODE=1
