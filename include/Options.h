@@ -73,7 +73,7 @@ class Option {
      * @param[in] pi_help help of option
      */
     Option(const std::string pi_name, Type pi_type, std::string pi_help) :
-        name(pi_name), type(pi_type), help(pi_help), value() {}
+        name(pi_name), help(pi_help), type(pi_type), value() {}
 
     /**
      * Get help

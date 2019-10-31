@@ -38,14 +38,14 @@ class Tree {
         /**
          * Default constructor
          */
-        iterator() {}
+        iterator(): st(){}
 
         /**
          * Parametrised constructor
          *
          * @param[in] pi_node node to push while creating iterator
          */
-        iterator(Node* pi_node) { st.push(pi_node); }
+        iterator(Node* pi_node): iterator() { st.push(pi_node); }
 
         /**
          * Operator*
@@ -105,6 +105,27 @@ class Tree {
     Tree() : root(nullptr) {}
 
     /**
+     * Copy Constructor
+     *
+     * @param[in] pi_to_copy Object to copy
+     */
+    Tree(const Tree<T>& pi_to_copy);
+
+    /**
+     * Move Constructor
+     *
+     * @param[in,out] pi_to_copy Object to move
+     */
+    Tree(Tree<T>&& pi_to_move);
+
+    /**
+     * Operator=
+     *
+     * @param[in] pi_to_copy Object to copy
+     */
+    Tree<T>& operator=(const Tree<T>& pi_to_copy);
+
+    /**
      * Default destructor
      */
     ~Tree();
@@ -155,6 +176,27 @@ class Tree {
          * @param[in] pi_d takes data to store
          */
         Node(const T pi_d) : data(pi_d), left(nullptr), right(nullptr) {}
+
+        /**
+         * Copy Constructor
+         *
+         * @param[in] pi_to_copy Node to copy
+         */
+        Node(const Node& pi_to_copy);
+
+        /**
+         * Move Constructor
+         *
+         * @param[in,out] pi_to_move Node to move
+         */
+        Node(Node&& pi_to_move);
+
+        /**
+         * Operator=
+         *
+         * @param[in] pi_to_copy Node to copy
+         */
+        Node& operator=(const Node& pi_to_copy);
     };
 
     Node* root;

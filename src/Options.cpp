@@ -28,7 +28,7 @@
 
 #include "Log.h"
 
-Options::Options() {
+Options::Options(): option_list(), pos_args() {
     addOption("-h", Option::BOOL, "print help message");
 }
 
@@ -87,6 +87,8 @@ bool Options::parse(const int pi_argc, const char* pi_argv[]) {
                             result = false;
                         }
                         break;
+                    default:
+                        Log::e("Option not suppoted");
                 }
             }
             else

@@ -1,3 +1,22 @@
+/* Copy Constructor */
+template <typename T>
+Tree<T>::Tree(const Tree<T>& pi_to_copy) {
+    root = new Node(*pi_to_copy);
+}
+
+/* Move Constructor */
+template <typename T>
+Tree<T>::Tree(Tree<T>&& pi_to_move) {
+    root = pi_to_move.root;
+    pi_to_move = nullptr;
+}
+
+template <typename T>
+Tree<T>& Tree<T>::operator=(const Tree<T>& pi_to_copy) {
+    root = new Node(*pi_to_copy);
+    return *this;
+}
+
 template <typename T>
 Tree<T>::~Tree() {
     if(root)
@@ -70,6 +89,45 @@ template <typename T>
 typename Tree<T>::iterator& Tree<T>::end() const {
     static iterator iter;
     return iter;
+}
+
+/* Copy Constructor */
+template<typename T>
+Tree<T>::Node::Node(const Tree<T>::Node& pi_to_copy) {
+    if(std::is_pointer<T>::value)
+        data = new std::remove_pointer<T>(*pi_to_copy.data);
+    else
+        data = pi_to_copy.data;
+
+    left = pi_to_copy.left ? new Node(*pi_to_copy.left) : nullptr;
+    right = pi_to_copy.right ? new Node(*pi_to_copy.right) : nullptr;
+}
+
+/* Move Constructor */
+template<typename T>
+Tree<T>::Node::Node(Tree<T>::Node&& pio_to_move) {
+    data = pio_to_move.data;
+    left = pio_to_move.left;
+    right = pio_to_move.right;
+
+    if(std::is_pointer<T>::value) {
+        pio_to_move.data = nullptr;
+    }
+    pio_to_move.left = nullptr;
+    pio_to_move.right = nullptr;
+}
+
+template<typename T>
+typename Tree<T>::Node& Tree<T>::Node::operator=(const Tree<T>::Node& pi_to_copy) {
+    if(std::is_pointer<T>::value)
+        data = new std::remove_pointer<T>(*pi_to_copy.data);
+    else
+        data = pi_to_copy.data;
+
+    left = pi_to_copy.left ? new Node(*pi_to_copy.left) : nullptr;
+    right = pi_to_copy.right ? new Node(*pi_to_copy.right) : nullptr;
+
+    return *this;
 }
 
 /** @cond */
