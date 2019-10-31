@@ -15,7 +15,7 @@ OPTION['--sanitize']="value:bool,eval:BUILD_MODE=sanitize,help:create sanitized 
 OPTION['--strict']="value:bool,eval:STRICT=yes,help:use strict options for compilation"
 
 TEE() {
-    rm -f $1
+    echo "" > $1
     while IFS= read line; do
         echo "$line"
         echo "$line" | sed 's|\x1b\[[;0-9]*m\x1b\[K||g' >> $1
