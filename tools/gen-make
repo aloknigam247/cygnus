@@ -153,7 +153,7 @@ def main():
         rule.write(" \\\n    -I " + i, '')
     rule.write('\n')
 
-    rule.write("OBJ_COMMON := " + os.path.relpath("obj", opt.cDir[opt.cDir.rfind("unit/"):]) + "\n" +
+    rule.write("OBJ_COMMON := " + os.path.relpath("obj", os.getcwd()[os.getcwd().rfind("unit/"):]) + "\n" +
                 "OBJ_LOCAL  := obj\n\n" +
                 "############# Targets #############\n" +
                 "all: $(OBJ_COMMON) $(OBJ_LOCAL) " + target + "\n\n" +

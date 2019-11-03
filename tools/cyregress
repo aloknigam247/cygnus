@@ -12,6 +12,14 @@ declare TEST_MODE=''
 declare HAVE_UNIT=0
 declare HAVE_FUNC=0
 
+TEE() {
+    echo "" > $1
+    while IFS= read line; do
+        echo "$line"
+        echo "$line" | sed 's|\x1b\[[;0-9]*m\x1b\[K||g' >> $1
+    done
+}
+
 OPTION['-a']='value:bool,with:-d,help:run all testcases in this directory'
 OPTION['-d']='value:string,metavar:dir,help:test case directory'
 OPTION['-f']='value:bool,with:-d,without:-a,help:run unit tests only'
@@ -75,7 +83,6 @@ runFuncTest() {
 }
 
 runUnitTest() {
-    #run_log_color=$OUT_DIR/$testcase_dir/.run.log
     {
 #        if [[ ! -a $TEST_DIR/$testcase_dir/Makefile ]]; then
             gen-make -i $CYGNUS_HOME/include -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src -s $CYGNUS_HOME/tests/utils/src test.cpp
@@ -83,8 +90,8 @@ runUnitTest() {
         if [[ $? -ne 0 ]]; then
             EXIT 1
         fi
-        make --no-print-directory $TEST_MODE 2>&1 | tee make.log
-        #sed 's|\x1b\[[;0-9]*m\x1b\[K||g' $OUT_DIR/$testcase_dir/make.log.color > $OUT_DIR/$testcase_dir/make.log
+        echo "Building..."
+        make --no-print-directory $TEST_MODE 2>&1 | TEE make.log
         echo "[CMD] $tool ./test"
         $tool ./test 2>&1 | tee run.log
         status=$?
@@ -94,10 +101,10 @@ runUnitTest() {
         #        echo "TESTFAIL" > testfail
         #    fi
         #fi
-    } 2>&1 | tee $unit_test.log
+    } 2>&1 | tee unit_test.log
     cat unit_test.log >> $CYGNUS_HOME/reports/unit/unit_test_$TEST_MODE.log
-    #sed 's|\x1b\[[;0-9]*m\x1b\[K||g' $run_log_color > $run_log
-    [[ $status -eq 0 ]] && echo " --PASS--" || echo " --FAIL--"
+    #[[ $status -eq 0 ]] && echo " --PASS--" || echo " --FAIL--"
+    echo
 }
 
 main() {

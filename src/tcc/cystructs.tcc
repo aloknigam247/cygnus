@@ -13,7 +13,7 @@ Tree<T>::Tree(Tree<T>&& pi_to_move) {
 
 template <typename T>
 Tree<T>& Tree<T>::operator=(const Tree<T>& pi_to_copy) {
-    root = new Node(*pi_to_copy);
+    root = new Node(*pi_to_copy.root);
     return *this;
 }
 
