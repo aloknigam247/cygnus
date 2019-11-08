@@ -10,5 +10,5 @@ echo "    errors: $(egrep 'linterror: ' reports/lint/cppcheck | egrep -v 'Cppche
 
 echo
 echo "clang-tidy"
-clang-tidy-9 -checks='*,-fuchsia*' -header-filter='.*' $(find src -name "*.cpp") -- $includes > reports/lint/tidy 2>&1
+clang-tidy -checks='*,-fuchsia*' -header-filter='.*' $(find src -name "*.cpp") -- $includes > reports/lint/tidy 2>&1
 echo "    errors: $(egrep -c 'warning: ' reports/lint/tidy)"
