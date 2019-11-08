@@ -1,5 +1,5 @@
 CASE=(
-        "$CYGNUS"
-        "$CYGNUS -h"
-        "$CYGNUS -a abc"
+        "cygnus"
+        "cygnus -h"
+        "cygnus -a abc"
      )

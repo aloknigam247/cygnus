@@ -24,6 +24,7 @@ OPTION['-a']='value:bool,with:-d,help:run all testcases in this directory'
 OPTION['-d']='value:string,metavar:dir,help:test case directory'
 OPTION['-f']='value:bool,with:-d,without:-a,help:run unit tests only'
 OPTION['-o']='value:string,metavar:dir,help:output directory of test run'
+OPTION['-r']='value:bool,help:reflog update'
 OPTION['-u']='value:bool,with:-d,without:-a,help:run functional tests only'
 OPTION['--coverage']='value:bool,eval:TEST_MODE=coverage,help:run coverage tests'
 OPTION['--mem-check']='value:bool,eval:TEST_MODE=mem-check,help:run mem-check tests'
@@ -68,12 +69,14 @@ makeRunDir(){
 
 runFuncTest() {
     source `basename $1`
+    {
     for i in ${!CASE[@]}; do
         echo "|CASE $((i+1))| $(echo ${CASE[$i]} | sed "s|$CYGNUS|cygnus|")"
         ${tool} ${CASE[$i]} | sed 's/.*/>   &/'
         echo
     done
-    
+    } > TESTLOG
+
     #if [[ $TEST_MODE == "perf" ]]; then
     #    diff gmon.out gmon.gold
     #    if [[ $? -ne 0 ]]; then
@@ -90,10 +93,8 @@ runUnitTest() {
         if [[ $? -ne 0 ]]; then
             EXIT 1
         fi
-        echo "Building..."
-        make --no-print-directory $TEST_MODE 2>&1 | TEE make.log
-        echo "[CMD] $tool ./test"
-        $tool ./test 2>&1 | tee run.log
+        make --no-print-directory $TEST_MODE 2> >(TEE make.log) 1>>make.log
+        $tool ./test 2>&1 > TESTLOG
         status=$?
         #if [[ $TEST_MODE == "perf" ]]; then
         #    diff gmon.out gmon.gold
@@ -103,16 +104,14 @@ runUnitTest() {
         #fi
     } 2>&1 | tee unit_test.log
     cat unit_test.log >> $CYGNUS_HOME/reports/unit/unit_test_$TEST_MODE.log
-    #[[ $status -eq 0 ]] && echo " --PASS--" || echo " --FAIL--"
-    echo
 }
 
 main() {
     parseCmdLine $@
     TEST_DIR=${VALUES['-d']:-$TEST_DIR}
     OUT_DIR=${VALUES['-o']:-$OUT_DIR} 
-    echo "TEST_DIR: $TEST_DIR"
-    echo "OUT_DIR : $OUT_DIR"
+    echo "    TEST_DIR: $TEST_DIR"
+    echo "    OUT_DIR: $OUT_DIR"
 
     test -d $TEST_DIR || LOG E "directory \`$TEST_DIR' does not exit"
     if [[ $test_out == $OUT_DIR ]]; then
@@ -161,6 +160,7 @@ main() {
     rm -rf reports/func reports/unit
     mkdir -p reports/func reports/unit
     for test in $valid_tests; do
+        echo
         if [[ $test =~ func.*cyt ]]; then
             local testcase=$(echo $test | egrep -o "func.*cyt")
             local testcase_dir=${test%/$testcase}
@@ -180,6 +180,15 @@ main() {
             echo "|TESTCASE| $testcase"
             runUnitTest $testcase
         fi
+        diff -N --color=auto REFLOG TESTLOG \
+            &&  echo "status: PASS" \
+            ||  (
+                    echo "status: FAIL"
+                    if [[ ${VALUES['-r']} ]]; then
+                        cp TESTLOG REFLOG
+                        echo "REFLOG updated"
+                    fi
+                )
         case $TEST_MODE in
             mem-check)
                 sed -nr -e 's/^=+[0-9]+=+ //' -e '/HEAP SUMMARY/,/LEAK SUMMARY/ p' valgrind.out | sed -e '/HEAP SUMMARY:\|LEAK SUMMARY:/,/^$/ d'  | \

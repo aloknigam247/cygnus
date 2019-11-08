@@ -60,7 +60,7 @@ OPTION['--help']='value:bool,help:print help'
 
 # Print usage
 usage(){
-    # scan all options for alignments
+    # scan all options for tabular alignments
     local _max_len=0
     local _pos_name=''
     for _opt in ${!OPTION[@]}; do
@@ -68,23 +68,19 @@ usage(){
         IFS=','
         for _param in ${OPTION[$_opt]}; do
             case $_param in
+                count:1)
+                    _pos_name="$_POS_NAME"
+                    ;;
+                count:0+)
+                    _pos_name="[$_POS_NAME...]"
+                    ;;
+                count:1+)
+                    _pos_name="$_POS_NAME..."
+                    ;;
                 metavar:*)
                     len=${_param#*:}
                     t_len=$(( ${#_opt} + ${#_len} ))
                     [[ $_max_len -lt $t_len ]] && _max_len=$t_len
-                    break
-                    ;;
-                count:1)
-                    _pos_name="$_POS_NAME"
-                    break
-                    ;;
-                count:0+)
-                    _pos_name="[$_POS_NAME...]"
-                    break
-                    ;;
-                count:1+)
-                    _pos_name="$_POS_NAME..."
-                    break
                     ;;
             esac
         done
@@ -110,10 +106,10 @@ usage(){
                     _help=${param#*:}
                     ;;
                 with:*)
-                    _with=", with ${param#*:}"
+                    _with=" [with ${param#*:}]"
                     ;;
                 without:*)
-                    _without=", without ${param#*:}"
+                    _without=" [without ${param#*:}]"
                     ;;
             esac
         done
@@ -176,7 +172,6 @@ parseCmdLine() {
             case $_param in
                 dest:*)
                     _POS_NAME=${_param#*:}
-                    break
                     ;;
             esac
         done
@@ -247,7 +242,6 @@ parseCmdLine() {
     done
     if [[ -n $_pos && -n $_POS_NAME ]]; then
         VALUES[$_POS_NAME]="$_pos"
-        echo ""
     fi
 
     if [[ ${VALUES["-h"]} || ${VALUES["--help"]} ]]; then
