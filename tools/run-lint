@@ -1,0 +1,14 @@
+#!/bin/bash
+
+mkdir -p reports/lint
+
+includes="-I include -I include/utils/ -I src/tcc"
+
+echo "cppcheck:"
+cppcheck --enable=all --check-config src $includes --template= '{file}:{line}: linterror: ({severity},{id}): {message}' > reports/lint/cppcheck 2>&1
+echo "    errors: $(egrep 'linterror: ' reports/lint/cppcheck | egrep -v 'Cppcheck does not need standard library headers to get proper results' | wc -l)"
+
+echo
+echo "clang-tidy"
+clang-tidy-9 -checks='*,-fuchsia*' -header-filter='.*' $(find src -name "*.cpp") -- $includes > reports/lint/tidy 2>&1
+echo "    errors: $(egrep -c 'warning: ' reports/lint/tidy)"
