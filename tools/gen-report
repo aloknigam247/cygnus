@@ -123,7 +123,7 @@ perfReport() {
 releaseTestReport() {
     EXITCODE=1
     echo -n "Release Test "
-    sed -n '/Summary:/,+3 p' reports/cyregress.log
+    test -f logs/cyregress.log && sed -n '/Summary:/,+3 p' logs/cyregress.log || echo "Summary: Not Run"
     echo
 }
 
