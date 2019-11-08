@@ -70,14 +70,16 @@ docsReport() {
 }
 
 lintReport() {
-    local lint_error=$(egrep 'linterror: ' reports/lint.log | egrep -v 'Cppcheck does not need standard library headers to get proper results' | wc -l)
+    local cppcheck_error=$(egrep 'linterror: ' reports/lint/cppcheck | egrep -v 'Cppcheck does not need standard library headers to get proper results' | wc -l)
+    local tidy_error=$(egrep -c "warning: " reports/lint/tidy)
 
-    if [[ $lint_error -gt 0 ]]; then
+    if [[ $cppcheck_error -gt 0 || $tidy_error -gt 0 ]]; then
         EXITCODE=1
     fi
 
     echo "Lint Report::"
-    echo "    Errors: $lint_error"
+    echo "    cppcheck: $cppcheck_error"
+    echo "    clang-tidy: $tidy_error"
     echo
 }
 

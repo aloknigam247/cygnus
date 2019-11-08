@@ -9,6 +9,6 @@ cppcheck --enable=all --check-config src $includes --template= '{file}:{line}: l
 echo "    errors: $(egrep 'linterror: ' reports/lint/cppcheck | egrep -v 'Cppcheck does not need standard library headers to get proper results' | wc -l)"
 
 echo
-echo "clang-tidy"
+echo "clang-tidy:"
 clang-tidy -checks='*,-fuchsia*' -header-filter='.*' $(find src -name "*.cpp") -- $includes > reports/lint/tidy 2>&1
 echo "    errors: $(egrep -c 'warning: ' reports/lint/tidy)"
