@@ -122,9 +122,8 @@ perfReport() {
 
 releaseTestReport() {
     EXITCODE=1
-    echo "Release Testing::"
-    echo "    Functional Test: -1"
-    echo "    Unit Test: -1"
+    echo -n "Release Test "
+    sed -n '/Summary:/,+3 p' reports/cyregress.log
     echo
 }
 

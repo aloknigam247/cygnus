@@ -9,8 +9,8 @@ declare -a valid_tests
 TEST_DIR='.'
 declare OUT_DIR='test_run'
 declare TEST_MODE=''
-declare HAVE_UNIT=0
-declare HAVE_FUNC=0
+declare FUNC_COUNT=0
+declare UNIT_COUNT=0
 
 TEE() {
     echo "" > $1
@@ -75,8 +75,7 @@ runFuncTest() {
         ${tool} ${CASE[$i]} | sed 's/.*/>   &/'
         echo
     done
-    } > TESTLOG
-
+    } 2>&1 > TESTLOG
     #if [[ $TEST_MODE == "perf" ]]; then
     #    diff gmon.out gmon.gold
     #    if [[ $? -ne 0 ]]; then
@@ -87,26 +86,21 @@ runFuncTest() {
 
 runUnitTest() {
     {
-#        if [[ ! -a $TEST_DIR/$testcase_dir/Makefile ]]; then
-            gen-make -i $CYGNUS_HOME/include -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src -s $CYGNUS_HOME/tests/utils/src test.cpp
-#        fi
-        if [[ $? -ne 0 ]]; then
-            EXIT 1
-        fi
-        make --no-print-directory $TEST_MODE 2> >(TEE make.log) 1>>make.log
-        $tool ./test 2>&1 > TESTLOG
-        status=$?
-        #if [[ $TEST_MODE == "perf" ]]; then
-        #    diff gmon.out gmon.gold
-        #    if [[ $? -ne 0 ]]; then
-        #        echo "TESTFAIL" > testfail
-        #    fi
-        #fi
-    } 2>&1 | tee unit_test.log
-    cat unit_test.log >> $CYGNUS_HOME/reports/unit/unit_test_$TEST_MODE.log
+    gen-make -i $CYGNUS_HOME/include -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src -s $CYGNUS_HOME/tests/utils/src test.cpp
+    make --no-print-directory $TEST_MODE 2> >(TEE make.log) 1>>make.log
+    $tool ./test 2>&1 > TESTLOG
+    #if [[ $TEST_MODE == "perf" ]]; then
+    #    diff gmon.out gmon.gold
+    #    if [[ $? -ne 0 ]]; then
+    #        echo "TESTFAIL" > testfail
+    #    fi
+    #fi
+    } 2>&1 > test.log
 }
 
 main() {
+    mkdir -p reports
+    {
     parseCmdLine $@
     TEST_DIR=${VALUES['-d']:-$TEST_DIR}
     OUT_DIR=${VALUES['-o']:-$OUT_DIR} 
@@ -124,7 +118,7 @@ main() {
     for test in $valid_tests; do
         tc_cnt=$((tc_cnt + 1))
     done
-    echo -e "\nGenerated Testcase: $tc_cnt\n"
+    echo -e "\nGenerated Testcase: $tc_cnt"
 
     case $TEST_MODE in
         coverage)
@@ -159,36 +153,38 @@ main() {
     fi
     rm -rf reports/func reports/unit
     mkdir -p reports/func reports/unit
+    local fail_cnt=0
     for test in $valid_tests; do
         echo
         if [[ $test =~ func.*cyt ]]; then
             local testcase=$(echo $test | egrep -o "func.*cyt")
             local testcase_dir=${test%/$testcase}
-            HAVE_FUNC=1
+            FUNC_COUNT=$((FUNC_COUNT + 1))
             makeRunDir $testcase_dir $testcase
             cd $OUT_DIR/`dirname $testcase`
-
-            echo "|TESTCASE| $testcase"
+            echo "|TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt | $testcase"
             runFuncTest $testcase
         else
             local testcase=$(echo $test | egrep -o "unit.*cyt")
             local testcase_dir=${test%/$testcase}
-            HAVE_UNIT=1
+            UNIT_COUNT=$((UNIT_COUNT + 1))
             makeRunDir $testcase_dir $testcase
             cd $OUT_DIR/`dirname $testcase`
-
-            echo "|TESTCASE| $testcase"
+            echo "|TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt | $testcase"
             runUnitTest $testcase
         fi
+
         diff -N --color=auto REFLOG TESTLOG \
             &&  echo "status: PASS" \
             ||  (
-                    echo "status: FAIL"
-                    if [[ ${VALUES['-r']} ]]; then
-                        cp TESTLOG REFLOG
-                        echo "REFLOG updated"
-                    fi
+                echo "status: FAIL"
+                fail_cnt=$((fail_cnt + 1))
+                if [[ ${VALUES['-r']} ]]; then
+                    cp TESTLOG REFLOG
+                    echo "REFLOG updated"
+                fi
                 )
+
         case $TEST_MODE in
             mem-check)
                 sed -nr -e 's/^=+[0-9]+=+ //' -e '/HEAP SUMMARY/,/LEAK SUMMARY/ p' valgrind.out | sed -e '/HEAP SUMMARY:\|LEAK SUMMARY:/,/^$/ d'  | \
@@ -205,17 +201,21 @@ main() {
         esac
         cd - > /dev/null
     done
+    echo -e "\nSummary:"
+    echo "    RUN:  $tc_cnt"
+    echo "    PASS: $((tc_cnt - fail_cnt))"
+    echo "    FAIL: $fail_cnt"
 
     case $TEST_MODE in
         coverage)
-            if [[ $HAVE_FUNC -eq 1 ]]; then
+            if [[ $FUNC_COUNT -gt 0 ]]; then
                 mkdir -p reports/coverage/func
                 lcov --gcov-tool=gcov-7 -b src -c -d build/obj/coverage -d include --no-external -o reports/coverage/func/coverage.info -q 2> /dev/null
                 genhtml reports/coverage/func/coverage.info --output-directory reports/coverage/func/html --demangle-cpp > reports/coverage/func/genhtml.log 2> /dev/null
                 echo "Functional Coverage:"
                 egrep -A 1 "  lines\.\.\.\.\.\.: " reports/coverage/func/genhtml.log
             fi
-            if [[ $HAVE_UNIT -eq 1 ]]; then
+            if [[ $UNIT_COUNT -gt 0 ]]; then
                 mkdir -p reports/coverage/unit
                 lcov --gcov-tool=gcov-7 -b src -c -d $OUT_DIR -d include --no-external -o reports/coverage/unit/coverage.info -q 2> /dev/null
 
@@ -264,6 +264,7 @@ main() {
             ;;
         *)
     esac
+    } | TEE reports/cyregress.log
     return 0
 }
 
