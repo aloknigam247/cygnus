@@ -96,7 +96,7 @@ class Tree {
          *
          * @returns iterator that points to first inorder element
          */
-        friend iterator& Tree<T>::begin() const;
+        friend iterator Tree<T>::begin() const;
     };
 
     /**
@@ -152,21 +152,21 @@ class Tree {
      * @returns iterator that contains the result
      */
     template<typename K>
-    iterator& search(const K& pi_key);
+    iterator search(const K& pi_key);
 
     /**
      * Iterator to first position
      *
      * @returns iterator to first position
      */
-    iterator& begin() const;
+    iterator begin() const;
 
     /**
      * Iterator to first position
      *
      * @returns iterator to first position
      */
-    iterator& end() const;
+    iterator end() const;
 
     private:
     /**

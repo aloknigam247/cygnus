@@ -32,6 +32,11 @@ Options::Options(): option_list(), pos_args() {
     addOption("-h", Option::BOOL, "print help message");
 }
 
+Options::~Options() {
+    for(auto opt : option_list)
+        delete opt;
+}
+
 void Options::addOption(const std::string& pi_option_name,
                         Option::Type pi_type,
                         const std::string& pi_help) {

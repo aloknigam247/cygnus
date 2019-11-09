@@ -146,8 +146,8 @@ def main():
     
     # Print Makefile
     rule.write("CXX     = g++\n" +
-                "COMP_FLAGS = -fdiagnostics-color\n"+
-                "CY_COMP    = $(CXX) -std=c++11 $(COMP_FLAGS) $(INC)\n\n" +
+                "COMP_FLAGS = -std=c++11 -fdiagnostics-color\n"+
+                "CY_COMP    = $(CXX) $(COMP_FLAGS) $(INC)\n\n" +
                 "INC := ", '')
     for i in opt.incDir:
         rule.write(" \\\n    -I " + i, '')
@@ -172,6 +172,8 @@ def main():
     rule.createRule(opt.file)
     rule.write(target + ": " + ' '.join(rule.obj_list))
     rule.write("\t$(CY_COMP) -o $@ $^")
+    rule.write("\nclean: " + ' '.join(rule.obj_list))
+    rule.write("\t rm -f $^")
 
 if __name__ == "__main__":
     ret = main()

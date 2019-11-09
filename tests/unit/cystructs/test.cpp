@@ -33,7 +33,9 @@ void intPointer() {
     iter = t.search(9);
     if(iter != t.end())
         int* p = *iter;
-    for(auto iter : t) {}
+    for(auto iter : t) {
+        delete iter;
+    }
 }
 
 void objPointer() {
@@ -46,6 +48,9 @@ void objPointer() {
         name = iter->name;
     }
     catch(...) {
+    }
+    for(auto iter : t) {
+        delete iter;
     }
 }
 

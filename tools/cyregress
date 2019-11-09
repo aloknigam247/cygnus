@@ -85,7 +85,6 @@ runFuncTest() {
 }
 
 runUnitTest() {
-    {
     gen-make -i $CYGNUS_HOME/include -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src -s $CYGNUS_HOME/tests/utils/src test.cpp
     make --no-print-directory $TEST_MODE 2> >(TEE make.log) 1>>make.log
     $tool ./test 2>&1 > TESTLOG
@@ -95,7 +94,6 @@ runUnitTest() {
     #        echo "TESTFAIL" > testfail
     #    fi
     #fi
-    } 2>&1 > test.log
 }
 
 main() {
@@ -152,7 +150,7 @@ main() {
     fi
     rm -rf reports/func reports/unit
     mkdir -p reports/func reports/unit
-    local fail_cnt=0
+    export fail_cnt=0
     for test in $valid_tests; do
         echo
         if [[ $test =~ func.*cyt ]]; then
@@ -173,30 +171,35 @@ main() {
             runUnitTest $testcase
         fi
 
-        diff -N --color=auto REFLOG TESTLOG \
-            &&  echo "status: PASS" \
-            ||  (
-                echo "status: FAIL"
-                fail_cnt=$((fail_cnt + 1))
-                if [[ ${VALUES['-r']} ]]; then
-                    cp TESTLOG REFLOG
-                    echo "REFLOG updated"
-                fi
-                )
+        diff -N --color=auto REFLOG TESTLOG
+        if [[ $? -ne 0 ]]; then
+            echo "status: FAIL"
+            fail_cnt=$((fail_cnt + 1))
+            if [[ ${VALUES['-r']} ]]; then
+                cp TESTLOG REFLOG
+                echo "REFLOG updated"
+            fi
+        else
+            echo "status: PASS"
+        fi
 
         case $TEST_MODE in
             mem-check)
-                sed -nr -e 's/^=+[0-9]+=+ //' -e '/HEAP SUMMARY/,/LEAK SUMMARY/ p' valgrind.out | sed -e '/HEAP SUMMARY:\|LEAK SUMMARY:/,/^$/ d'  | \
-                while IFS= read line; do
-                    if [[ $line == "" ]]; then
-                        checksum=$(echo $error | md5sum | egrep -o "[0-Z]+")
-                        echo "CHECKSUM: $checksum" >> mem.err
-                        echo -e "$error" >> mem.err
-                        error=""
-                        continue
-                    fi
-                    error="    ${line/#   /}\n$error"
-                done
+                if [[ $(egrep -c "ERROR SUMMARY: 0 errors" valgrind.out) -ne 1 ]]; then
+                    sed -nr -e 's/^=+[0-9]+=+ //' -e '/HEAP SUMMARY/,/LEAK SUMMARY/ p' valgrind.out | sed -e '/HEAP SUMMARY:\|LEAK SUMMARY:/,/^$/ d'  | \
+                    while IFS= read line; do
+                        if [[ $line == "" ]]; then
+                            checksum=$(echo $error | md5sum | egrep -o "[0-Z]+")
+                            echo "CHECKSUM: $checksum" >> mem.err
+                            echo -e "$error" >> mem.err
+                            error=""
+                            continue
+                        fi
+                        error="    ${line/#   /}\n$error"
+                    done
+                    echo "mem-error: $(egrep -c "CHECKSUM: " mem.err)"
+                fi
+                ;;
         esac
         cd - > /dev/null
     done
@@ -256,6 +259,7 @@ main() {
                 mkdir -p reports/mem-check/unit
                 find $OUT_DIR/unit -name "mem.err" | xargs egrep -h "CHECKSUM" | sort -u | wc -l >> reports/mem-check/unit/errors
             fi
+            echo "    Memory Errors: $(find $OUT_DIR/unit $OUT_DIR/func -name "mem.err" | xargs egrep -h "CHECKSUM" | sort -u | wc -l)"
             ;;
         perf)
             # TODO: collect reports

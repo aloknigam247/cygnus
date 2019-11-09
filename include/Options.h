@@ -214,6 +214,11 @@ class Options {
     Options();
 
     /**
+     * Destructor
+     */
+    ~Options();
+
+    /**
      * Adds Option to option list
      *
      * @param[in] pi_option_name name of option

@@ -1,8 +1,10 @@
+#ifndef CYTEST_H
+#define CYTEST_H
+
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>
-
-typedef void (*caseType)();
 
 namespace cytest {
 class Log {
@@ -26,6 +28,8 @@ class Log {
     static void display() { std::cout << std::endl; }
 };
 
+typedef void (*caseType)();
+
 class Testcase {
     private:
         std::vector<caseType> case_list;
@@ -34,3 +38,5 @@ class Testcase {
         void run();
 };
 }
+
+#endif

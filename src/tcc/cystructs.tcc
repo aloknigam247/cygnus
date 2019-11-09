@@ -39,11 +39,11 @@ void Tree<T>::insert(const T pi_t) {
 }
 
 template <typename T> template <typename K>
-typename Tree<T>::iterator& Tree<T>::search(const K& pi_key) {
+typename Tree<T>::iterator Tree<T>::search(const K& pi_key) {
     Node* p = binarySearch(root, pi_key);
     if(p)
-        return *(new iterator(p));
-    return *(new iterator);
+        return iterator(p);
+    return iterator();
 }
 
 template <typename T>
@@ -84,18 +84,18 @@ typename Tree<T>::iterator& Tree<T>::iterator::operator++() {
 }
 
 template <typename T>
-typename Tree<T>::iterator& Tree<T>::begin() const {
-    iterator* iter = new iterator;
+typename Tree<T>::iterator Tree<T>::begin() const {
+    iterator iter;
     Node* curr = root;
     while(curr) {
-        iter->st.push(curr);
+        iter.st.push(curr);
         curr = curr->left;
     }
-    return *iter;
+    return iter;
 }
 
 template <typename T>
-typename Tree<T>::iterator& Tree<T>::end() const {
+typename Tree<T>::iterator Tree<T>::end() const {
     static iterator iter;
     return iter;
 }
