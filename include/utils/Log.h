@@ -7,8 +7,8 @@
  * @author Alok Nigam
  */
 
-#ifndef _LOG_H
-#define _LOG_H
+#ifndef UTILS_LOG_H
+#define UTILS_LOG_H
 
 #include <iostream>
 

@@ -24,7 +24,7 @@
 
 #include "Options.h"
 
-#include <string.h>
+#include <cstring>
 
 #include "Log.h"
 
@@ -32,9 +32,9 @@ Options::Options(): option_list(), pos_args() {
     addOption("-h", Option::BOOL, "print help message");
 }
 
-void Options::addOption(const std::string pi_option_name,
+void Options::addOption(const std::string& pi_option_name,
                         Option::Type pi_type,
-                        const std::string pi_help) {
+                        const std::string& pi_help) {
     option_list.insert(new Option(pi_option_name, pi_type, pi_help));
 }
 
@@ -95,7 +95,7 @@ bool Options::parse(const int pi_argc, const char* pi_argv[]) {
                 Log::w("ignoring unknown option ", opt);
         }
         else {
-            pos_args.push_back(std::string(opt));
+            pos_args.emplace_back(opt);
         }
     }
     cystructs::Tree<Option*>::iterator iter = option_list.search("-h");

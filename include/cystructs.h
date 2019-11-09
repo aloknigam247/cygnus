@@ -7,8 +7,8 @@
  * @author Alok Nigam
  */
 
-#ifndef _CYSTRUCTS_H
-#define _CYSTRUCTS_H
+#ifndef CYSTRUCTS_H
+#define CYSTRUCTS_H
 
 #include <stack>
 #include <stdexcept>
@@ -45,7 +45,7 @@ class Tree {
          *
          * @param[in] pi_node node to push while creating iterator
          */
-        iterator(Node* pi_node): iterator() { st.push(pi_node); }
+        explicit iterator(Node* pi_node): iterator() { st.push(pi_node); }
 
         /**
          * Operator*
@@ -107,23 +107,30 @@ class Tree {
     /**
      * Copy Constructor
      *
-     * @param[in] pi_to_copy Object to copy
+     * @param[in] pi_to_copy object to copy
      */
     Tree(const Tree<T>& pi_to_copy);
 
     /**
      * Move Constructor
      *
-     * @param[in,out] pi_to_copy Object to move
+     * @param[in,out] pi_to_copy object to move
      */
-    Tree(Tree<T>&& pi_to_move);
+    Tree(Tree<T>&& pio_to_move) noexcept;
 
     /**
      * Operator=
      *
-     * @param[in] pi_to_copy Object to copy
+     * @param[in] pi_to_copy object to copy
      */
     Tree<T>& operator=(const Tree<T>& pi_to_copy);
+
+    /**
+     * Move Assignemnt
+     *
+     * @param[in,out] pio_to_copy object to move
+     */
+    Tree<T>& operator=(Tree<T>&& pio_to_move) noexcept;
 
     /**
      * Default destructor
@@ -135,7 +142,7 @@ class Tree {
      *
      * @param[in] pi_t data to insert
      */
-    void insert(const T pi_t);
+    void insert(T pi_t);
 
     /**
      * Searches in Tree
@@ -175,7 +182,7 @@ class Tree {
          * Parametrised Constructor
          * @param[in] pi_d takes data to store
          */
-        Node(const T pi_d) : data(pi_d), left(nullptr), right(nullptr) {}
+        explicit Node(const T pi_d) : data(pi_d), left(nullptr), right(nullptr) {}
 
         /**
          * Copy Constructor
@@ -189,14 +196,22 @@ class Tree {
          *
          * @param[in,out] pi_to_move Node to move
          */
-        Node(Node&& pi_to_move);
+        Node(Node&& pio_to_move) noexcept;
 
+        ~Node();
         /**
          * Operator=
          *
          * @param[in] pi_to_copy Node to copy
          */
         Node& operator=(const Node& pi_to_copy);
+
+        /**
+         * Move Assignemnt
+         *
+         * @param[in,out] pio_to_move Node to move
+         */
+        Node& operator=(Node&& pio_to_move) noexcept;
     };
 
     Node* root;

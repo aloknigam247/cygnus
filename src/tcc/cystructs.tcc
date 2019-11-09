@@ -6,21 +6,30 @@ Tree<T>::Tree(const Tree<T>& pi_to_copy) {
 
 /* Move Constructor */
 template <typename T>
-Tree<T>::Tree(Tree<T>&& pi_to_move) {
-    root = pi_to_move.root;
-    pi_to_move = nullptr;
+Tree<T>::Tree(Tree<T>&& pio_to_move) noexcept {
+    root = pio_to_move.root;
+    pio_to_move = nullptr;
 }
 
 template <typename T>
 Tree<T>& Tree<T>::operator=(const Tree<T>& pi_to_copy) {
+    if(this == &pi_to_copy)
+        return *this;
     root = new Node(*pi_to_copy.root);
+    return *this;
+}
+
+/* Move Assignment */
+template <typename T>
+Tree<T>& Tree<T>::operator=(Tree<T>&& pio_to_move) noexcept {
+    root = pio_to_move.root;
+    pio_to_move = nullptr;
     return *this;
 }
 
 template <typename T>
 Tree<T>::~Tree() {
-    if(root)
-        delete root;
+    delete root;
 }
 
 template <typename T>
@@ -105,7 +114,7 @@ Tree<T>::Node::Node(const Tree<T>::Node& pi_to_copy) {
 
 /* Move Constructor */
 template<typename T>
-Tree<T>::Node::Node(Tree<T>::Node&& pio_to_move) {
+Tree<T>::Node::Node(Tree<T>::Node&& pio_to_move) noexcept {
     data = pio_to_move.data;
     left = pio_to_move.left;
     right = pio_to_move.right;
@@ -118,7 +127,16 @@ Tree<T>::Node::Node(Tree<T>::Node&& pio_to_move) {
 }
 
 template<typename T>
+Tree<T>::Node::~Node() {
+    delete left;
+    delete right;
+}
+
+template<typename T>
 typename Tree<T>::Node& Tree<T>::Node::operator=(const Tree<T>::Node& pi_to_copy) {
+    if(this == &pi_to_copy)
+        return *this;
+
     if(std::is_pointer<T>::value)
         data = new std::remove_pointer<T>(*pi_to_copy.data);
     else
@@ -126,6 +144,22 @@ typename Tree<T>::Node& Tree<T>::Node::operator=(const Tree<T>::Node& pi_to_copy
 
     left = pi_to_copy.left ? new Node(*pi_to_copy.left) : nullptr;
     right = pi_to_copy.right ? new Node(*pi_to_copy.right) : nullptr;
+
+    return *this;
+}
+
+/* Move Assignment */
+template<typename T>
+typename Tree<T>::Node& Tree<T>::Node::operator=(Tree<T>::Node&& pio_to_move) noexcept {
+    data = pio_to_move.data;
+    left = pio_to_move.left;
+    right = pio_to_move.right;
+
+    if(std::is_pointer<T>::value) {
+        pio_to_move.data = nullptr;
+    }
+    pio_to_move.left = nullptr;
+    pio_to_move.right = nullptr;
 
     return *this;
 }
@@ -153,11 +187,9 @@ template <typename T> template <typename K>
 typename Tree<T>::Node* Tree<T>::binarySearch(Node* pi_root, K& pi_key) const {
     if(!pi_root)
         return nullptr;
-    
     if(ref_of(pi_root->data) == pi_key)
         return pi_root;
-    else if(*pi_root->data > pi_key)
+    if(*pi_root->data > pi_key)
         return binarySearch(pi_root->left, pi_key);
-    else
-        return binarySearch(pi_root->right, pi_key);
+    return binarySearch(pi_root->right, pi_key);
 }

@@ -31,8 +31,8 @@
  * @author Alok Nigam
  */
 
-#ifndef _OPTIONS_H
-#define _OPTIONS_H
+#ifndef OPTIONS_H
+#define OPTIONS_H
 
 #include <string>
 #include <vector>
@@ -72,7 +72,7 @@ class Option {
      * @param[in] pi_type type of option
      * @param[in] pi_help help of option
      */
-    Option(const std::string pi_name, Type pi_type, std::string pi_help) :
+    Option(const std::string& pi_name, Type pi_type, const std::string& pi_help) :
         name(pi_name), help(pi_help), type(pi_type), value() {}
 
     /**
@@ -220,7 +220,7 @@ class Options {
      * @param[in] pi_type type of option
      * @param[in] pi_help option help
      */
-    void addOption(const std::string pi_option_name, Option::Type pi_type, const std::string pi_help);
+    void addOption(const std::string& pi_option_name, Option::Type pi_type, const std::string& pi_help);
 
     /**
      * Parses command line
@@ -229,7 +229,7 @@ class Options {
      * @param[in] pi_argv array of arguments
      * @returns true if command line is parsed without error
      */
-    bool parse(const int pi_argc, const char* pi_argv[]);
+    bool parse(int pi_argc, const char* pi_argv[]);
 
     /**
      * Get positional arguments
