@@ -33,12 +33,12 @@ class Error:
         print(self.file, end = ':')
         if(self.lineno):
             print(self.lineno, end = ':')
-            if(self.begin > -1):
+            if(self.begin > 3):
                 print(self.begin - 3, end = ':')
         print(' error: ' + self.desc)
         if(self.line):
             print(' '*4 + self.line)
-            if(self.begin > -1):
+            if(self.begin > 3):
                 print(' '*self.begin + '^', end = '')
                 if(self.len > 0):
                     print('~'*self.len, end = '')
@@ -48,7 +48,7 @@ class StylePattern:
     space=' +'
     type_qualifier='(const|static) +'
     type_name='[a-zA-Z]+'
-    type_mod='( +\*|\* +| +&|& +| +)'
+    type_mod='( +\*+|\*+ +| +&|& +| +)'
     type='('+type_qualifier+')?'+type_name+type_mod
     any_name=r'[a-zA-Z_]+'
     array='\[\d*]'
@@ -62,11 +62,10 @@ class StyleGuide:
     upper_camel_case='[A-Z][a-zA-Z]*'
     snake_case='[^_][a-z_]+'
     type_name='([a-z]*|'+upper_camel_case+')'
-    type_mod='(\* +|& +)?'
-    func_name=lower_camel_case
-    #var_name=
-    type='('+StylePattern.type_qualifier+')?'+type_name+type_mod
-    #var_dec=type+
+    type_mod='(\*+ +|& +)?'
+    var_name='[a-z_]+'
+    func_name='('+lower_camel_case+')|((get_|set_)'+var_name+')'
+    type='('+StylePattern.type_qualifier+')?'+type_name+type_mod+' *'
 
 #--------------------------------------------------------------------------------------------------
 def collectFiles(dir, ext):
@@ -103,12 +102,12 @@ def checkLicense(file):
  * SOFTWARE.                                                                        *
  ************************************************************************************/\
 """.split('\n')
-    lineno=1
+    lineno=0
     for line in open(file, 'r').readlines():
         lineno = lineno+1
         if(lineno >= len(lic)):
             break
-        if(lic[lineno] != line.rstrip()):
+        if(lic[lineno-1] != line.rstrip()):
             error_list.append(Error("LICENSE is missing", file))
             break
 
@@ -126,15 +125,12 @@ def checkFuncNames(file):
 
             # Check function return type
             return_type = re.search(StylePattern.type, func_proto.group(0)[:func_temp.start()])
-            if(not re.match(StyleGuide.type, return_type.group(0))):
-                print("adding error")
-                print(return_type)
-                print(StyleGuide.type)
+            if(not re.fullmatch(StyleGuide.type, return_type.group(0))):
                 error_list.append(Error("function return type should be like <type>(*|&| )",
                                 file,
                                 line.rstrip(),
                                 lineno,
-                                return_type.start(),
+                                func_proto.start() + return_type.start(),
                                 len(return_type.group(0))
                                 )
                             )
@@ -142,12 +138,12 @@ def checkFuncNames(file):
             # Check function name
             func_name_start = return_type.end()
             func_name = return_type.string[func_name_start:]
-            if(not re.match(StyleGuide.func_name, func_name)):
+            if(not re.fullmatch(StyleGuide.func_name, func_name)):
                 error_list.append(Error("func name is not in lower camel case",
                                 file,
                                 line.rstrip(),
                                 lineno,
-                                func_name_start,
+                                func_proto.start() + func_name_start,
                                 len(func_name)
                                 )
                             )
@@ -159,7 +155,7 @@ def checkFuncNames(file):
                 for param in param_list.split(','):
                     # Check paramter type
                     param_type = re.search(StylePattern.type, param)
-                    if(not re.search(StyleGuide.type, param_type.group(0))):
+                    if(not re.fullmatch(StyleGuide.type, param_type.group(0))):
                         error_list.append(Error("parameter type should be like <type>(*|&| )",
                                         file,
                                         line.rstrip(),
@@ -170,6 +166,7 @@ def checkFuncNames(file):
                                     )
 
                     # Check paramter name
+                    # TODO: add rule to check pi_ is with const
                     param_name = param[param_type.end():].replace('[','').replace(']','')
                     if(not re.match('pi_|po_|pio_', param_name)):
                         error_list.append(Error("parameter name should start with pi_|po_|pio_",
@@ -249,7 +246,7 @@ def checkSpaces(file):
         lineno = lineno+1
         # Check leading space
         leading_space = re.match(' +', line)
-        if(leading_space != None and leading_space.end()%4):
+        if(leading_space != None and leading_space.end()%4 and line[1] != '*'):
             error_list.append(Error("leading space is not multiple of 4",
                             file,
                             line.rstrip(),
@@ -267,6 +264,18 @@ def checkSpaces(file):
                             lineno,
                             trailing_space.start(),
                             len(trailing_space.group(0))
+                            )
+                        )
+        
+        # Check space only in line
+        line_space = re.match('^ +$', line)
+        if(line_space):
+            error_list.append(Error("empty line have spaces only",
+                            file,
+                            line.rstrip(),
+                            lineno,
+                            line_space.start(),
+                            len(line)
                             )
                         )
     return error_list
@@ -289,6 +298,7 @@ def main():
 
     for dir in opt.dir:
         cppList += (collectFiles(dir, "cpp"))
+        cppList += (collectFiles(dir, "tcc"))
         hList += (collectFiles(dir, "h"))
 
     for file in cppList+hList:
@@ -299,3 +309,8 @@ def main():
 if __name__ == "__main__":
     ret = main()
     sys.exit(ret)
+
+# TODO: rule to check }; ends with /* class|struct|namespace <name> */
+# TODO: check tabs in source code
+# TODO: check if style and function style for spaces
+# TODO: check for param to be with in, out, in,out in docs

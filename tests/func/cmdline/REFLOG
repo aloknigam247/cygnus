@@ -1,0 +1,9 @@
+|CASE 1| cygnus
+
+|CASE 2| cygnus -h
+>   usage: cygnus [options]
+>       -h: print help message
+
+|CASE 3| cygnus -a abc
+>   |WARN| ignoring unknown option -a
+

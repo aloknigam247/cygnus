@@ -14,35 +14,34 @@ OPTION['--release']="value:bool,eval:BUILD_MODE=release,help:create release buil
 OPTION['--sanitize']="value:bool,eval:BUILD_MODE=sanitize,help:create sanitized build"
 OPTION['--strict']="value:bool,eval:STRICT=yes,help:use strict options for compilation"
 
+TEE() {
+    echo "" > $1
+    while IFS= read line; do
+        echo "$line"
+        echo "$line" | sed 's|\x1b\[[;0-9]*m\x1b\[K||g' >> $1
+    done
+}
+
 MAKE() {
     {
-    mkdir -p reports/warnings
     if [[ ${VALUES['--force']} ]]; then
         make clean
     fi
 
     if [[ ${VALUES['--strict']} ]]; then
         make -q && make clean
-        make MODE=$1 STRICT=yes 2> reports/warnings/${BUILD_MODE}-errors
+        make MODE=$1 STRICT=yes 2> >(TEE $report_dir/${BUILD_MODE}-errors)
     else
-        make MODE=$1 2> reports/warnings/${BUILD_MODE}-errors
+        make MODE=$1 2> >(TEE $report_dir/${BUILD_MODE}-errors)
     fi
-
-    if [[ -s reports/warnings/${BUILD_MODE}-errors ]]; then
-        echo -e "\e[1;31mERRORS:\e[m"
-        cat reports/warnings/${BUILD_MODE}-errors
-    fi
-    
-    errors=`grep -c "error:|warning:" reports/warnings/${BUILD_MODE}-errors`
-    if [[ $errors -gt 0 ]]; then
-        echo "Errors|Warnings: $errors"
-        return 1;
-    fi
-    } | tee logs/cybuild-${BUILD_MODE}.log
+    } | TEE logs/cybuild-${BUILD_MODE}.log
 }
 
 main() {
     parseCmdLine $@
+    local errors=0
+    local report_dir="reports/compiler"
+    mkdir -p $report_dir
     case $BUILD_MODE in
         clean)
             make clean
@@ -69,7 +68,15 @@ main() {
             MAKE debug
             ;;
     esac
+
+    test -f $report_dir/${BUILD_MODE}-errors \
+        && errors=$(egrep -c "error:|warning:" $report_dir/${BUILD_MODE}-errors)
+    echo -e "\e[1;31mErrors|Warnings: $errors\e[m"
+    if [[ $errors -gt 0 ]]; then
+        return 1;
+    fi
 }
 
 mkdir -p logs
 main $@
+exit $?

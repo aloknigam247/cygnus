@@ -1,0 +1,5 @@
+CASE=(
+        "cygnus"
+        "cygnus -h"
+        "cygnus -a abc"
+     )

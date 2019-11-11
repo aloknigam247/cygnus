@@ -12,19 +12,46 @@ adder() {
 }
 
 covReport() {
-    local func_cov=-1
-    local unit_cov=-1
+    local comp_cov_line=-1
+    local comp_cov_func=-1
+    local comp_log="reports/coverage/comp/genhtml.log"
+    local func_cov_line=-1
+    local func_cov_func=-1
+    local func_log="reports/coverage/func/genhtml.log"
+    local unit_cov_line=-1
+    local unit_cov_func=-1
+    local unit_log="reports/coverage/unit/genhtml.log"
 
-    test -f reports/coverage/func/html/index.html && func_cov=$(egrep -m 1 "headerCovTableEntryHi" reports/coverage/func/html/index.html | sed -r 's/[^0-9.]//g')
-    test -f reports/coverage/unit/html/index.html && unit_cov=$(egrep -m 1 "headerCovTableEntryHi" reports/coverage/unit/html/index.html | sed -r 's/[^0-9.]//g')
-    
-    if [[ $func_cov -lt 100 || $unit_cov -lt 100 ]]; then
+    if [[ -f reports/coverage/comp/genhtml.log ]]; then 
+        comp_cov_line=$(egrep 'lines......: ' $comp_log | sed 's/.*lines......: //')
+        comp_cov_func=$(egrep 'functions..: ' $comp_log | sed 's/.*functions..: //')
+    fi
+    if [[ -f reports/coverage/func/genhtml.log ]]; then 
+        func_cov_line=$(egrep 'lines......: ' $func_log | sed 's/.*lines......: //')
+        func_cov_func=$(egrep 'functions..: ' $func_log | sed 's/.*functions..: //')
+    fi
+    if [[ -f reports/coverage/unit/genhtml.log ]]; then 
+        unit_cov_line=$(egrep 'lines......: ' $unit_log | sed 's/.*lines......: //')
+        unit_cov_func=$(egrep 'functions..: ' $unit_log | sed 's/.*functions..: //')
+    fi
+    if [[ ${comp_cov_line/\.*/} -lt 94 || ${comp_cov_func/\.*/} -lt 97  ]] ||
+       [[ ${func_cov_line/\.*/} -lt 71 || ${func_cov_func/\.*/} -lt 82  ]] ||
+       [[ ${unit_cov_line/\.*/} -lt 98 || ${unit_cov_func/\.*/} -lt 98 ]]; then
         EXITCODE=1
     fi
     
     echo "Coverage Report::"
-    echo "    Funtional Coverage: ${func_cov}%"
-    echo "    Unit Coverage: ${func_cov}%"
+    echo "    Complete Coverage:"
+    echo "        Lines......: $comp_cov_line"
+    echo "        Functions..: $comp_cov_func"
+    echo
+    echo "    Funtional Coverage:"
+    echo "        Lines......: $func_cov_line"
+    echo "        Functions..: $func_cov_func"
+    echo
+    echo "    Unit Coverage:"
+    echo "        Lines......: $unit_cov_line"
+    echo "        Functions..: $unit_cov_func"
     echo
 }
 
@@ -43,23 +70,27 @@ docsReport() {
 }
 
 lintReport() {
-    local lint_error=$(($(cat reports/lint.log | wc -l)-1))
+    local cppcheck_error=$(egrep 'linterror: ' reports/lint/cppcheck | egrep -v 'Cppcheck does not need standard library headers to get proper results' | wc -l)
+    local tidy_error=$(egrep -c "warning: |error: " reports/lint/tidy)
 
-    if [[ $lint_error -gt 0 ]]; then
+    if [[ $cppcheck_error -gt 0 || $tidy_error -gt 0 ]]; then
         EXITCODE=1
     fi
 
     echo "Lint Report::"
-    echo "    Errors: $lint_error"
+    echo "    cppcheck: $cppcheck_error"
+    echo "    clang-tidy: $tidy_error"
     echo
 }
 
 memReport() {
     local func_error=-1
+    local f_file="reports/mem-check/func/errors"
     local unit_error=-1
+    local u_file="reports/mem-check/unit/errors"
 
-    test -f reports/mem-check/func/errors && func_error=$(adder $(egrep -o "[0-9] errors" reports/mem-check/func/errors | sed 's/ errors//'))
-    test -f reports/mem-check/unit/errors && unit_error=$(adder $(egrep -o "[0-9] errors" reports/mem-check/unit/errors | sed 's/ errors//'))
+    test -f $f_file && func_error=$(cat $f_file)
+    test -f $u_file && unit_error=$(cat $u_file)
 
     if [[ $func_error -ne 0 || $unit_error -ne 0 ]]; then
         EXITCODE=1
@@ -93,26 +124,15 @@ perfReport() {
 
 releaseTestReport() {
     EXITCODE=1
-    echo "Test Cases::"
-    echo "    Functional Test: -1"
-    echo "    Unit Test: -1"
+    echo -n "Release Test "
+    test -f logs/cyregress.log && sed -n '/Summary:/,+3 p' logs/cyregress.log || echo "Summary: Not Run"
     echo
 }
 
 sanitizationReport() {
-    echo "Sanitization Report::"
-    if [[  $(find test_run/sanitize/func -name "run.log" | xargs egrep -c "ERROR: ") -eq 0 ]]; then
-        echo "    Functioncal: PASS"
-    else
-        EXITCODE=1
-        echo "    Functional: FAIL"
-    fi
-    if [[  $(find test_run/sanitize/unit -name "run.log" | xargs egrep -c "ERROR: ") -eq 0 ]]; then
-        echo "    Unit: PASS"
-    else
-        EXITCODE=1
-        echo "    Unit: FAIL"
-    fi
+    EXITCODE=1
+    echo -n "Sanitization "
+    test -f logs/cyregress-sanitize.log && sed -n '/Summary:/,+3 p' logs/cyregress-sanitize.log || echo "Summary: Not Run"
     echo
 }
 
@@ -131,11 +151,14 @@ styleReport() {
 }
 
 warnReport() {
+    local report_dir="reports/compiler"
     local debug_warn=-1
+    local debug_file="$report_dir/debug-errors"
     local release_warn=-1
+    local release_file="$report_dir/release-errors"
 
-    test -f reports/warnings/debug-errors && debug_warn=$(egrep -c "warning: " reports/warnings/debug-errors) 
-    test -f reports/warnings/release-errors && release_warn=$(egrep -c "warning: " reports/warnings/release-errors)
+    test -f $report_dir/debug-errors && debug_warn=$(egrep -c "warning: " $debug_file) 
+    test -f $report_dir/release-errors && release_warn=$(egrep -c "warning: " $release_file)
     
     if [[ $debug_warn -ne 0 || $release_warn -ne 0 ]]; then
         EXITCODE=1
@@ -147,17 +170,16 @@ warnReport() {
 }
 
 main() {
-    parseCmdLine $@
-    covReport
-    docsReport
+    warnReport
     lintReport
+    covReport
+    releaseTestReport
     memReport
-    perfReport
-    relaseTestReport
+    #perfReport
     sanitizationReport
     styleReport
-    warnReport
-    exit #$EXITCODE
+    docsReport
+    exit $EXITCODE
 }
 
 main $@

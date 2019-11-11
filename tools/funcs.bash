@@ -20,14 +20,14 @@ LOG(){
     local _msg=${2:?"message missing."}
     case $1 in
         E)
-            echo "[ERROR] $_msg"
+            echo "|ERROR| $_msg"
             _EXITCODE=1
             ;;
         I)
-            echo "[INFO] $_msg"
+            echo "|INFO| $_msg"
             ;;
         W)
-            echo "[WARN] $_msg"
+            echo "|WARN| $_msg"
             ;;
         *)
             LOG E "unrecognized log type"
@@ -36,20 +36,20 @@ LOG(){
     esac
 }
 
-####################################################################
-# How to create new option                                         #
-#   * eval:      : action to evaluate when option is found          #
-#   * help:      : create help statement, use . in place of space   #
-#   * metavar:   : string to be displayed for option argument       #
-#   * value:     : type of value                                    #
-#                   bool    - no argument                          #
-#                   string  - option expects single argument       #
-#   * with:      : mention dependency of option                     #
-#   ** POS      : special option to provide positional args        #
-#                                                                  #
-#   OPTION['option-name']="list of above options"                  #
-#   OPTION['POS']="variable-name"                                  #
-####################################################################
+#####################################################################
+# How to create new option                                          #
+#   * eval:     : action to evaluate when option is found           #
+#   * help:     : create help statement, use . in place of space    #
+#   * metavar:  : string to be displayed for option argument        #
+#   * value:    : type of value                                     #
+#                  bool    - no argument                            #
+#               : string  - option expects single argument          #
+#   * with:     : mention dependency of option                      #
+#   ** POS      : special option to provide positional args         #
+#                                                                   #
+#   OPTION['option-name']="list of above options"                   #
+#   OPTION['POS']="variable-name"                                   #
+#####################################################################
 declare -A OPTION
 declare -A VALUES
 declare _POS_NAME
@@ -60,7 +60,7 @@ OPTION['--help']='value:bool,help:print help'
 
 # Print usage
 usage(){
-    # scan all options for alignments
+    # scan all options for tabular alignments
     local _max_len=0
     local _pos_name=''
     for _opt in ${!OPTION[@]}; do
@@ -68,23 +68,19 @@ usage(){
         IFS=','
         for _param in ${OPTION[$_opt]}; do
             case $_param in
+                count:1)
+                    _pos_name="$_POS_NAME"
+                    ;;
+                count:0+)
+                    _pos_name="[$_POS_NAME...]"
+                    ;;
+                count:1+)
+                    _pos_name="$_POS_NAME..."
+                    ;;
                 metavar:*)
                     len=${_param#*:}
                     t_len=$(( ${#_opt} + ${#_len} ))
                     [[ $_max_len -lt $t_len ]] && _max_len=$t_len
-                    break
-                    ;;
-                count:1)
-                    _pos_name="$_POS_NAME"
-                    break
-                    ;;
-                count:0+)
-                    _pos_name="[$_POS_NAME...]"
-                    break
-                    ;;
-                count:1+)
-                    _pos_name="$_POS_NAME..."
-                    break
                     ;;
             esac
         done
@@ -93,7 +89,7 @@ usage(){
     done
 
     # print usage now
-    echo "Usage: `basename $0` [options] $pos_name"
+    echo "Usage: `basename $0` [options] $_pos_name"
     for opt in `echo ${!OPTION[@]} | sed 's/ /\n/g' | sort | grep -v POS`; do
         _meta=''
         _help=''
@@ -110,10 +106,10 @@ usage(){
                     _help=${param#*:}
                     ;;
                 with:*)
-                    _with=", with ${param#*:}"
+                    _with=" [with ${param#*:}]"
                     ;;
                 without:*)
-                    _without=", without ${param#*:}"
+                    _without=" [without ${param#*:}]"
                     ;;
             esac
         done
@@ -126,7 +122,6 @@ usage(){
 # Error message for option
 # Usage: optionError <option>
 optionError(){
-    LOG E "option \`$1' expects argument"
     local _IFS_Prev=$IFS
     local _meta=''
     local _help=''
@@ -135,16 +130,21 @@ optionError(){
     IFS=','
     for _param in ${OPTION[$1]};do
         case $_param in
+            help:*)
+                _help=${_param#*:}
+                ;;
             metavar:*)
                 _meta="<${_param#*:}>"
                 ;;
-            help:*)
-                _help=${_param#*:}
+            value:*)
+                if [[ $_param == "value:string" ]]; then
+                    LOG E "option \`$1' expects argument"
+                fi
                 ;;
             with:*)
                 _with=", with ${_param#*:}"
                 ;;
-            _without:*)
+            without:*)
                 _without=", without ${_param#*:}"
         esac
     done
@@ -172,7 +172,6 @@ parseCmdLine() {
             case $_param in
                 dest:*)
                     _POS_NAME=${_param#*:}
-                    break
                     ;;
             esac
         done
@@ -241,9 +240,8 @@ parseCmdLine() {
         fi
         shift
     done
-    if [[ -n $_pos && -n $POS_NAME ]]; then
-        VALUES[$POS_NAME]="$_pos"
-        echo ""
+    if [[ -n $_pos && -n $_POS_NAME ]]; then
+        VALUES[$_POS_NAME]="$_pos"
     fi
 
     if [[ ${VALUES["-h"]} || ${VALUES["--help"]} ]]; then
@@ -252,7 +250,7 @@ parseCmdLine() {
 
     for _o in ${!_with[@]}; do
         if [[ -z ${VALUES[$_o]} ]]; then
-            LOG E "option\[s\] $_o is missing needed by ${_with[$_o]}"
+            LOG E "option $_o is missing needed by ${_with[$_o]}"
             optionError ${_with[$_o]}
         fi
     done

@@ -6,7 +6,8 @@ Q	:= @
 #---------- Modes ----------# 
 ifeq ($(MODE),coverage)
 CPP_FLAGS 	+= --coverage -g
-CXX          = g++-7	# Using ver 7 as lcov does not support ver 9 gcno file dump
+# Using ver 7 as lcov does not support ver 9 gcno file dump
+CXX          = g++-7
 else ifeq ($(MODE),debug)
 CPP_FLAGS 	+= -g
 else ifeq ($(MODE),memory)
@@ -16,7 +17,9 @@ CPP_FLAGS 	+= -pg
 else ifeq ($(MODE),release)
 CPP_FLAGS 	+= -O
 else ifeq ($(MODE),sanitize)
-CPP_FLAGS 	+= -g -D_FORTIFY_SOURCE=2 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow -fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error
+CPP_FLAGS 	+= -g -D_FORTIFY_SOURCE=2 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC \
+			-fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow\
+			-fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error
 else ifndef MODE
 MODE=debug
 CPP_FLAGS 	+= -g
@@ -36,9 +39,13 @@ EXE 	:= $(BLD_DIR)/bin/cygnus
 export OBJ DEP
 
 #---------- Compile Flags ----------# 
-export CPP_FLAGS += -std=c++11
+export CPP_FLAGS += -std=c++11 -fdiagnostics-color
 ifdef STRICT
-	CPP_FLAGS += -pedantic -Wall -Walloc-zero -Wcast-align -Wcast-qual -Wconversion -Wduplicated-branches -Wduplicated-cond -Weffc++ -Wextra -Wfloat-equal -Wformat=2 -Winline -Wlogical-op -Wmissing-include-dirs -Woverloaded-virtual -Wshadow -Wstrict-overflow=5 -Wstringop-overflow=2 -Wsuggest-attribute=const -Wswitch-default -Wswitch-enum -Wunused -Wunused-macros
+	CPP_FLAGS += -pedantic -Wall -Walloc-zero -Wcast-align -Wcast-qual -Wconversion\
+				-Wduplicated-branches -Wduplicated-cond -Weffc++ -Wextra -Wfloat-equal -Wformat=2\
+				-Winline -Wlogical-op -Wmissing-include-dirs -Woverloaded-virtual -Wshadow\
+				-Wstrict-overflow=5 -Wstringop-overflow=2 -Wsuggest-attribute=const\
+				-Wswitch-default -Wswitch-enum -Wunused -Wunused-macros
 endif
 export CPP_COMPILE := $(CXX) $(CPP_FLAGS)
 

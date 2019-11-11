@@ -9,145 +9,89 @@ declare -a valid_tests
 TEST_DIR='.'
 declare OUT_DIR='test_run'
 declare TEST_MODE=''
+declare FUNC_COUNT=0
+declare UNIT_COUNT=0
+
+TEE() {
+    echo "" > $1
+    while IFS= read line; do
+        echo "$line"
+        echo "$line" | sed 's|\x1b\[[;0-9]*m\x1b\[K||g' >> $1
+    done
+}
 
 OPTION['-a']='value:bool,with:-d,help:run all testcases in this directory'
 OPTION['-d']='value:string,metavar:dir,help:test case directory'
 OPTION['-f']='value:bool,with:-d,without:-a,help:run unit tests only'
 OPTION['-o']='value:string,metavar:dir,help:output directory of test run'
+OPTION['-r']='value:bool,help:reflog update'
 OPTION['-u']='value:bool,with:-d,without:-a,help:run functional tests only'
 OPTION['--coverage']='value:bool,eval:TEST_MODE=coverage,help:run coverage tests'
 OPTION['--mem-check']='value:bool,eval:TEST_MODE=mem-check,help:run mem-check tests'
-OPTION['--perf']='value:bool,eval:TEST_MODE=perf,help:run mem-check tests'
+#OPTION['--perf']='value:bool,eval:TEST_MODE=perf,help:run mem-check tests'
 OPTION['--sanitize']='value:bool,eval:TEST_MODE=sanitize,help:run sanitization tests'
 OPTION['POS']='dest:test_list,count:0+'
 
 validateTests() {
-    if [[ ${VALUES["-a"]} ]]; then
-        if [[ ${VALUES["test_list"]} ]]; then
-            LOG I "-a is given, ignoring ${VALUES["test_list"]}"
-        fi
-        test -d $TEST_DIR && cd $TEST_DIR
-        valid_tests=`find -type f -path "./unit*.cyt" -o -path "./func*.cyt" | sed 's|^./||'`
-        cd - > /dev/null
-        if [[ -z $valid_tests ]]; then
-            LOG W "no testcases found in directory: $TEST_DIR"
-            EXIT
-        fi
-    elif [[ ${VALUES["-f"]} ]]; then
-        if [[ ${VALUES["test_list"]} ]]; then
-            LOG I "-f is given, ignoring ${VALUES["test_list"]}"
-        fi
-        test -d $TEST_DIR && cd $TEST_DIR
-        valid_tests=`find -type f -path "./func*.cyt" | sed 's|^./||'`
-        cd - > /dev/null
-        if [[ -z $valid_tests ]]; then
-            LOG W "no testcases found in directory: $TEST_DIR"
-            EXIT
-        fi
-    elif [[ ${VALUES["-u"]} ]]; then
-        if [[ ${VALUES["test_list"]} ]]; then
-            LOG I "-u is given, ignoring ${VALUES["test_list"]}"
-        fi
-        test -d $TEST_DIR && cd $TEST_DIR
-        valid_tests=`find -type f -path "./unit*.cyt" | sed 's|^./||'`
-        cd - > /dev/null
-        if [[ -z $valid_tests ]]; then
-            LOG W "no testcases found in directory: $TEST_DIR"
-            EXIT
+    if [[ ${VALUES['-a']} || ${VALUES['-f']} || ${VALUES['-u']} ]]; then
+        if [[ ${VALUES['-f']} ]]; then
+            valid_tests=$(find $TEST_DIR -type f -path "*func*.cyt" | xargs realpath)
+        elif [[ ${VALUES['-u']} ]]; then
+            valid_tests=$(find $TEST_DIR -type f -path "*unit*.cyt" | xargs realpath)
+        else
+            valid_tests=$(find $TEST_DIR -type f -name "*.cyt" | xargs realpath)
         fi
     else
         for test in ${VALUES["test_list"]}; do
-            if [[ $test =~ unit.*\.cyt || $test =~ func.*\.cyt && -a $TEST_DIR/$test ]]; then
-                valid_tests+=" $test"
+            abs_test=$(realpath $test)
+            if [[ $abs_test =~ unit.*\.cyt || $abs_test =~ func.*\.cyt && -a $abs_test ]]; then
+                valid_tests+=" $abs_test"
             else
-                LOG W "[invalid testcase] $test"
+                LOG W "[invalid testcase] $abs_test"
                 continue
             fi
         done
-        if [[ -z $valid_tests ]]; then
-          LOG E "testcases missing"
-          EXIT
-        fi
+    fi
+    if [[ -z $valid_tests ]]; then
+      LOG E "no valid testcases found"
+      EXIT
     fi
 }
 
 makeRunDir(){
-    local testcase=$1
+    local testcase_dir=$1
+    local testcase=$2
     local test_out=$OUT_DIR/`dirname $testcase`
     rm -rf $test_out
     mkdir -p $test_out
-    pwd
-    ln -rs $TEST_DIR/`dirname $testcase`/* $test_out/
+    ln -rs $testcase_dir/`dirname $testcase`/* $test_out/
 }
 
 runFuncTest() {
-    local testcase=$1
-    local testcase_dir=`dirname $testcase`
-
-    echo "[RUN] $testcase"
-    makeRunDir $testcase
-    cd $OUT_DIR/$testcase_dir
-    echo "[CMD] $tool `cat runme`"
-    $tool `cat runme` 2>&1 | tee run.log
-    if [[ $TEST_MODE == "perf" ]]; then
-        diff gmon.out gmon.gold
-        if [[ $? -ne 0 ]]; then
-            echo "TESTFAIL" > testfail
-        fi
-    fi
+    source `basename $1`
+    {
+    for i in ${!CASE[@]}; do
+        echo "|CASE $((i+1))| $(echo ${CASE[$i]} | sed "s|$CYGNUS|cygnus|")"
+        ${tool} ${CASE[$i]} | sed 's/.*/>   &/'
+        echo
+    done
+    } 2>&1 > TESTLOG
 }
 
 runUnitTest() {
-    local testcase=$1
-    local testcase_dir=`dirname $testcase`
-    local run_log=$OUT_DIR/$testcase_dir/unit_test.log
-    #run_log_color=$OUT_DIR/$testcase_dir/.run.log
-
-    echo "[RUN] $testcase"
-    pwd
-    
-    makeRunDir $testcase
-    {
-        LOG I "Run directory created"
-        if [[ ! -a $TEST_DIR/$testcase_dir/Makefile ]]; then
-            gen-make -d $OUT_DIR/$testcase_dir -i $CYGNUS_HOME/include -i $CYGNUS_HOME/tests/utils/include test.cpp
-        fi
-        if [[ $? -ne 0 ]]; then
-            EXIT 1
-        fi
-        make --no-print-directory -C $OUT_DIR/$testcase_dir $TEST_MODE 2>&1 | tee $OUT_DIR/$testcase_dir/make.log
-        #sed 's|\x1b\[[;0-9]*m\x1b\[K||g' $OUT_DIR/$testcase_dir/make.log.color > $OUT_DIR/$testcase_dir/make.log
-        cd $OUT_DIR/$testcase_dir
-        echo "[CMD] $tool ./test"
-        $tool ./test 2>&1 | tee run.log
-        status=$?
-        if [[ $TEST_MODE == "perf" ]]; then
-            diff gmon.out gmon.gold
-            if [[ $? -ne 0 ]]; then
-                echo "TESTFAIL" > testfail
-            fi
-        fi
-    } 2>&1 | tee $run_log
-    cat $run_log >> reports/unit/unit_test.log
-    #sed 's|\x1b\[[;0-9]*m\x1b\[K||g' $run_log_color > $run_log
-    [[ $status -eq 0 ]] && echo " --PASS--" || echo " --FAIL--"
-}
-
-runTest() {
-    if [[ $1 =~ 'func' ]]; then
-        runFuncTest $1
-    else
-        runUnitTest $1
-    fi
+    gen-make -i $CYGNUS_HOME/include -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src -s $CYGNUS_HOME/tests/utils/src test.cpp
+    make --no-print-directory $TEST_MODE 2> >(TEE make.log) 1>>make.log
+    $tool ./test 2>&1 > TESTLOG
 }
 
 main() {
+    mkdir -p logs
     parseCmdLine $@
     TEST_DIR=${VALUES['-d']:-$TEST_DIR}
     OUT_DIR=${VALUES['-o']:-$OUT_DIR} 
-    echo "TEST_DIR: $TEST_DIR"
-    echo "OUT_DIR : $OUT_DIR"
-
+    echo "    TEST_DIR: $TEST_DIR"
+    echo "    OUT_DIR: $OUT_DIR"
+    {
     test -d $TEST_DIR || LOG E "directory \`$TEST_DIR' does not exit"
     if [[ $test_out == $OUT_DIR ]]; then
         LOG E "test directory and out directory cannot be same"
@@ -159,68 +103,157 @@ main() {
     for test in $valid_tests; do
         tc_cnt=$((tc_cnt + 1))
     done
-    echo -e "\nGenerated Testcase: $tc_cnt\n"
+    echo -e "\nGenerated Testcase: $tc_cnt"
 
     case $TEST_MODE in
         coverage)
+            CYGNUS=$CYGNUS_HOME/build/bin/coverage/cygnus-coverage
             OUT_DIR="$OUT_DIR/coverage"
             mkdir -p reports/coverage
             ;;
         mem-check)
+            CYGNUS=$CYGNUS_HOME/build/bin/memory/cygnus-memory
             OUT_DIR="$OUT_DIR/mem-check"
             mkdir -p reports/mem-check
-            tool="valgrind --leak-check=full --log-file=valgrind.out"
+            tool="valgrind --track-origins=yes --errors-for-leak-kinds=all --show-leak-kinds=all --leak-check=full --log-file=valgrind.out"
             ;;
         perf)
+            CYGNUS=$CYGNUS_HOME/build/bin/perf/cygnus-perf
             OUT_DIR="$OUT_DIR/perf"
             mkdir -p reports/perf
             ;;
         sanitize)
+            CYGNUS=$CYGNUS_HOME/build/bin/sanitize/cygnus-sanitize
             OUT_DIR="$OUT_DIR/sanitize"
             mkdir -p reports/sanitize
             ;;
         *)
+            CYGNUS=$CYGNUS_HOME/build/bin/cygnus
             ;;
     esac
 
+    if [[ ${VALUES['-a']} || ${VALUES['-f']} ]] && [[ ! -x $CYGNUS ]]; then
+        LOG E "$CYGNUS does not exist"
+        EXIT
+    fi
     rm -rf reports/func reports/unit
     mkdir -p reports/func reports/unit
+    export fail_cnt=0
     for test in $valid_tests; do
-        cd $CYGNUS_HOME
-        runTest $test
-        cd $CYGNUS_HOME
+        echo
+        if [[ $test =~ func.*cyt ]]; then
+            local testcase=$(echo $test | egrep -o "func.*cyt")
+            local testcase_dir=${test%/$testcase}
+            FUNC_COUNT=$((FUNC_COUNT + 1))
+            makeRunDir $testcase_dir $testcase
+            cd $OUT_DIR/`dirname $testcase`
+            echo "|TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt | $testcase"
+            runFuncTest $testcase
+        else
+            local testcase=$(echo $test | egrep -o "unit.*cyt")
+            local testcase_dir=${test%/$testcase}
+            UNIT_COUNT=$((UNIT_COUNT + 1))
+            makeRunDir $testcase_dir $testcase
+            cd $OUT_DIR/`dirname $testcase`
+            echo "|TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt | $testcase"
+            runUnitTest $testcase
+        fi
+
+        diff -N --color=auto REFLOG TESTLOG
+        if [[ $? -ne 0 ]]; then
+            echo "status: FAIL"
+            fail_cnt=$((fail_cnt + 1))
+            if [[ ${VALUES['-r']} ]]; then
+                cp TESTLOG REFLOG
+                echo "REFLOG updated"
+            fi
+        else
+            echo "status: PASS"
+        fi
+
+        case $TEST_MODE in
+            mem-check)
+                if [[ $(egrep -c "ERROR SUMMARY: 0 errors" valgrind.out) -ne 1 ]]; then
+                    sed -nr -e 's/^=+[0-9]+=+ //' -e '/HEAP SUMMARY/,/LEAK SUMMARY/ p' valgrind.out | sed -e '/HEAP SUMMARY:\|LEAK SUMMARY:/,/^$/ d'  | \
+                    while IFS= read line; do
+                        if [[ $line == "" ]]; then
+                            checksum=$(echo $error | md5sum | egrep -o "[0-Z]+")
+                            echo "CHECKSUM: $checksum" >> mem.err
+                            echo -e "$error" >> mem.err
+                            error=""
+                            continue
+                        fi
+                        error="    ${line/#   /}\n$error"
+                    done
+                    echo "mem-error: $(egrep -c "CHECKSUM: " mem.err)"
+                fi
+                ;;
+        esac
+        cd - > /dev/null
     done
+    echo -e "\nSummary:"
+    echo "    RUN:  $tc_cnt"
+    echo "    PASS: $((tc_cnt - fail_cnt))"
+    echo "    FAIL: $fail_cnt"
 
     case $TEST_MODE in
         coverage)
-            if [[ ${VALUES['-a']} || ${VALUES['-f']} ]]; then
+            if [[ $FUNC_COUNT -gt 0 ]]; then
                 mkdir -p reports/coverage/func
-                lcov --gcov-tool=gcov-7 --capture --directory build/obj/coverage  --no-external --output-file reports/coverage/func/coverage.info
-                genhtml reports/coverage/func/coverage.info --output-directory reports/coverage/func/html --demangle-cpp
+                lcov --gcov-tool=gcov-7 -b src -c -d build/obj/coverage -d include --no-external -o reports/coverage/func/coverage.info -q 2> /dev/null
+                genhtml reports/coverage/func/coverage.info --output-directory reports/coverage/func/html --demangle-cpp > reports/coverage/func/genhtml.log 2> /dev/null
+                echo "Functional Coverage:"
+                egrep -A 1 "  lines\.\.\.\.\.\.: " reports/coverage/func/genhtml.log
             fi
-            if [[ ${VALUES['-a']} || ${VALUES['-u']} ]]; then
+            if [[ $UNIT_COUNT -gt 0 ]]; then
                 mkdir -p reports/coverage/unit
-                lcov --gcov-tool=gcov-7 --capture --directory $OUT_DIR --no-external --output-file reports/coverage/unit/coverage.info
-                genhtml reports/coverage/unit/coverage.info --output-directory reports/coverage/unit/html --demangle-cpp
+                lcov --gcov-tool=gcov-7 -b src -c -d $OUT_DIR -d include --no-external -o reports/coverage/unit/coverage.info -q 2> /dev/null
+
+                # Put missing files in coverage.info
+                mkdir /tmp/cygnus_tmp -p
+                find include src -regex ".*\.cpp\|.*\.h\|.*\.tcc" | egrep -v "main.cpp|cymem.cpp" | sort -u | xargs realpath > /tmp/cygnus_tmp/all_files
+                egrep "SF:" reports/coverage/unit/coverage.info  | sed 's/SF://' | sort -u > /tmp/cygnus_tmp/covered_files
+                comm -23 /tmp/cygnus_tmp/all_files /tmp/cygnus_tmp/covered_files > /tmp/cygnus_tmp/uncovered_files
+                {
+                for file in `cat /tmp/cygnus_tmp/uncovered_files`; do
+                    echo "SF:$file"
+                    cat -ns $file | sed -r -e 's/^[ ]+//' -e 's/\t/ /g' | egrep -v "^[0-9]+ $|[0-9]+ (/|#)|[0-9]+  \*" | egrep -o "^[0-9]+" | sed 's/.*/DA:&,0/'
+                    echo "end_of_record"
+                done
+                } >> reports/coverage/unit/coverage.info
+
+                # remove test.cpp from coverage.info
+                sed -i '/test.cpp$/,/end_of_record/ d' reports/coverage/unit/coverage.info
+
+                genhtml --ignore-errors source reports/coverage/unit/coverage.info --output-directory reports/coverage/unit/html --demangle-cpp | tee reports/coverage/unit/genhtml.log 2> /dev/null
+            fi
+            if [[ ${VALUES['-a']} ]]; then
+                mkdir -p reports/coverage/comp
+                lcov --gcov-tool=gcov-7 -b src -c -d build/obj/coverage -d $OUT_DIR -d include --no-external -o reports/coverage/comp/coverage.info -q 2> /dev/null
+
+                # remove test.cpp from coverage.info
+                sed -i '/test.cpp$/,/end_of_record/ d' reports/coverage/comp/coverage.info
+
+                genhtml --ignore-errors source reports/coverage/comp/coverage.info --output-directory reports/coverage/comp/html --demangle-cpp | tee reports/coverage/comp/genhtml.log 2> /dev/null
             fi
             ;;
         mem-check)
             rm -rf reports/mem-check
             if [[ ${VALUES['-a']} || ${VALUES['-f']} ]]; then
                 mkdir -p reports/mem-check/func
-                find $OUT_DIR/func -name "valgrind.out" | xargs egrep "[0-9]+ errors" >> reports/mem-check/func/errors
+                find $OUT_DIR/func -name "mem.err" | xargs egrep -h "CHECKSUM" | sort -u | wc -l >> reports/mem-check/func/errors
             fi
             if [[ ${VALUES['-a']} || ${VALUES['-u']} ]]; then
                 mkdir -p reports/mem-check/unit
-                find $OUT_DIR/unit -name "valgrind.out" | xargs egrep "[0-9]+ errors" >> reports/mem-check/unit/errors
+                find $OUT_DIR/unit -name "mem.err" | xargs egrep -h "CHECKSUM" | sort -u | wc -l >> reports/mem-check/unit/errors
             fi
+            echo "    Memory Errors: $(find $OUT_DIR/unit $OUT_DIR/func -name "mem.err" | xargs egrep -h "CHECKSUM" | sort -u | wc -l)"
             ;;
         perf)
-            # TODO: collect reports
-            tool=gprof
             ;;
         *)
     esac
+    } | TEE logs/cyregress${TEST_MODE:+-$TEST_MODE}.log
     return 0
 }
 

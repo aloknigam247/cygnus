@@ -2,22 +2,26 @@
 
 CONFIG=.doxygen/config
 
-mv docs docs.old
-
-mkdir docs
-mkdir -p reports/docs
+mkdir -p docs reports/docs
 
 doxygen $CONFIG
-undoc=`cat reports/docs/undoc | wc -l`
+sed -i '/\(variable\)/ d' reports/docs/undoc
+cat reports/docs/undoc
+undoc=$(cat reports/docs/undoc | wc -l)
 
-diff -qr docs docs.old
-if [[ $? -eq 0 ]]; then
+if [[ $(tar -df docs.tar docs | egrep -v "Mod time differs|Mode differs") ]]; then
+    tar uf docs.tar docs
+fi
+
+if [[ $(git status docs.tar | tail -1) == "nothing to commit, working tree clean" ]]; then
     doc_diff=no
 else
     doc_diff=yes
 fi
 
-rm -rf docs.old
+if [[ $1 != "-r" ]]; then
+    rm -rf docs
+fi
 
 echo "Undocumented: $undoc" | tee reports/docs/status
 echo "Need to update docs: $doc_diff" | tee -a reports/docs/status
