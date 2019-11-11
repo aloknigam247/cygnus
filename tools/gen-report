@@ -130,19 +130,9 @@ releaseTestReport() {
 }
 
 sanitizationReport() {
-    echo "Sanitization Report::"
-    if [[  $(find test_run/sanitize/func -name "run.log" | xargs egrep -c "ERROR: ") -eq 0 ]]; then
-        echo "    Functioncal: PASS"
-    else
-        EXITCODE=1
-        echo "    Functional: FAIL"
-    fi
-    if [[  $(find test_run/sanitize/unit -name "run.log" | xargs egrep -c "ERROR: ") -eq 0 ]]; then
-        echo "    Unit: PASS"
-    else
-        EXITCODE=1
-        echo "    Unit: FAIL"
-    fi
+    EXITCODE=1
+    echo -n "Sanitization "
+    test -f logs/cyregress-sanitize.log && sed -n '/Summary:/,+3 p' logs/cyregress-sanitize.log || echo "Summary: Not Run"
     echo
 }
 
