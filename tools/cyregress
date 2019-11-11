@@ -28,7 +28,7 @@ OPTION['-r']='value:bool,help:reflog update'
 OPTION['-u']='value:bool,with:-d,without:-a,help:run functional tests only'
 OPTION['--coverage']='value:bool,eval:TEST_MODE=coverage,help:run coverage tests'
 OPTION['--mem-check']='value:bool,eval:TEST_MODE=mem-check,help:run mem-check tests'
-OPTION['--perf']='value:bool,eval:TEST_MODE=perf,help:run mem-check tests'
+#OPTION['--perf']='value:bool,eval:TEST_MODE=perf,help:run mem-check tests'
 OPTION['--sanitize']='value:bool,eval:TEST_MODE=sanitize,help:run sanitization tests'
 OPTION['POS']='dest:test_list,count:0+'
 
@@ -76,24 +76,12 @@ runFuncTest() {
         echo
     done
     } 2>&1 > TESTLOG
-    #if [[ $TEST_MODE == "perf" ]]; then
-    #    diff gmon.out gmon.gold
-    #    if [[ $? -ne 0 ]]; then
-    #        echo "TESTFAIL" > testfail
-    #    fi
-    #fi
 }
 
 runUnitTest() {
     gen-make -i $CYGNUS_HOME/include -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src -s $CYGNUS_HOME/tests/utils/src test.cpp
     make --no-print-directory $TEST_MODE 2> >(TEE make.log) 1>>make.log
     $tool ./test 2>&1 > TESTLOG
-    #if [[ $TEST_MODE == "perf" ]]; then
-    #    diff gmon.out gmon.gold
-    #    if [[ $? -ne 0 ]]; then
-    #        echo "TESTFAIL" > testfail
-    #    fi
-    #fi
 }
 
 main() {
@@ -262,8 +250,6 @@ main() {
             echo "    Memory Errors: $(find $OUT_DIR/unit $OUT_DIR/func -name "mem.err" | xargs egrep -h "CHECKSUM" | sort -u | wc -l)"
             ;;
         perf)
-            # TODO: collect reports
-            tool=gprof
             ;;
         *)
     esac

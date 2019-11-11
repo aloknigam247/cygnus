@@ -226,9 +226,6 @@ workflows:
       - mem-checks:
           requires:
             - checkout
-      - performance:
-          requires:
-            - checkout
       - release-tests:
           requires:
             - checkout
@@ -244,7 +241,6 @@ workflows:
             - mem-checks
             - sanitization
             - coverage
-            - performance
             - lint-checks
             - docs-checks
             - style-checks

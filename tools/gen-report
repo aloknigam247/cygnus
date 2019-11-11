@@ -185,7 +185,7 @@ main() {
     covReport
     releaseTestReport
     memReport
-    perfReport
+    #perfReport
     sanitizationReport
     styleReport
     docsReport
