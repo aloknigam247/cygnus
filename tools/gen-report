@@ -60,7 +60,7 @@ docsReport() {
     local need_update=$(egrep -o "yes|no" reports/docs/status)
 
     if [[ $undoc_count -gt 0 || $need_update == 'yes' ]]; then
-        EXITCODE=1
+        EXITCODE=2
     fi
 
     echo "DOCS::"
@@ -74,7 +74,7 @@ lintReport() {
     local tidy_error=$(egrep -c "warning: |error: " reports/lint/tidy)
 
     if [[ $cppcheck_error -gt 0 || $tidy_error -gt 0 ]]; then
-        EXITCODE=1
+        EXITCODE=3
     fi
 
     echo "Lint Report::"
@@ -93,7 +93,7 @@ memReport() {
     test -f $u_file && unit_error=$(cat $u_file)
 
     if [[ $func_error -ne 0 || $unit_error -ne 0 ]]; then
-        EXITCODE=1
+        EXITCODE=4
     fi
 
     echo "Memory Report::"
@@ -110,27 +110,27 @@ perfReport() {
     if [[ $func_perf -eq 0 ]]; then
         echo "    Functional: PASS"
     else
-        EXITCODE=1
+        EXITCODE=5
         echo "    Functional: FAIL"
     fi
     if [[ $unit_perf -eq 0 ]]; then
         echo "    Unit: PASS"
     else
-        EXITCODE=1
+        EXITCODE=6
         echo "    Unit: FAIL"
     fi
     echo
 }
 
 releaseTestReport() {
-    EXITCODE=1
+    #EXITCODE=7
     echo -n "Release Test "
     test -f logs/cyregress.log && sed -n '/Summary:/,+3 p' logs/cyregress.log || echo "Summary: Not Run"
     echo
 }
 
 sanitizationReport() {
-    EXITCODE=1
+    #EXITCODE=8
     echo -n "Sanitization "
     test -f logs/cyregress-sanitize.log && sed -n '/Summary:/,+3 p' logs/cyregress-sanitize.log || echo "Summary: Not Run"
     echo
@@ -141,7 +141,7 @@ styleReport() {
 
     test -f reports/style.log && errors=$(egrep -c "error: " reports/style.log)
     if [[ $errors -gt 0 ]]; then
-        EXITCODE=1
+        EXITCODE=9
     fi
 
     echo "Style Report::"
@@ -161,7 +161,7 @@ warnReport() {
     test -f $report_dir/release-errors && release_warn=$(egrep -c "warning: " $release_file)
     
     if [[ $debug_warn -ne 0 || $release_warn -ne 0 ]]; then
-        EXITCODE=1
+        EXITCODE=10
     fi
     echo "Compiler Warnings::"
     echo "    Debug: $debug_warn"
