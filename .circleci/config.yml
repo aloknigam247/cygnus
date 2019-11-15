@@ -217,9 +217,6 @@ workflows:
       - coverage:
           requires:
             - checkout
-      - docs-checks:
-          requires:
-            - checkout
       - lint-checks:
           requires:
             - checkout
@@ -232,9 +229,6 @@ workflows:
       - sanitization:
           requires:
             - checkout
-      - style-checks:
-          requires:
-            - checkout
       - gen-report:
           requires:
             - release-tests
@@ -242,5 +236,3 @@ workflows:
             - sanitization
             - coverage
             - lint-checks
-            - docs-checks
-            - style-checks

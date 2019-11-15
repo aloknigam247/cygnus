@@ -31,8 +31,8 @@
  * @author Alok Nigam
  */
 
-#ifndef OPTIONS_H
-#define OPTIONS_H
+#ifndef BASE_OPTIONS_H
+#define BASE_OPTIONS_H
 
 #include <string>
 #include <vector>
