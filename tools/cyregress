@@ -79,7 +79,7 @@ runFuncTest() {
 }
 
 runUnitTest() {
-    gen-make -i $CYGNUS_HOME/include -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src -s $CYGNUS_HOME/tests/utils/src test.cpp
+    gen-make -i $CYGNUS_HOME/include/base -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/base/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src/base -s $CYGNUS_HOME/tests/utils/src test.cpp
     make --no-print-directory $TEST_MODE 2> >(TEE make.log) 1>>make.log
     $tool ./test 2>&1 > TESTLOG
 }
@@ -200,14 +200,14 @@ main() {
         coverage)
             if [[ $FUNC_COUNT -gt 0 ]]; then
                 mkdir -p reports/coverage/func
-                lcov --gcov-tool=gcov-7 -b src -c -d build/obj/coverage -d include --no-external -o reports/coverage/func/coverage.info -q 2> /dev/null
+                lcov --gcov-tool=gcov-7 -b src/base -c -d build/obj/coverage -d include --no-external -o reports/coverage/func/coverage.info -q 2> /dev/null
                 genhtml reports/coverage/func/coverage.info --output-directory reports/coverage/func/html --demangle-cpp > reports/coverage/func/genhtml.log 2> /dev/null
                 echo "Functional Coverage:"
                 egrep -A 1 "  lines\.\.\.\.\.\.: " reports/coverage/func/genhtml.log
             fi
             if [[ $UNIT_COUNT -gt 0 ]]; then
                 mkdir -p reports/coverage/unit
-                lcov --gcov-tool=gcov-7 -b src -c -d $OUT_DIR -d include --no-external -o reports/coverage/unit/coverage.info -q 2> /dev/null
+                lcov --gcov-tool=gcov-7 -b src/base -c -d $OUT_DIR -d include --no-external -o reports/coverage/unit/coverage.info -q 2> /dev/null
 
                 # Put missing files in coverage.info
                 mkdir /tmp/cygnus_tmp -p
@@ -229,7 +229,7 @@ main() {
             fi
             if [[ ${VALUES['-a']} ]]; then
                 mkdir -p reports/coverage/comp
-                lcov --gcov-tool=gcov-7 -b src -c -d build/obj/coverage -d $OUT_DIR -d include --no-external -o reports/coverage/comp/coverage.info -q 2> /dev/null
+                lcov --gcov-tool=gcov-7 -b src/base -c -d build/obj/coverage -d $OUT_DIR -d include --no-external -o reports/coverage/comp/coverage.info -q 2> /dev/null
 
                 # remove test.cpp from coverage.info
                 sed -i '/test.cpp$/,/end_of_record/ d' reports/coverage/comp/coverage.info
