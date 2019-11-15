@@ -5,9 +5,9 @@ Q	:= @
 
 #---------- Modes ----------# 
 ifeq ($(MODE),coverage)
+CXX          = g++-7
 CPP_FLAGS 	+= --coverage -g
 # Using ver 7 as lcov does not support ver 9 gcno file dump
-CXX          = g++-7
 else ifeq ($(MODE),debug)
 CPP_FLAGS 	+= -g
 else ifeq ($(MODE),memory)
@@ -33,7 +33,7 @@ BIN		:= $(BLD_DIR)/bin/$(MODE)
 DEP		:= $(BLD_DIR)/dep/$(MODE)
 OBJ		:= $(BLD_DIR)/obj/$(MODE)
 MOD_EXE	:= $(BIN)/cygnus-$(MODE)
-DUMP 	:= $(BIN) $(OBJ) $(DEP)
+DUMP 	:= $(BIN)
 EXE 	:= $(BLD_DIR)/bin/cygnus
 
 export OBJ DEP
@@ -47,7 +47,7 @@ ifdef STRICT
 				-Wstrict-overflow=5 -Wstringop-overflow=2 -Wsuggest-attribute=const\
 				-Wswitch-default -Wswitch-enum -Wunused -Wunused-macros
 endif
-export CPP_COMPILE := $(CXX) $(CPP_FLAGS)
+export CY_COMPILE := $(CXX) $(CPP_FLAGS)
 
 #---------- Make Flags ----------#
 export MAKE_FLAGS	:= --no-print-directory 
@@ -66,8 +66,8 @@ $(EXE): $(MOD_EXE)
 	ln -sfr $< $@
 
 $(MOD_EXE):  INCLUDE_DIR=''
-$(MOD_EXE):  $(addprefix $(OBJ)/,$(notdir $(subst .cpp,.o,$(wildcard src/*.cpp))))
-	$(CPP_COMPILE) -o $@ $^
+$(MOD_EXE):  $(subst src,$(OBJ),$(subst .cpp,.o,$(wildcard src/*/*.cpp)))
+	$(CY_COMPILE) -o $@ $^
 
 clean:
 	$Qecho "cleaning ..."

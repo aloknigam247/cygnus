@@ -1,14 +1,8 @@
-export INCLUDE_DIR += -I . -I ../include -I ../include/utils -I ../src/tcc
+MODULES := base
 
-.INTERMEDIATE : $(DEP_FILES)
+.PHONY: $(MODULES)
 
-SRC_FILES = $(wildcard *.cpp)
-DEP_FILES = $(addprefix $(DEP)/,$(SRC_FILES:.cpp=.d))
+all: $(MODULES)
 
-src: $(DEP_FILES) build
-
-$(DEP_FILES): $(DEP)/%.d : %.cpp
-	$(CPP_COMPILE) $(INCLUDE_DIR) -MM -MF $@ -MT $(OBJ)/$(^:.cpp=.o) $^
-
-build:
-	$(MAKE) -f build.mk
+$(MODULES):
+	$(MAKE) -C $@ DEP=$(DEP)/$@ OBJ=$(OBJ)/$@
