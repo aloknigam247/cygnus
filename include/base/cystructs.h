@@ -7,8 +7,8 @@
  * @author Alok Nigam
  */
 
-#ifndef CYSTRUCTS_H
-#define CYSTRUCTS_H
+#ifndef BASE_CYSTRUCTS_H
+#define BASE_CYSTRUCTS_H
 
 #include <stack>
 #include <stdexcept>

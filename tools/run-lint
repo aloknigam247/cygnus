@@ -10,5 +10,5 @@ echo "    errors: $(egrep 'linterror: ' reports/lint/cppcheck | egrep -v 'Cppche
 
 echo
 echo "clang-tidy:"
-clang-tidy -checks='*,-fuchsia*,-readability-redundant-member-init,-modernize-use-trailing-return-type,-*braces-around-statements,-cppcoreguidelines-owning-memory,-*avoid-c-arrays,-*-no-malloc,-cppcoreguidelines-avoid-c-arrays,-cppcoreguidelines-pro-type-union-access,-cppcoreguidelines-pro-type-const-cast,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-modernize-pass-by-value,-misc-non-private-member-variables-in-classes,-*use-auto,-*array*decay' --header-filter='.*' $(find src -name "*.cpp") -- $includes > reports/lint/tidy 2>&1
+clang-tidy -checks='*,-fuchsia*,-readability-redundant-member-init,-modernize-use-trailing-return-type,-*braces-around-statements,-cppcoreguidelines-owning-memory,-*avoid-c-arrays,-*-no-malloc,-cppcoreguidelines-avoid-c-arrays,-cppcoreguidelines-pro-type-union-access,-cppcoreguidelines-pro-type-const-cast,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-modernize-pass-by-value,-misc-non-private-member-variables-in-classes,-*use-auto,-*array*decay' --line-filter={"name":"Options.cpp","lines":"[35]"} --header-filter='.*' $(find src -name "*.cpp") -- $includes > reports/lint/tidy 2>&1
 echo "    errors: $(egrep -c 'warning: |error: ' reports/lint/tidy)"
