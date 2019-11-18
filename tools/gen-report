@@ -177,7 +177,7 @@ main() {
     memReport
     #perfReport
     sanitizationReport
-    #styleReport
+    styleReport
     #docsReport
     exit $EXITCODE
 }

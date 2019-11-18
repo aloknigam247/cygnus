@@ -68,122 +68,121 @@ class Option {
     /**
      * Paranetrised constructor
      *
-     * @param[in] pi_name name of option
-     * @param[in] pi_type type of option
-     * @param[in] pi_help help of option
+     * @param[in] name name of option
+     * @param[in] type type of option
+     * @param[in] help help of option
      */
-    Option(const std::string& pi_name, Type pi_type, const std::string& pi_help) :
-        name(pi_name), help(pi_help), type(pi_type), value() {}
+    Option(const std::string& name, Type type, const std::string& help) :
+        m_name(name), m_help(help), m_type(type), m_value() {}
 
     /**
      * Get help
      *
      * @returns help
      */
-    std::string get_help() const { return help;  }
+    std::string get_help() const { return m_help; }
 
     /**
      * Get option name
      *
      * @returns option name
      */
-    std::string get_name() const { return name;  }
+    std::string get_name() const { return m_name; }
 
     /**
      * Get option type
      *
      * @returns option type
      */
-    Type get_type() const { return type;  }
-    
+    Type get_type() const { return m_type; }
 
     /**
      * Get bool value
      *
      * @returns bool value
      */
-    bool  get_bool_value() const { return value.b; }
+    bool  get_bool_value() const { return m_value.b; }
 
     /**
      * Get char value
      *
      * @returns char value
      */
-    char  get_char_value() const { return value.c; }
+    char  get_char_value() const { return m_value.c; }
 
     /**
      * Get int value
      *
      * @returns int value
      */
-    int   get_int_value() const { return value.i; }
+    int   get_int_value() const { return m_value.i; }
 
     /**
      * Get string value
      *
      * @returns string value
      */
-    const char* get_string_value() const { return value.s; }
+    const char* get_string_value() const { return m_value.s; }
 
     /**
      * Set bool value
      *
-     * @param[in] pi_value bool value
+     * @param[in] value bool value
      */
-    void set_value(const bool  pi_value) { value.b = pi_value; }
+    void set_value(const bool value) { m_value.b = value; }
 
     /**
      * Set char value
      *
-     * @param[in] pi_value char value
+     * @param[in] value char value
      */
-    void set_value(const char  pi_value) { value.c = pi_value; }
+    void set_value(const char value) { m_value.c = value; }
 
     /**
      * Set int value
      *
-     * @param[in] pi_value int value
+     * @param[in] value int value
      */
-    void set_value(const int   pi_value) { value.i = pi_value; }
+    void set_value(const int value) { m_value.i = value; }
 
     /**
      * Set string value
      *
-     * @param[in] pi_value string value
+     * @param[in] value string value
      */
-    void set_value(const char* pi_value) { value.s = pi_value; }
-
-   /**
-    * Operator>
-    *
-    * @param[in] pi_opt Option to compare
-    * @returns true if left Option is greater than right Option are equal
-    */
-    bool operator>(const Option& pi_opt) { return name > pi_opt.name; }
+    void set_value(const char* value) { m_value.s = value; }
 
     /**
      * Operator>
      *
-     * @param[in] pi_opt string to compare
+     * @param[in] opt Option to compare
+     * @returns true if left Option is greater than right Option are equal
+     */
+    bool operator>(const Option& opt) { return m_name > opt.m_name; }
+
+    /**
+     * Operator>
+     *
+     * @param[in] opt string to compare
      * @returns true if Option name is greater than string on the right
      */
-    bool operator>(const char* pi_opt)   { return name > pi_opt; }
+    bool operator>(const char* opt) { return m_name > opt; }
 
     /**
      * Operator==
      *
-     * @param[in] pi_opt Option to compare
+     * @param[in] opt Option to compare
      * @returns true if both options are equal
      */
-    bool operator==(const char* pi_opt)  { return name == pi_opt; }
-    
+    bool operator==(const char* opt) { return m_name == opt; }
+
     private:
     /**
      * @union Value
      *
      * Stores value of different types in a single union
      */
-    union Value {
+    union Value { 
         bool b;
         char c;
         int i;
@@ -195,9 +194,9 @@ class Option {
         Value() : s(nullptr) {}
     };
 
-    const std::string name, help;
-    const Type type;
-    Value value;
+    const std::string m_name, m_help;
+    const Type m_type;
+    Value m_value;
 };
 
 /**
@@ -221,27 +220,27 @@ class Options {
     /**
      * Adds Option to option list
      *
-     * @param[in] pi_option_name name of option
-     * @param[in] pi_type type of option
-     * @param[in] pi_help option help
+     * @param[in] option_name name of option
+     * @param[in] type type of option
+     * @param[in] help option help
      */
-    void addOption(const std::string& pi_option_name, Option::Type pi_type, const std::string& pi_help);
+    void addOption(const std::string& option_name, Option::Type type, const std::string& help);
 
     /**
      * Parses command line
      *
-     * @param[in] pi_argc number of arguments
-     * @param[in] pi_argv array of arguments
+     * @param[in] argc number of arguments
+     * @param[in] argv array of arguments
      * @returns true if command line is parsed without error
      */
-    bool parse(int pi_argc, const char* pi_argv[]);
+    bool parse(int argc, const char* argv[]);
 
     /**
      * Get positional arguments
      *
      * @returns list of positional arguments if any
      */
-    const std::vector<std::string>& get_positional() const { return pos_args; }
+    const std::vector<std::string>& get_positional() const { return m_pos_args; }
 
     /**
      * Autogenerated Usage
@@ -249,8 +248,8 @@ class Options {
     void usage() const;
 
     private:
-    cystructs::Tree<Option*> option_list;
-    std::vector<std::string> pos_args;
+    cystructs::Tree<Option*> m_option_list;
+    std::vector<std::string> m_pos_args;
 };
 
 #endif

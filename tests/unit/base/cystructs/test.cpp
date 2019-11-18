@@ -7,10 +7,10 @@
 
 struct TestStruct {
     std::string name;
-    TestStruct(std::string pi_name): name(pi_name) {}
-    bool operator>(const TestStruct& pi_right) { return name > pi_right.name; }
-    bool operator>(const char* pi_right)       { return name > pi_right;      }
-    bool operator==(const char* pi_right)      { return name == pi_right;     }
+    TestStruct(std::string name): name(name) {}
+    bool operator>(const TestStruct& right) { return name > right.name; }
+    bool operator>(const char* right)       { return name > right;      }
+    bool operator==(const char* right)      { return name == right;     }
 };
 
 void intType() {

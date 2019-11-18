@@ -1,46 +1,70 @@
+/************************************************************************************
+ * MIT License                                                                      *
+ *                                                                                  *
+ * Copyright (c) 2019 Alok Nigam                                                    *
+ *                                                                                  *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy     *
+ * of this software and associated documentation files (the "Software"), to deal    *
+ * in the Software without restriction, including without limitation the rights     *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell        *
+ * copies of the Software, and to permit persons to whom the Software is            *
+ * furnished to do so, subject to the following conditions:                         *
+ *                                                                                  *
+ * The above copyright notice and this permission notice shall be included in all   *
+ * copies or substantial portions of the Software.                                  *
+ *                                                                                  *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR       *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,         *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE      *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER           *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,    *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE    *
+ * SOFTWARE.                                                                        *
+ ************************************************************************************/
+
 /* Copy Constructor */
 template <typename T>
-Tree<T>::Tree(const Tree<T>& pi_to_copy) {
-    root = new Node(*pi_to_copy);
+Tree<T>::Tree(const Tree<T>& to_copy) {
+    m_root = new Node(*to_copy);
 }
 
 /* Move Constructor */
 template <typename T>
-Tree<T>::Tree(Tree<T>&& pio_to_move) noexcept {
-    root = pio_to_move.root;
-    pio_to_move = nullptr;
+Tree<T>::Tree(Tree<T>&& to_move) noexcept {
+    m_root = to_move.m_root;
+    to_move = nullptr;
 }
 
 template <typename T>
-Tree<T>& Tree<T>::operator=(const Tree<T>& pi_to_copy) {
-    if(this == &pi_to_copy)
+Tree<T>& Tree<T>::operator=(const Tree<T>& to_copy) {
+    if(this == &to_copy)
         return *this;
-    root = new Node(*pi_to_copy.root);
+    m_root = new Node(*to_copy.root);
     return *this;
 }
 
 /* Move Assignment */
 template <typename T>
-Tree<T>& Tree<T>::operator=(Tree<T>&& pio_to_move) noexcept {
-    root = pio_to_move.root;
-    pio_to_move = nullptr;
+Tree<T>& Tree<T>::operator=(Tree<T>&& to_move) noexcept {
+    m_root = to_move.m_root;
+    to_move = nullptr;
     return *this;
 }
 
 template <typename T>
 Tree<T>::~Tree() {
-    delete root;
+    delete m_root;
 }
 
 template <typename T>
-void Tree<T>::insert(const T pi_t) {
-   Node* n = new Node(pi_t);
-   binaryInsert(root, n);
+void Tree<T>::insert(const T t) {
+    Node* n = new Node(t);
+    binaryInsert(m_root, n);
 }
 
 template <typename T> template <typename K>
-typename Tree<T>::iterator Tree<T>::search(const K& pi_key) {
-    Node* p = binarySearch(root, pi_key);
+typename Tree<T>::iterator Tree<T>::search(const K& key) {
+    Node* p = binarySearch(m_root, key);
     if(p)
         return iterator(p);
     return iterator();
@@ -48,35 +72,35 @@ typename Tree<T>::iterator Tree<T>::search(const K& pi_key) {
 
 template <typename T>
 T Tree<T>::iterator::operator*() const {
-    if(st.empty())
+    if(m_st.empty())
         throw std::underflow_error("iterator is empty");
-    return st.top()->data;
+    return m_st.top()->data;
 }
 
 template <typename T>
-bool Tree<T>::iterator::operator==(const iterator& pi_iter) const {
-    return this->st == pi_iter.st;
+bool Tree<T>::iterator::operator==(const iterator& iter) const {
+    return this->m_st == iter.m_st;
 }
 
 template <typename T>
-bool Tree<T>::iterator::operator!=(const iterator& pi_iter) const {
-    return !(*this == pi_iter);
+bool Tree<T>::iterator::operator!=(const iterator& iter) const {
+    return !(*this == iter);
 }
 
 template <typename T>
 T Tree<T>::iterator::operator->() const {
-    if(st.empty())
+    if(m_st.empty())
         throw std::underflow_error("iterator is empty");
-    return st.top()->data;
+    return m_st.top()->data;
 }
 
 template <typename T>
 typename Tree<T>::iterator& Tree<T>::iterator::operator++() {
-    if(!st.empty()) {
-        Node* curr = this->st.top()->right;
-        this->st.pop();
+    if(!m_st.empty()) {
+        Node* curr = this->m_st.top()->right;
+        this->m_st.pop();
         while(curr) {
-            this->st.push(curr);
+            this->m_st.push(curr);
             curr = curr->left;
         }
     }
@@ -86,9 +110,9 @@ typename Tree<T>::iterator& Tree<T>::iterator::operator++() {
 template <typename T>
 typename Tree<T>::iterator Tree<T>::begin() const {
     iterator iter;
-    Node* curr = root;
+    Node* curr = m_root;
     while(curr) {
-        iter.st.push(curr);
+        iter.m_st.push(curr);
         curr = curr->left;
     }
     return iter;
@@ -102,28 +126,28 @@ typename Tree<T>::iterator Tree<T>::end() const {
 
 /* Copy Constructor */
 template<typename T>
-Tree<T>::Node::Node(const Tree<T>::Node& pi_to_copy) {
+Tree<T>::Node::Node(const Tree<T>::Node& to_copy) {
     if(std::is_pointer<T>::value)
-        data = new std::remove_pointer<T>(*pi_to_copy.data);
+        data = new std::remove_pointer<T>(*to_copy.data);
     else
-        data = pi_to_copy.data;
+        data = to_copy.data;
 
-    left = pi_to_copy.left ? new Node(*pi_to_copy.left) : nullptr;
-    right = pi_to_copy.right ? new Node(*pi_to_copy.right) : nullptr;
+    left = to_copy.left ? new Node(*to_copy.left) : nullptr;
+    right = to_copy.right ? new Node(*to_copy.right) : nullptr;
 }
 
 /* Move Constructor */
 template<typename T>
-Tree<T>::Node::Node(Tree<T>::Node&& pio_to_move) noexcept {
-    data = pio_to_move.data;
-    left = pio_to_move.left;
-    right = pio_to_move.right;
+Tree<T>::Node::Node(Tree<T>::Node&& to_move) noexcept {
+    data = to_move.data;
+    left = to_move.left;
+    right = to_move.right;
 
     if(std::is_pointer<T>::value) {
-        pio_to_move.data = nullptr;
+        to_move.data = nullptr;
     }
-    pio_to_move.left = nullptr;
-    pio_to_move.right = nullptr;
+    to_move.left = nullptr;
+    to_move.right = nullptr;
 }
 
 template<typename T>
@@ -133,63 +157,63 @@ Tree<T>::Node::~Node() {
 }
 
 template<typename T>
-typename Tree<T>::Node& Tree<T>::Node::operator=(const Tree<T>::Node& pi_to_copy) {
-    if(this == &pi_to_copy)
+typename Tree<T>::Node& Tree<T>::Node::operator=(const Tree<T>::Node& to_copy) {
+    if(this == &to_copy)
         return *this;
 
     if(std::is_pointer<T>::value)
-        data = new std::remove_pointer<T>(*pi_to_copy.data);
+        data = new std::remove_pointer<T>(*to_copy.data);
     else
-        data = pi_to_copy.data;
+        data = to_copy.data;
 
-    left = pi_to_copy.left ? new Node(*pi_to_copy.left) : nullptr;
-    right = pi_to_copy.right ? new Node(*pi_to_copy.right) : nullptr;
+    left = to_copy.left ? new Node(*to_copy.left) : nullptr;
+    right = to_copy.right ? new Node(*to_copy.right) : nullptr;
 
     return *this;
 }
 
 /* Move Assignment */
 template<typename T>
-typename Tree<T>::Node& Tree<T>::Node::operator=(Tree<T>::Node&& pio_to_move) noexcept {
-    data = pio_to_move.data;
-    left = pio_to_move.left;
-    right = pio_to_move.right;
+typename Tree<T>::Node& Tree<T>::Node::operator=(Tree<T>::Node&& to_move) noexcept {
+    data = to_move.data;
+    left = to_move.left;
+    right = to_move.right;
 
     if(std::is_pointer<T>::value) {
-        pio_to_move.data = nullptr;
+        to_move.data = nullptr;
     }
-    pio_to_move.left = nullptr;
-    pio_to_move.right = nullptr;
+    to_move.left = nullptr;
+    to_move.right = nullptr;
 
     return *this;
 }
 
 /** @cond */
 template <typename T>
-static T& ref_of(T &o) {return o;}
+static T& refObj(T& o) {return o;}
 template <typename T>
-static T& ref_of(T *o) {return *o;}
+static T& refObj(T* o) {return *o;}
 /** @endcond */
 
 template <typename T>
-void Tree<T>::binaryInsert(Node*& pio_root, const Node* pi_data) {
-    if(!pio_root) {
-        pio_root = const_cast<Node*>(pi_data);
+void Tree<T>::binaryInsert(Node*& root, const Node* data) {
+    if(!root) {
+        root = const_cast<Node*>(data);
         return;
-    }    
-    if(ref_of(pio_root->data) > ref_of(pi_data->data))
-        binaryInsert(pio_root->left, pi_data);
+    }
+    if(refObj(root->data) > refObj(data->data))
+        binaryInsert(root->left, data);
     else
-        binaryInsert(pio_root->right, pi_data);
+        binaryInsert(root->right, data);
 }
 
 template <typename T> template <typename K>
-typename Tree<T>::Node* Tree<T>::binarySearch(Node* pi_root, K& pi_key) const {
-    if(!pi_root)
+typename Tree<T>::Node* Tree<T>::binarySearch(Node* root, K& key) const {
+    if(!root)
         return nullptr;
-    if(ref_of(pi_root->data) == pi_key)
-        return pi_root;
-    if(*pi_root->data > pi_key)
-        return binarySearch(pi_root->left, pi_key);
-    return binarySearch(pi_root->right, pi_key);
+    if(refObj(root->data) == key)
+        return root;
+    if(*root->data > key)
+        return binarySearch(root->left, key);
+    return binarySearch(root->right, key);
 }
