@@ -138,7 +138,7 @@ class Tree {
     /**
      * Move Constructor
      *
-     * @param[in,out] to_copy object to move
+     * @param[in,out] to_move object to move
      */
     Tree(Tree<T>&& to_move) noexcept;
 
@@ -146,13 +146,15 @@ class Tree {
      * Operator=
      *
      * @param[in] to_copy object to copy
+     * @return reference to self, Tree<T> object
      */
     Tree<T>& operator=(const Tree<T>& to_copy);
 
     /**
      * Move Assignemnt
      *
-     * @param[in,out] to_copy object to move
+     * @param[in,out] to_move object to move
+     * @return reference to self, Tree<T>
      */
     Tree<T>& operator=(Tree<T>&& to_move) noexcept;
 

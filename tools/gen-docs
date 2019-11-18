@@ -7,7 +7,7 @@ mkdir -p docs reports/docs
 doxygen $CONFIG
 sed -i '/\(variable\)/ d' reports/docs/undoc
 cat reports/docs/undoc
-undoc=$(cat reports/docs/undoc | wc -l)
+undoc=$(egrep "warning:" reports/docs/undoc | wc -l)
 
 if [[ $(tar -df docs.tar docs | egrep -v "Mod time differs|Mode differs") ]]; then
     tar uf docs.tar docs

@@ -182,7 +182,7 @@ class Option {
      *
      * Stores value of different types in a single union
      */
-    union Value { 
+    union Value {
         bool b;
         char c;
         int i;

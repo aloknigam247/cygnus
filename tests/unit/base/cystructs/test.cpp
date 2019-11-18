@@ -58,8 +58,8 @@ void objPointer() {
 void refOf() {
     int i;
     const int ci = 10;
-    cystructs::ref_of(i);
-    cystructs::ref_of(ci);
+    cystructs::refObj(i);
+    cystructs::refObj(ci);
 }
 
 int main() {
