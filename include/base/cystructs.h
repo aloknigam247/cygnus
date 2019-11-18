@@ -1,3 +1,27 @@
+/************************************************************************************
+ * MIT License                                                                      *
+ *                                                                                  *
+ * Copyright (c) 2019 Alok Nigam                                                    *
+ *                                                                                  *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy     *
+ * of this software and associated documentation files (the "Software"), to deal    *
+ * in the Software without restriction, including without limitation the rights     *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell        *
+ * copies of the Software, and to permit persons to whom the Software is            *
+ * furnished to do so, subject to the following conditions:                         *
+ *                                                                                  *
+ * The above copyright notice and this permission notice shall be included in all   *
+ * copies or substantial portions of the Software.                                  *
+ *                                                                                  *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR       *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,         *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE      *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER           *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,    *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE    *
+ * SOFTWARE.                                                                        *
+ ************************************************************************************/
+
 /**
  * @file cystructs.h
  * @brief Generic structures
@@ -38,14 +62,14 @@ class Tree {
         /**
          * Default constructor
          */
-        iterator(): st(){}
+        iterator(): m_st() {}
 
         /**
          * Parametrised constructor
          *
-         * @param[in] pi_node node to push while creating iterator
+         * @param[in] node node to push while creating iterator
          */
-        explicit iterator(Node* pi_node): iterator() { st.push(pi_node); }
+        explicit iterator(Node* node): iterator() { m_st.push(node); }
 
         /**
          * Operator*
@@ -58,18 +82,18 @@ class Tree {
         /**
          * Operator==
          *
-         * @param[in] pi_iter iterator object to compare
+         * @param[in] iter iterator object to compare
          * @returns true if both iterator are equal
          */
-        bool operator==(const iterator& pi_iter) const;
+        bool operator==(const iterator& iter) const;
 
         /**
          * Operator!=
          *
-         * @param[in] pi_iter iterator object to compare
+         * @param[in] iter iterator object to compare
          * @returns true if both iterator are not equal
          */
-        bool operator!=(const iterator& pi_iter) const;
+        bool operator!=(const iterator& iter) const;
 
         /**
          * Operator->
@@ -89,7 +113,7 @@ class Tree {
         iterator& operator++();
 
         private:
-        std::stack<Node*> st;
+        std::stack<Node*> m_st;
 
         /**
          * Friend class that creates stack for first inorder in tree
@@ -102,35 +126,37 @@ class Tree {
     /**
      * Default constructor
      */
-    Tree() : root(nullptr) {}
+    Tree() : m_root(nullptr) {}
 
     /**
      * Copy Constructor
      *
-     * @param[in] pi_to_copy object to copy
+     * @param[in] to_copy object to copy
      */
-    Tree(const Tree<T>& pi_to_copy);
+    Tree(const Tree<T>& to_copy);
 
     /**
      * Move Constructor
      *
-     * @param[in,out] pi_to_copy object to move
+     * @param[in,out] to_move object to move
      */
-    Tree(Tree<T>&& pio_to_move) noexcept;
+    Tree(Tree<T>&& to_move) noexcept;
 
     /**
      * Operator=
      *
-     * @param[in] pi_to_copy object to copy
+     * @param[in] to_copy object to copy
+     * @return reference to self, Tree<T> object
      */
-    Tree<T>& operator=(const Tree<T>& pi_to_copy);
+    Tree<T>& operator=(const Tree<T>& to_copy);
 
     /**
      * Move Assignemnt
      *
-     * @param[in,out] pio_to_copy object to move
+     * @param[in,out] to_move object to move
+     * @return reference to self, Tree<T>
      */
-    Tree<T>& operator=(Tree<T>&& pio_to_move) noexcept;
+    Tree<T>& operator=(Tree<T>&& to_move) noexcept;
 
     /**
      * Default destructor
@@ -140,19 +166,19 @@ class Tree {
     /**
      * Inserts new data in Tree
      *
-     * @param[in] pi_t data to insert
+     * @param[in] t data to insert
      */
-    void insert(T pi_t);
+    void insert(T t);
 
     /**
      * Searches in Tree
      *
      * @tparam K type of search key
-     * @param[in] pi_key search key
+     * @param[in] key search key
      * @returns iterator that contains the result
      */
     template<typename K>
-    iterator search(const K& pi_key);
+    iterator search(const K& key);
 
     /**
      * Iterator to first position
@@ -180,60 +206,60 @@ class Tree {
 
         /**
          * Parametrised Constructor
-         * @param[in] pi_d takes data to store
+         * @param[in] d takes data to store
          */
-        explicit Node(const T pi_d) : data(pi_d), left(nullptr), right(nullptr) {}
+        Node(const T d) : data(d), left(nullptr), right(nullptr) {}
 
         /**
          * Copy Constructor
          *
-         * @param[in] pi_to_copy Node to copy
+         * @param[in] to_copy Node to copy
          */
-        Node(const Node& pi_to_copy);
+        Node(const Node& to_copy);
 
         /**
          * Move Constructor
          *
-         * @param[in,out] pi_to_move Node to move
+         * @param[in,out] to_move Node to move
          */
-        Node(Node&& pio_to_move) noexcept;
+        Node(Node&& to_move) noexcept;
 
         ~Node();
         /**
          * Operator=
          *
-         * @param[in] pi_to_copy Node to copy
+         * @param[in] to_copy Node to copy
          */
-        Node& operator=(const Node& pi_to_copy);
+        Node& operator=(const Node& to_copy);
 
         /**
          * Move Assignemnt
          *
-         * @param[in,out] pio_to_move Node to move
+         * @param[in,out] to_move Node to move
          */
-        Node& operator=(Node&& pio_to_move) noexcept;
+        Node& operator=(Node&& to_move) noexcept;
     };
 
-    Node* root;
+    Node* m_root;
 
     /**
      * Inserts in binary tree
      *
-     * @param[in,out] pio_root root node
-     * @param[in] pi_data data to insert
+     * @param[in,out] root root node
+     * @param[in] data data to insert
      */
-    void binaryInsert(Node*& pio_root, const Node* pi_data);
+    void binaryInsert(Node*& root, const Node* data);
 
     /**
      * Searches in binary tree
      *
      * @tparam K type of search key
-     * @param[in] pi_root node
-     * @param[in] pi_key search key
+     * @param[in] root node
+     * @param[in] key search key
      * @returns node if found, nullptr if not found
      */
     template <typename K>
-    Node* binarySearch(Node* pi_root, K& pi_key) const;
+    Node* binarySearch(Node* root, K& key) const;
 };
 
 #include "cystructs.tcc"

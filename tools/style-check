@@ -60,7 +60,7 @@ class StylePattern:
 class StyleGuide:
     lower_camel_case='[a-z]+[a-zA-Z]*'
     upper_camel_case='[A-Z][a-zA-Z]*'
-    snake_case='[^_][a-z_]+'
+    snake_case='[a-z][a-z_]*'
     type_name='([a-z]*|'+upper_camel_case+')'
     type_mod='(\*+ +|& +)?'
     var_name='[a-z_]+'
@@ -103,11 +103,11 @@ def checkLicense(file):
  ************************************************************************************/\
 """.split('\n')
     lineno=0
-    for line in open(file, 'r').readlines():
+    for line in open(file, 'r').read().splitlines():
         lineno = lineno+1
         if(lineno >= len(lic)):
             break
-        if(lic[lineno-1] != line.rstrip()):
+        if(lic[lineno-1] != line):
             error_list.append(Error("LICENSE is missing", file))
             break
 
@@ -116,11 +116,12 @@ def checkLicense(file):
 def checkFuncNames(file):
     error_list=[]
     lineno=0
-    for line in open(file, 'r').readlines():
+    for line in open(file, 'r').read().splitlines():
         lineno=lineno+1
         # Checks in function prototype
         func_proto_iter = re.finditer(StylePattern.function_type, line)
         for func_proto in func_proto_iter:  # 1 iter for one function
+            param_start_pos = func_proto.start()
             func_temp = re.search(' *\(', func_proto.group(0))
 
             # Check function return type
@@ -128,7 +129,7 @@ def checkFuncNames(file):
             if(not re.fullmatch(StyleGuide.type, return_type.group(0))):
                 error_list.append(Error("function return type should be like <type>(*|&| )",
                                 file,
-                                line.rstrip(),
+                                line,
                                 lineno,
                                 func_proto.start() + return_type.start(),
                                 len(return_type.group(0))
@@ -141,24 +142,25 @@ def checkFuncNames(file):
             if(not re.fullmatch(StyleGuide.func_name, func_name)):
                 error_list.append(Error("func name is not in lower camel case",
                                 file,
-                                line.rstrip(),
+                                line,
                                 lineno,
                                 func_proto.start() + func_name_start,
                                 len(func_name)
                                 )
                             )
+
             # Check parameter
             param_dec_iter = re.finditer('\('+StylePattern.param+'+\)', func_proto.group(0))
             for param_dec in param_dec_iter:
-                param_list = param_dec.group(0).replace('(','').replace(')','')
-                param_start_pos = param_dec.start()
+                param_list = param_dec.group(0)[1:-1]
+                param_start_pos += param_dec.start()+1
                 for param in param_list.split(','):
                     # Check paramter type
                     param_type = re.search(StylePattern.type, param)
                     if(not re.fullmatch(StyleGuide.type, param_type.group(0))):
                         error_list.append(Error("parameter type should be like <type>(*|&| )",
                                         file,
-                                        line.rstrip(),
+                                        line,
                                         lineno,
                                         param_start_pos+param_type.start()+1,
                                         len(param_type.group(0))
@@ -168,21 +170,21 @@ def checkFuncNames(file):
                     # Check paramter name
                     # TODO: add rule to check pi_ is with const
                     param_name = param[param_type.end():].replace('[','').replace(']','')
-                    if(not re.match('pi_|po_|pio_', param_name)):
-                        error_list.append(Error("parameter name should start with pi_|po_|pio_",
-                                        file,
-                                        line.rstrip(),
-                                        lineno,
-                                        param_start_pos + param_type.end() + 1,
-                                        len(param_name)
-                                        )
-                                    )
+                    #if(not re.match('pi_|po_|pio_', param_name)):
+                    #    error_list.append(Error("parameter name should start with pi_|po_|pio_",
+                    #                    file,
+                    #                    line,
+                    #                    lineno,
+                    #                    param_start_pos + param_type.end() + 1,
+                    #                    len(param_name)
+                    #                    )
+                    #                )
                     if(not re.match(StyleGuide.snake_case, param_name)):
                         error_list.append(Error("parameter name should be in lower snake case",
                                         file,
-                                        line.rstrip(),
+                                        line,
                                         lineno,
-                                        param_start_pos + param_type.end() + 1,
+                                        param_start_pos + param_type.end(),
                                         len(param_name)
                                         )
                                     )
@@ -193,16 +195,15 @@ def checkFuncNames(file):
 def checkBraceStyle(file):
     error_list = []
     lineno=0
-    for line in open(file, 'r').readlines():
+    for line in open(file, 'r').read().splitlines():
         lineno=lineno+1
-
         # Check brace open
         brace_open_iter = re.finditer('\{', line)
         for brace_open in brace_open_iter:
-            if(re.search('[^ ] \{', brace_open.string) == None):
+            if(re.search(' +\{', brace_open.string) == None):
                 error_list.append(Error("wrong brace style",
                                 file,
-                                line.rstrip(),
+                                line,
                                 lineno,
                                 brace_open.start()
                                 )
@@ -215,7 +216,7 @@ def checkBraceStyle(file):
                re.search('\{.*\}', brace_close.string) == None):
                 error_list.append(Error("wrong brace style",
                                 file,
-                                line.rstrip(),
+                                line,
                                 lineno,
                                 brace_close.start()
                                 )
@@ -226,15 +227,15 @@ def checkBraceStyle(file):
 def checkLineLength(file):
     error_list = []
     lineno=0
-    for line in open(file, 'r').readlines():
+    for line in open(file, 'r').read().splitlines():
         lineno=lineno+1
-        if(len(line.rstrip()) > 100):
+        if(len(line) > 100):
             error_list.append(Error("line length is more than 100",
                             file,
-                            line.rstrip(),
+                            line,
                             lineno,
                             101,
-                            len(line.rstrip())-100
+                            len(line)-100
                             )
                         )
     return error_list
@@ -242,40 +243,47 @@ def checkLineLength(file):
 def checkSpaces(file):
     error_list = []
     lineno=0
-    for line in open(file, 'r').readlines():
+
+    for line in open(file, 'r').read().splitlines():
         lineno = lineno+1
+        # Check space only in line
+        line_space = re.match('^ +$', line)
+        if(line_space):
+            error_list.append(Error("line has spaces only",
+                            file,
+                            line.replace(' ','.'),
+                            lineno,
+                            line_space.start(),
+                            len(line)
+                            )
+                        )
+            continue
+
         # Check leading space
         leading_space = re.match(' +', line)
-        if(leading_space != None and leading_space.end()%4 and line[1] != '*'):
+        if(
+            leading_space != None                   # there are leading spaces
+            and leading_space.end()%4               # multiple of 4
+            and line[leading_space.end()] != '*'    # ignore if spaces end with '*'
+        ):
             error_list.append(Error("leading space is not multiple of 4",
                             file,
-                            line.rstrip(),
+                            line.replace(' ','.'),
                             lineno,
                             int(leading_space.end()/4)*4,
                             leading_space.end()%4
                             )
                         )
-        # Check trailing space
+
+            # Check trailing space
         trailing_space = re.search(' +$', line)
         if(trailing_space):
             error_list.append(Error("trailing spaces are not allowed",
                             file,
-                            line.rstrip(),
+                            line.replace(' ','.'),
                             lineno,
                             trailing_space.start(),
                             len(trailing_space.group(0))
-                            )
-                        )
-        
-        # Check space only in line
-        line_space = re.match('^ +$', line)
-        if(line_space):
-            error_list.append(Error("empty line have spaces only",
-                            file,
-                            line.rstrip(),
-                            lineno,
-                            line_space.start(),
-                            len(line)
                             )
                         )
     return error_list

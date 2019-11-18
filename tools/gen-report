@@ -59,9 +59,9 @@ docsReport() {
     local undoc_count=$(cat reports/docs/undoc | wc -l)
     local need_update=$(egrep -o "yes|no" reports/docs/status)
 
-    if [[ $undoc_count -gt 0 || $need_update == 'yes' ]]; then
-        EXITCODE=2
-    fi
+    #if [[ $undoc_count -gt 0 || $need_update == 'yes' ]]; then
+    #    EXITCODE=2
+    #fi
 
     echo "DOCS::"
     echo "    Needs Update: $need_update"
@@ -177,8 +177,8 @@ main() {
     memReport
     #perfReport
     sanitizationReport
-    #styleReport
-    #docsReport
+    styleReport
+    docsReport
     exit $EXITCODE
 }
 

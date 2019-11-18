@@ -24,8 +24,8 @@
 
 #include "Options.h"
 
-int main(const int pi_argc, const char* pi_argv[]) {
+int main(const int argc, const char* argv[]) {
     Options opt;
-    opt.parse(pi_argc, pi_argv);
+    opt.parse(argc, argv);
     return 0;
 }
