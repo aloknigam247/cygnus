@@ -53,11 +53,12 @@ jobs:
           command: |
             cd ~/cygnus
             source sourceme
-            gen-docs
+            gen-docs -r
       - persist_to_workspace:
           root: ~/cygnus
           paths:
             - reports
+            - docs
 
   lint-checks:
     docker:
@@ -217,6 +218,9 @@ workflows:
       - coverage:
           requires:
             - checkout
+      - docs-checks:
+          requires:
+            - checkout
       - lint-checks:
           requires:
             - checkout
@@ -235,6 +239,7 @@ workflows:
       - gen-report:
           requires:
             - coverage
+            - docs-checks
             - lint-checks
             - mem-checks
             - release-tests
