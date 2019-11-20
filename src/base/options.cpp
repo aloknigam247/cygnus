@@ -22,11 +22,11 @@
  * SOFTWARE.                                                                        *
  ************************************************************************************/
 
-#include "Options.h"
+#include "options.h"
 
 #include <cstring>
 
-#include "Log.h"
+#include "log.h"
 
 Options::Options(): m_option_list(), m_pos_args() {
     addOption("-h", Option::BOOL, "print help message");

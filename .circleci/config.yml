@@ -204,6 +204,9 @@ jobs:
               source cygnus/sourceme
               gen-report | tee reports/report.log
       - store_artifacts:
+          path: ~/docs
+          destination: API
+      - store_artifacts:
           path: ~/logs
           destination: Logs
       - store_artifacts:
