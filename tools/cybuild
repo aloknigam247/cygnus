@@ -38,6 +38,11 @@ MAKE() {
 }
 
 main() {
+    if [[ ! $0 =~ $CYGNUS_HOME ]]; then
+        LOG E "$(basename $0) is not inside $CYGNUS_HOME"
+        return 1
+    fi
+
     parseCmdLine $@
     local errors=0
     local report_dir="reports/compiler"
@@ -73,7 +78,7 @@ main() {
         && errors=$(egrep -c "error:|warning:" $report_dir/${BUILD_MODE}-errors)
     echo -e "\e[1;31mErrors|Warnings: $errors\e[m"
     if [[ $errors -gt 0 ]]; then
-        return 1;
+        return 1
     fi
 }
 

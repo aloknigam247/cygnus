@@ -22,10 +22,17 @@
  * SOFTWARE.                                                                        *
  ************************************************************************************/
 
+#include "nfa.h"
 #include "options.h"
 
 int main(const int argc, const char* argv[]) {
     Options opt;
     opt.parse(argc, argv);
+
+    NFA mach;
+    mach.addPattern("float");
+    mach.compile();
+    mach.printStates();
+    mach.printDot();
     return 0;
 }
