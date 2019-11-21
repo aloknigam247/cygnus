@@ -1,9 +1,13 @@
-export INCLUDE_DIR += -I . -I ../../include/base -I ../../include/utils -I tcc
+export INCLUDE_DIR += -I . \
+	-I ../../include/base \
+	-I ../../include/scanner \
+	-I ../../include/utils \
+	-I tcc
 
 SRC_FILES = $(wildcard *.cpp)
 DEP_FILES = $(addprefix $(DEP)/,$(SRC_FILES:.cpp=.d))
 
-all: $(DEP) $(OBJ) $(DEP_FILES) build
+scanner: $(DEP) $(OBJ) $(DEP_FILES) build
 
 $(DEP) $(OBJ):
 	$Qmkdir -p $@

@@ -85,6 +85,11 @@ runUnitTest() {
 }
 
 main() {
+    if [[ ! $0 =~ $CYGNUS_HOME ]]; then
+        LOG E "$(basename $0) is not inside $CYGNUS_HOME"
+        return 1
+    fi
+
     mkdir -p logs
     parseCmdLine $@
     TEST_DIR=${VALUES['-d']:-$TEST_DIR}

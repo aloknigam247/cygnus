@@ -65,8 +65,8 @@ src:
 $(EXE): $(MOD_EXE)
 	ln -sfr $< $@
 
-$(MOD_EXE):  INCLUDE_DIR=''
-$(MOD_EXE):  $(subst src,$(OBJ),$(subst .cpp,.o,$(wildcard src/*/*.cpp)))
+$(MOD_EXE): INCLUDE_DIR=''
+$(MOD_EXE): $(subst src,$(OBJ),$(subst .cpp,.o,$(wildcard src/*/*.cpp)))
 	$(CY_COMPILE) -o $@ $^
 
 clean:
