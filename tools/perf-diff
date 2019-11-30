@@ -21,5 +21,3 @@ for fun in dict1:
         print("SLOW\t" + dict1[fun] + "\t" + dict2[fun] + "\t" + fun)
     elif(dict1[fun] > dict2[fun]):
         print("FAST\t" + dict1[fun] + "\t" + dict2[fun] + "\t" + fun)
-    else:
-        print("SAME\t" + dict1[fun] + "\t" + dict2[fun] + "\t" + fun)
