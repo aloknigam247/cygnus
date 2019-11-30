@@ -13,7 +13,7 @@ CPP_FLAGS 	+= -g
 else ifeq ($(MODE),memory)
 CPP_FLAGS 	+= -g
 else ifeq ($(MODE),perf)
-CPP_FLAGS 	+= -pg
+CPP_FLAGS 	+= -g
 else ifeq ($(MODE),release)
 CPP_FLAGS 	+= -O
 else ifeq ($(MODE),sanitize)
