@@ -28,7 +28,7 @@ OPTION['-r']='value:bool,help:reflog update'
 OPTION['-u']='value:bool,with:-d,without:-a,help:run functional tests only'
 OPTION['--coverage']='value:bool,eval:TEST_MODE=coverage,help:run coverage tests'
 OPTION['--mem-check']='value:bool,eval:TEST_MODE=mem-check,help:run mem-check tests'
-#OPTION['--perf']='value:bool,eval:TEST_MODE=perf,help:run mem-check tests'
+OPTION['--perf']='value:bool,eval:TEST_MODE=perf,help:run mem-check tests'
 OPTION['--sanitize']='value:bool,eval:TEST_MODE=sanitize,help:run sanitization tests'
 OPTION['POS']='dest:test_list,count:0+'
 
@@ -72,14 +72,14 @@ runFuncTest() {
     {
     for i in ${!CASE[@]}; do
         echo "|CASE $((i+1))| $(echo ${CASE[$i]} | sed "s|$CYGNUS|cygnus|")"
-        ${tool} ${CASE[$i]} | sed 's/.*/>   &/'
+        $tool ${CASE[$i]} | sed 's/.*/>   &/'
         echo
     done
     } 2>&1 > TESTLOG
 }
 
 runUnitTest() {
-    gen-make -i $CYGNUS_HOME/include/base -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/base/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src/base -s $CYGNUS_HOME/tests/utils/src test.cpp
+    gen-make -i $CYGNUS_HOME/include/base -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/base/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src/base -s $CYGNUS_HOME/tests/utils/src test.cc
     make --no-print-directory $TEST_MODE 2> >(TEE make.log) 1>>make.log
     $tool ./test 2>&1 > TESTLOG
 }
@@ -110,6 +110,9 @@ main() {
     done
     echo -e "\nGenerated Testcase: $tc_cnt"
 
+    #############
+    # Pre Run   #
+    #############
     case $TEST_MODE in
         coverage)
             CYGNUS=$CYGNUS_HOME/build/bin/coverage/cygnus-coverage
@@ -126,6 +129,7 @@ main() {
             CYGNUS=$CYGNUS_HOME/build/bin/perf/cygnus-perf
             OUT_DIR="$OUT_DIR/perf"
             mkdir -p reports/perf
+            tool="valgrind --tool=callgrind --callgrind-out-file=callgrind.out"
             ;;
         sanitize)
             CYGNUS=$CYGNUS_HOME/build/bin/sanitize/cygnus-sanitize
@@ -144,6 +148,10 @@ main() {
     rm -rf reports/func reports/unit
     mkdir -p reports/func reports/unit
     export fail_cnt=0
+
+    #############
+    #    Run    #
+    #############
     for test in $valid_tests; do
         echo
         if [[ $test =~ func.*cyt ]]; then
@@ -193,6 +201,10 @@ main() {
                     echo "mem-error: $(egrep -c "CHECKSUM: " mem.err)"
                 fi
                 ;;
+            perf)
+                callgrind_annotate --threshold=100 callgrind.out | egrep "$CYGNUS_HOME/src/" | gen-perf > TESTPERF
+                perf-diff REFPERF TESTPERF | tee perf.diff
+                ;;
         esac
         cd - > /dev/null
     done
@@ -201,6 +213,9 @@ main() {
     echo "    PASS: $((tc_cnt - fail_cnt))"
     echo "    FAIL: $fail_cnt"
 
+    #############
+    # Post Run  #
+    #############
     case $TEST_MODE in
         coverage)
             if [[ $FUNC_COUNT -gt 0 ]]; then
@@ -216,7 +231,7 @@ main() {
 
                 # Put missing files in coverage.info
                 mkdir /tmp/cygnus_tmp -p
-                find include src -regex ".*\.cpp\|.*\.h\|.*\.tcc" | egrep -v "main.cpp|cymem.cpp" | sort -u | xargs realpath > /tmp/cygnus_tmp/all_files
+                find include src -regex ".*\.cc\|.*\.h\|.*\.tcc" | egrep -v "main.cc|cymem.cc" | sort -u | xargs realpath > /tmp/cygnus_tmp/all_files
                 egrep "SF:" reports/coverage/unit/coverage.info  | sed 's/SF://' | sort -u > /tmp/cygnus_tmp/covered_files
                 comm -23 /tmp/cygnus_tmp/all_files /tmp/cygnus_tmp/covered_files > /tmp/cygnus_tmp/uncovered_files
                 {
@@ -227,8 +242,8 @@ main() {
                 done
                 } >> reports/coverage/unit/coverage.info
 
-                # remove test.cpp from coverage.info
-                sed -i '/test.cpp$/,/end_of_record/ d' reports/coverage/unit/coverage.info
+                # remove test.cc from coverage.info
+                sed -i '/test.cc$/,/end_of_record/ d' reports/coverage/unit/coverage.info
 
                 genhtml --ignore-errors source reports/coverage/unit/coverage.info --output-directory reports/coverage/unit/html --demangle-cpp | tee reports/coverage/unit/genhtml.log 2> /dev/null
             fi
@@ -236,8 +251,8 @@ main() {
                 mkdir -p reports/coverage/comp
                 lcov --gcov-tool=gcov-7 -b src/base -c -d build/obj/coverage -d $OUT_DIR -d include --no-external -o reports/coverage/comp/coverage.info -q 2> /dev/null
 
-                # remove test.cpp from coverage.info
-                sed -i '/test.cpp$/,/end_of_record/ d' reports/coverage/comp/coverage.info
+                # remove test.cc from coverage.info
+                sed -i '/test.cc$/,/end_of_record/ d' reports/coverage/comp/coverage.info
 
                 genhtml --ignore-errors source reports/coverage/comp/coverage.info --output-directory reports/coverage/comp/html --demangle-cpp | tee reports/coverage/comp/genhtml.log 2> /dev/null
             fi

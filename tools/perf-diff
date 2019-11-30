@@ -1,0 +1,23 @@
+#!/usr/bin/python3.7
+
+import sys
+
+file1 = sys.argv[1]
+file2 = sys.argv[2]
+
+dict1 = dict()
+dict2 = dict()
+
+for line in open(file1, 'r').read().splitlines():
+    arr = line.split(';')
+    dict1[arr[0]] = arr[1]
+
+for line in open(file2, 'r').read().splitlines():
+    arr = line.split(';')
+    dict2[arr[0]] = arr[1]
+
+for fun in dict1:
+    if(dict1[fun] < dict2[fun]):
+        print("SLOW\t" + dict1[fun] + "\t" + dict2[fun] + "\t" + fun)
+    elif(dict1[fun] > dict2[fun]):
+        print("FAST\t" + dict1[fun] + "\t" + dict2[fun] + "\t" + fun)

@@ -13,7 +13,7 @@ CPP_FLAGS 	+= -g
 else ifeq ($(MODE),memory)
 CPP_FLAGS 	+= -g
 else ifeq ($(MODE),perf)
-CPP_FLAGS 	+= -pg
+CPP_FLAGS 	+= -g
 else ifeq ($(MODE),release)
 CPP_FLAGS 	+= -O
 else ifeq ($(MODE),sanitize)
@@ -65,8 +65,8 @@ src:
 $(EXE): $(MOD_EXE)
 	ln -sfr $< $@
 
-$(MOD_EXE): INCLUDE_DIR=''
-$(MOD_EXE): $(subst src,$(OBJ),$(subst .cpp,.o,$(wildcard src/*/*.cpp)))
+$(MOD_EXE):  INCLUDE_DIR=''
+$(MOD_EXE):  $(subst src,$(OBJ),$(subst .cc,.o,$(wildcard src/*/*.cc)))
 	$(CY_COMPILE) -o $@ $^
 
 clean:

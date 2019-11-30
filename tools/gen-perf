@@ -1,0 +1,12 @@
+#!/usr/bin/python3.7
+
+import re
+import sys
+import os
+
+for line in sys.stdin:
+    l = line[0:line.rfind('[')]
+    ir = l.split()[0]
+    fun = re.sub(".*src",'src',(''.join(l.split()[1:])))
+
+    print(fun + ';' + ir)
