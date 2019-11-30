@@ -77,7 +77,7 @@ class Rules:
         if(os.path.exists(file)):
             print(file)
             return file
-        elif(file.endswith(".cpp")):
+        elif(file.endswith(".cc")):
             lookup = self.src_list
         else:
             lookup = self.inc_list
@@ -89,19 +89,19 @@ class Rules:
         #IO.log('W', "included file " + file + " does not exist")
         return None
 
-    def h2cpp(self, h_file):
-        cpp = os.path.basename(h_file).replace(".h", ".cpp")
-        cpp_file = self.findFile(cpp)
-        if(cpp_file):
-            return cpp_file
+    def h2cc(self, h_file):
+        cc = os.path.basename(h_file).replace(".h", ".cc")
+        cc_file = self.findFile(cc)
+        if(cc_file):
+            return cc_file
         return None
 
-    def cpp2o(self, file):
+    def cc2o(self, file):
         obj_dir = '$(OBJ_LOCAL)'
         for src in self.src_list:
             if(file.startswith(src)):
                 obj_dir = '$(OBJ_COMMON)'
-        dot_o = obj_dir + '/' + os.path.basename(file).replace(".cpp", ".o")
+        dot_o = obj_dir + '/' + os.path.basename(file).replace(".cc", ".o")
         return dot_o
 
     def createRule(self, file):
@@ -117,13 +117,13 @@ class Rules:
             ret = self.createRule(inc)
 
         if(file.endswith(".h")):
-            src = self.h2cpp(file)
+            src = self.h2cc(file)
             if(src):
                 ret = self.createRule(src)
                 if(ret):
                     ret_list.union(ret)
-        elif(file.endswith(".cpp")):
-            dot_o = self.cpp2o(file)
+        elif(file.endswith(".cc")):
+            dot_o = self.cc2o(file)
             self.obj_list.append(dot_o)
             self.write(dot_o + ": " + file + ' ', '')
             for inc in incs:

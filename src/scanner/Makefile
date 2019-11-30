@@ -1,15 +1,15 @@
 export INCLUDE_DIR += -I . -I ../../include/base -I ../../include/utils -I tcc
 
-SRC_FILES = $(wildcard *.cpp)
-DEP_FILES = $(addprefix $(DEP)/,$(SRC_FILES:.cpp=.d))
+SRC_FILES = $(wildcard *.cc)
+DEP_FILES = $(addprefix $(DEP)/,$(SRC_FILES:.cc=.d))
 
 all: $(DEP) $(OBJ) $(DEP_FILES) build
 
 $(DEP) $(OBJ):
 	$Qmkdir -p $@
 
-$(DEP_FILES): $(DEP)/%.d : %.cpp
-	$(CY_COMPILE) $(INCLUDE_DIR) -MM -MF $@ -MT $(OBJ)/$(^:.cpp=.o) $^
+$(DEP_FILES): $(DEP)/%.d : %.cc
+	$(CY_COMPILE) $(INCLUDE_DIR) -MM -MF $@ -MT $(OBJ)/$(^:.cc=.o) $^
 
 build:
 	$(MAKE) -f build.mk

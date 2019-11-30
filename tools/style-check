@@ -69,10 +69,10 @@ class StyleGuide:
 
 #--------------------------------------------------------------------------------------------------
 def collectFiles(dir, ext):
-    cpp_list = []
+    cc_list = []
     for file in Path(dir).glob('**/*.' + ext):
-        cpp_list.append(file)
-    return cpp_list
+        cc_list.append(file)
+    return cc_list
 
 #--------------------------------------------------------------------------------------------------
 def checkLicense(file):
@@ -293,7 +293,7 @@ def main():
     args = Args()
     opt = args.parse()
 
-    cppList = []
+    ccList = []
     hList = []
 
     common_rule_list = [
@@ -305,11 +305,11 @@ def main():
                         ]
 
     for dir in opt.dir:
-        cppList += (collectFiles(dir, "cpp"))
-        cppList += (collectFiles(dir, "tcc"))
+        ccList += (collectFiles(dir, "cc"))
+        ccList += (collectFiles(dir, "tcc"))
         hList += (collectFiles(dir, "h"))
 
-    for file in cppList+hList:
+    for file in ccList+hList:
         for rule in common_rule_list:
             for error in rule(file):
                 error.show()

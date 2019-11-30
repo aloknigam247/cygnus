@@ -1,6 +1,6 @@
-SRC_FILES = $(wildcard *.cpp)
-OBJ_FILES = $(addprefix $(OBJ)/,$(SRC_FILES:.cpp=.o))
-DEP_FILES = $(addprefix $(DEP)/,$(SRC_FILES:.cpp=.d))
+SRC_FILES = $(wildcard *.cc)
+OBJ_FILES = $(addprefix $(OBJ)/,$(SRC_FILES:.cc=.o))
+DEP_FILES = $(addprefix $(DEP)/,$(SRC_FILES:.cc=.d))
 
 all: $(OBJ_FILES) $(OBJ_FILES)
 
