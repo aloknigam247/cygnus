@@ -32,4 +32,5 @@ int main() {
     testcase.add(helpOption);
     testcase.add(allOptionsType);
     testcase.run();
+    return 0;
 }

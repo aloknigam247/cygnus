@@ -69,4 +69,5 @@ int main() {
     testcase.add(objPointer);
     testcase.add(refOf);
     testcase.run();
+    return 0;
 }

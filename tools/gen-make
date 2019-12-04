@@ -75,7 +75,6 @@ class Rules:
 
     def findFile(self, file):
         if(os.path.exists(file)):
-            print(file)
             return file
         elif(file.endswith(".cc")):
             lookup = self.src_list
@@ -153,7 +152,7 @@ def main():
         rule.write(" \\\n    -I " + i, '')
     rule.write('\n')
 
-    rule.write("OBJ_COMMON := " + os.path.relpath("obj", os.getcwd()[os.getcwd().rfind("unit/"):]) + "\n" +
+    rule.write("OBJ_COMMON := " + os.path.relpath("obj", os.getcwd()[os.getcwd().rfind("unit/")+5:]) + "\n" +
                 "OBJ_LOCAL  := obj\n\n" +
                 "############# Targets #############\n" +
                 "all: $(OBJ_COMMON) $(OBJ_LOCAL) " + target + "\n\n" +

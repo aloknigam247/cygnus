@@ -63,8 +63,8 @@ makeRunDir(){
     local testcase=$2
     local test_out=$OUT_DIR/`dirname $testcase`
     rm -rf $test_out
-    mkdir -p $test_out
-    ln -rs $testcase_dir/`dirname $testcase`/* $test_out/
+    mkdir -p $test_out || return 1
+    ln -rs $testcase_dir/`dirname $testcase`/* $test_out/ || return 1
 }
 
 runFuncTest() {
@@ -72,16 +72,16 @@ runFuncTest() {
     {
     for i in ${!CASE[@]}; do
         echo "|CASE $((i+1))| $(echo ${CASE[$i]} | sed "s|$CYGNUS|cygnus|")"
-        $tool ${CASE[$i]} | sed 's/.*/>   &/'
+        $tool ${CASE[$i]} | sed 's/.*/>   &/' || return 1
         echo
     done
     } 2>&1 > TESTLOG
 }
 
 runUnitTest() {
-    gen-make -i $CYGNUS_HOME/include/base -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/base/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src/base -s $CYGNUS_HOME/tests/utils/src test.cc
-    make --no-print-directory $TEST_MODE 2> >(TEE make.log) 1>>make.log
-    $tool ./test 2>&1 > TESTLOG
+    gen-make -i $CYGNUS_HOME/include/base -i $CYGNUS_HOME/include/scanner -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/base/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src/base -s $CYGNUS_HOME/src/scanner -s $CYGNUS_HOME/tests/utils/src test.cc || return 1
+    make --no-print-directory $TEST_MODE 2>&1 | TEE make.log || return 1
+    $tool ./test 2>&1 > TESTLOG || return 1
 }
 
 main() {
@@ -153,6 +153,7 @@ main() {
     #    Run    #
     #############
     for test in $valid_tests; do
+        ret=0
         echo
         if [[ $test =~ func.*cyt ]]; then
             local testcase=$(echo $test | egrep -o "func.*cyt")
@@ -161,7 +162,7 @@ main() {
             makeRunDir $testcase_dir $testcase
             cd $OUT_DIR/`dirname $testcase`
             echo "|TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt | $testcase"
-            runFuncTest $testcase
+            runFuncTest $testcase || ret=1
         else
             local testcase=$(echo $test | egrep -o "unit.*cyt")
             local testcase_dir=${test%/$testcase}
@@ -169,11 +170,11 @@ main() {
             makeRunDir $testcase_dir $testcase
             cd $OUT_DIR/`dirname $testcase`
             echo "|TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt | $testcase"
-            runUnitTest $testcase
+            runUnitTest $testcase || ret=1
         fi
 
-        diff -N --color=auto REFLOG TESTLOG
-        if [[ $? -ne 0 ]]; then
+        diff -N --color=always REFLOG TESTLOG
+        if [[ $? -ne 0 || $ret -eq 1 ]]; then
             echo "status: FAIL"
             fail_cnt=$((fail_cnt + 1))
             if [[ ${VALUES['-r']} ]]; then
@@ -227,20 +228,22 @@ main() {
             fi
             if [[ $UNIT_COUNT -gt 0 ]]; then
                 mkdir -p reports/coverage/unit
-                lcov --gcov-tool=gcov-7 -b src/base -c -d $OUT_DIR -d include --no-external -o reports/coverage/unit/coverage.info -q 2> /dev/null
+                lcov --gcov-tool=gcov-7 -b src/base -b src/scanner -c -d $OUT_DIR -d include --no-external -o reports/coverage/unit/coverage.info -q 2> /dev/null
 
-                # Put missing files in coverage.info
-                mkdir /tmp/cygnus_tmp -p
-                find include src -regex ".*\.cc\|.*\.h\|.*\.tcc" | egrep -v "main.cc|cymem.cc" | sort -u | xargs realpath > /tmp/cygnus_tmp/all_files
-                egrep "SF:" reports/coverage/unit/coverage.info  | sed 's/SF://' | sort -u > /tmp/cygnus_tmp/covered_files
-                comm -23 /tmp/cygnus_tmp/all_files /tmp/cygnus_tmp/covered_files > /tmp/cygnus_tmp/uncovered_files
-                {
-                for file in `cat /tmp/cygnus_tmp/uncovered_files`; do
-                    echo "SF:$file"
-                    cat -ns $file | sed -r -e 's/^[ ]+//' -e 's/\t/ /g' | egrep -v "^[0-9]+ $|[0-9]+ (/|#)|[0-9]+  \*" | egrep -o "^[0-9]+" | sed 's/.*/DA:&,0/'
-                    echo "end_of_record"
-                done
-                } >> reports/coverage/unit/coverage.info
+                # Put missing files in coverage.info when all testcases in directory run
+                if [[ ${VALUES['-a']} ]]; then
+                    mkdir /tmp/cygnus_tmp -p
+                    find include src -regex ".*\.cc\|.*\.h\|.*\.tcc" | egrep -v "main.cc|cymem.cc" | sort -u | xargs realpath > /tmp/cygnus_tmp/all_files
+                    egrep "SF:" reports/coverage/unit/coverage.info  | sed 's/SF://' | sort -u > /tmp/cygnus_tmp/covered_files
+                    comm -23 /tmp/cygnus_tmp/all_files /tmp/cygnus_tmp/covered_files > /tmp/cygnus_tmp/uncovered_files
+                    {
+                    for file in `cat /tmp/cygnus_tmp/uncovered_files`; do
+                        echo "SF:$file"
+                        cat -ns $file | sed -r -e 's/^[ ]+//' -e 's/\t/ /g' | egrep -v "^[0-9]+ $|[0-9]+ (/|#)|[0-9]+  \*" | egrep -o "^[0-9]+" | sed 's/.*/DA:&,0/'
+                        echo "end_of_record"
+                    done
+                    } >> reports/coverage/unit/coverage.info
+                fi
 
                 # remove test.cc from coverage.info
                 sed -i '/test.cc$/,/end_of_record/ d' reports/coverage/unit/coverage.info

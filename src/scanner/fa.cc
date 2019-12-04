@@ -1,45 +1,23 @@
-#include "nfa.h"
+#include "fa.h"
 
 #include <cstdlib>
-#include <fstream>
 
 #include "log.h"
 
-int NFA::state_id=1;
-
-void NFA::addPattern(std::string patt) {
-    m_patt_list.push_back(patt);
-}
-
-void NFA::compile() {
-    for(auto patt: m_patt_list) {
-        Log::d(patt);
-        State* cur = &m_state;
-        for(auto c: patt) {
-            Log::d(c);
-            cur = move(cur, c);
-        }
-        cur->is_final = true;
-    }
-}
-
-void NFA::execute() {
-}
-
-void NFA::printStates(State& st) {
-    const State* cur = &st;
+void FA::printTPaths(State& st) {
+    const FA::State* cur = &st;
     for(auto p: cur->next) {
         std::cout << 'q' << cur->id  << "--" << p.sym << "-->";
-        printStates(*p.link);
+        printTPaths(*p.link);
     }
     if(cur->next.empty())
         std::cout << 'q' << cur->id << '\n';
 }
 
-void NFA::printDot() {
+void FA::printTGraph() {
     std::ofstream dotfile("dotfile");
     dotfile << 
-R"(digraph nfa {
+R"(digraph fa {
     rankdir=LR;
 )";
     traverse(m_state, dotfile);
@@ -49,7 +27,7 @@ R"(digraph nfa {
     std::system("dot -Tpng dotfile > t.png");
 }
 
-void NFA::traverse(State& st, std::ofstream& out) {
+void FA::traverse(State& st, std::ofstream& out) {
     for(auto p: st.next) {
         out << "    "<< 'q' << st.id  << " -> ";
         if(p.link->is_final)
@@ -61,8 +39,13 @@ void NFA::traverse(State& st, std::ofstream& out) {
     }
 }
 
-State* NFA::move(State* from, char sym) {
-    State* new_state = new State(state_id++);
-    from->next.push_back(State::pair(sym, new_state));
+FA::State* FA::addTransition(State* from, char sym) {
+    State* new_state = new State(genStateId());
+    from->next.push_back(State::Pair(sym, new_state));
     return new_state;
+}
+
+int FA::genStateId() {
+    static int state_id = 0;
+    return ++state_id;
 }
