@@ -1,3 +1,4 @@
 Number of cases: 1
 CASE 1
-q0--a-->q1--b-->q2
+(q0)--a-->((q1))
+(q0)--b-->(q2)

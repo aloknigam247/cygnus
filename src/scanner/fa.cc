@@ -1,41 +1,59 @@
 #include "fa.h"
 
-#include <cstdlib>
-
 #include "log.h"
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
 
-void FA::printTPaths(State& st) {
-    const FA::State* cur = &st;
-    for(auto p: cur->next) {
-        std::cout << 'q' << cur->id  << "--" << p.sym << "-->";
-        printTPaths(*p.link);
-    }
-    if(cur->next.empty())
-        std::cout << 'q' << cur->id << '\n';
+void FA::printTPaths() {
+    traversePath(m_state);
 }
 
-void FA::printTGraph() {
-    std::ofstream dotfile("dotfile");
+void FA::printTGraph(const char* file_stem) {
+    std::ofstream dotfile(file_stem);
     dotfile << 
 R"(digraph fa {
     rankdir=LR;
 )";
-    traverse(m_state, dotfile);
+    traverseGraph(m_state, dotfile);
     dotfile << "}\n";
     dotfile.close();
 
-    std::system("dot -Tpng dotfile > t.png");
+    char command[std::strlen(file_stem)*2+17];
+    std::strcpy(command, "dot -Tpng ");
+    std::strcpy(command+10, file_stem);
+    std::strcpy(command+10+std::strlen(file_stem), " > ");
+    std::strcpy(command+10+std::strlen(file_stem)+3, file_stem);
+    std::strcpy(command+10+std::strlen(file_stem)+3+std::strlen(file_stem), ".png");
+    std::system(command);
 }
 
-void FA::traverse(State& st, std::ofstream& out) {
-    for(auto p: st.next) {
-        out << "    "<< 'q' << st.id  << " -> ";
-        if(p.link->is_final)
-            out << "{node [shape=doublecircle] q" << p.link->id << " }";
+void FA::traversePath(State& st) {
+    const FA::State* cur = &st;
+    for(auto p: cur->next) {
+        if(cur->is_final)
+            std::cout << "((q" << cur->id << "))--" << p.sym << "-->";
         else
-            out << 'q' << p.link->id;
-        out << " [label=\"" << p.sym << "\"]\n";
-        traverse(*p.link, out);
+            std::cout << "(q" << cur->id << ")--" << p.sym << "-->";
+        traversePath(*p.link);
+    }
+    if(cur->next.empty())
+        if(cur->is_final)
+            std::cout << "((q" << cur->id << "))\n";
+        else
+            std::cout << "(q" << cur->id << ")\n";
+}
+
+void FA::traverseGraph(State& st, std::ofstream& out) {
+    for(auto p: st.next) {
+        out << "    {";
+        if(st.is_final)
+            out << "node [shape=doublecircle] ";
+        out << "q" << st.id  << "} -> {";
+        if(p.link->is_final)
+            out << "node [shape=doublecircle] ";
+        out << "q" << p.link->id << "} [label=\"" << p.sym << "\"]\n";
+        traverseGraph(*p.link, out);
     }
 }
 

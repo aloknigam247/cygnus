@@ -2,4 +2,8 @@ CASE=(
         "cygnus"
         "cygnus -h"
         "cygnus -a abc"
-     )
+    )
+
+DIFFS=(
+        ['REFLOG']='TESTLOG'
+    )
