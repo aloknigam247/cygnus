@@ -6,6 +6,10 @@
 
 class FA {
     public:
+    void printTPaths();
+    void printTGraph(const char* file_stem = "fa");
+
+    protected:
     struct State {
         struct Pair {
             char sym;
@@ -18,15 +22,11 @@ class FA {
         State(int id): is_final(false), id(id), next() {}
     };
 
-    void printTPaths(State& st);
-    void printTGraph();
-    State& get_state() { return m_state; }
-
-    protected:
     FA(): m_state(0) {}
     State* addTransition(State* from, char sym);
     State m_state;
-    void traverse(State& st, std::ofstream& out);
+    void traversePath(State& st);
+    void traverseGraph(State& st, std::ofstream& out);
     int genStateId();
 };
 

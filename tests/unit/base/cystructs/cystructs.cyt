@@ -1,0 +1,3 @@
+DIFFS=(
+        ['REFLOG']='TESTLOG'
+    )
