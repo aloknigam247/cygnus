@@ -1,12 +1,14 @@
 #include "fa.h"
 
-#include "log.h"
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
 
+int FA::state_id = 0;
+
 void FA::printTPaths() {
-    traversePath(m_state);
+    std::vector<bool> visited(state_id);
+    traversePath(m_state, visited);
 }
 
 void FA::printTGraph(const char* file_stem) {
@@ -15,7 +17,8 @@ void FA::printTGraph(const char* file_stem) {
 R"(digraph fa {
     rankdir=LR;
 )";
-    traverseGraph(m_state, dotfile);
+    std::vector<bool> visited(state_id);
+    traverseGraph(m_state, dotfile, visited);
     dotfile << "}\n";
     dotfile.close();
 
@@ -28,14 +31,18 @@ R"(digraph fa {
     std::system(command);
 }
 
-void FA::traversePath(State& st) {
+void FA::traversePath(State& st, std::vector<bool>& visited) {
+    if(visited[st.id])
+        return;
+    visited[st.id] = true;
     const FA::State* cur = &st;
     for(auto p: cur->next) {
         if(cur->is_final)
             std::cout << "((q" << cur->id << "))--" << p.sym << "-->";
         else
             std::cout << "(q" << cur->id << ")--" << p.sym << "-->";
-        traversePath(*p.link);
+        if(p.link->id > cur->id)
+            traversePath(*p.link, visited);
     }
     if(cur->next.empty())
         if(cur->is_final)
@@ -44,7 +51,10 @@ void FA::traversePath(State& st) {
             std::cout << "(q" << cur->id << ")\n";
 }
 
-void FA::traverseGraph(State& st, std::ofstream& out) {
+void FA::traverseGraph(State& st, std::ofstream& out, std::vector<bool>& visited) {
+    if(visited[st.id])
+        return;
+    visited[st.id] = true;
     for(auto p: st.next) {
         out << "    {";
         if(st.is_final)
@@ -53,17 +63,23 @@ void FA::traverseGraph(State& st, std::ofstream& out) {
         if(p.link->is_final)
             out << "node [shape=doublecircle] ";
         out << "q" << p.link->id << "} [label=\"" << p.sym << "\"]\n";
-        traverseGraph(*p.link, out);
+        if(p.link->id > st.id)
+            traverseGraph(*p.link, out, visited);
     }
 }
 
-FA::State* FA::addTransition(State* from, char sym) {
-    State* new_state = new State(genStateId());
+FA::State* FA::addTransition(State* from, char sym, State* to) {
+    State* new_state = to ? to : new State(++state_id);
+    std::cout << "q" << from->id << " to " << new_state->id << '\n';
     from->next.push_back(State::Pair(sym, new_state));
     return new_state;
 }
 
-int FA::genStateId() {
-    static int state_id = 0;
-    return ++state_id;
+std::vector<FA::State*> FA::addTransition(std::vector<State*> from, char sym, State* to) {
+    State* new_state = to ? to : new State(++state_id);
+    for(auto from_st: from) {
+        std::cout << "q" << from_st->id << " to " << new_state->id << '\n';
+        from_st->next.push_back(State::Pair(sym, new_state));
+    }
+    return std::vector<State*>(1, new_state);
 }
