@@ -176,9 +176,9 @@ main() {
     done
     echo -e "\nGenerated Testcase: $tc_cnt"
 
-    #############
+    #-----------#
     # Pre Run   #
-    #############
+    #-----------#
     case $TEST_MODE in
         coverage)
             CYGNUS=$CYGNUS_HOME/build/bin/coverage/cygnus-coverage
@@ -215,9 +215,9 @@ main() {
     mkdir -p reports/func reports/unit
     export fail_cnt=0
 
-    #############
+    #-----------#
     #    Run    #
-    #############
+    #-----------#
     for test in $valid_tests; do
         ret=0
         echo
@@ -228,9 +228,9 @@ main() {
     echo "    PASS: $((tc_cnt - fail_cnt))"
     echo "    FAIL: $fail_cnt"
 
-    #############
+    #-----------#
     # Post Run  #
-    #############
+    #-----------#
     case $TEST_MODE in
         coverage)
             if [[ $FUNC_COUNT -gt 0 ]]; then
