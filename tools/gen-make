@@ -160,13 +160,9 @@ def main():
                 "\tmkdir $@\n\n" +
                 "coverage: CXX = g++-7\n" +
                 "coverage: COMP_FLAGS += --coverage\n" +
-                "coverage: all\n\n" +
-                "mem-check: COMP_FLAGS += -g\n" +
-                "mem-check: all\n\n" +
-                "perf: COMP_FLAGS += -g\n" +
-                "perf: all\n\n" +
+                "debug mem-check perf: COMP_FLAGS += -g\n" +
                 "sanitize: COMP_FLAGS += -g -D_FORTIFY_SOURCE=2 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow -fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error\n" +
-                "sanitize: all\n")
+                "coverage debug mem-check perf sanitize: all\n")
 
     rule.createRule(opt.file)
     rule.write(target + ": " + ' '.join(rule.obj_list))
