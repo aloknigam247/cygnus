@@ -70,7 +70,6 @@ void FA::traverseGraph(State& st, std::ofstream& out, std::vector<bool>& visited
 
 FA::State* FA::addTransition(State* from, char sym, State* to) {
     State* new_state = to ? to : new State(++state_id);
-    std::cout << "q" << from->id << " to " << new_state->id << '\n';
     from->next.push_back(State::Pair(sym, new_state));
     return new_state;
 }
@@ -78,7 +77,6 @@ FA::State* FA::addTransition(State* from, char sym, State* to) {
 std::vector<FA::State*> FA::addTransition(std::vector<State*> from, char sym, State* to) {
     State* new_state = to ? to : new State(++state_id);
     for(auto from_st: from) {
-        std::cout << "q" << from_st->id << " to " << new_state->id << '\n';
         from_st->next.push_back(State::Pair(sym, new_state));
     }
     return std::vector<State*>(1, new_state);
