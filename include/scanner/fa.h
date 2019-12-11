@@ -19,7 +19,7 @@ class FA {
         bool is_final;
         int id;
         std::vector<Pair> next;
-        State(int id): is_final(false), id(id), next() {}
+        State(int p_id): is_final(false), id(p_id), next() {}
     };
 
     FA(): m_state(0) {}

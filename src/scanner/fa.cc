@@ -19,13 +19,15 @@ R"(digraph fa {
     dotfile << "}\n";
     dotfile.close();
 
-    char command[std::strlen(file_stem)*2+17];
-    std::strcpy(command, "dot -Tpng ");
-    std::strcpy(command+10, file_stem);
-    std::strcpy(command+10+std::strlen(file_stem), " > ");
-    std::strcpy(command+10+std::strlen(file_stem)+3, file_stem);
-    std::strcpy(command+10+std::strlen(file_stem)+3+std::strlen(file_stem), ".png");
-    std::system(command);
+    char* cmd = new char[(std::strlen(file_stem)*2+17)*sizeof(char)];
+    std::strcpy(cmd, "dot -Tpng ");
+    std::strcpy(cmd+10, file_stem);
+    std::strcpy(cmd+10+std::strlen(file_stem), " > ");
+    std::strcpy(cmd+10+std::strlen(file_stem)+3, file_stem);
+    std::strcpy(cmd+10+std::strlen(file_stem)+3+std::strlen(file_stem), ".png");
+    if(!std::system(cmd))
+        Log::e("error: ", cmd);
+    delete cmd;
 }
 
 void FA::traversePath(State& st) {
@@ -37,11 +39,12 @@ void FA::traversePath(State& st) {
             std::cout << "(q" << cur->id << ")--" << p.sym << "-->";
         traversePath(*p.link);
     }
-    if(cur->next.empty())
+    if(cur->next.empty()) {
         if(cur->is_final)
             std::cout << "((q" << cur->id << "))\n";
         else
             std::cout << "(q" << cur->id << ")\n";
+    }
 }
 
 void FA::traverseGraph(State& st, std::ofstream& out) {
