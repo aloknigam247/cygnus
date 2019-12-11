@@ -23,7 +23,7 @@ class FA {
     };
 
     FA(): m_state(0) {}
-    static int state_id;
+    int state_id;
     State* addTransition(State* from, char sym, State* to=nullptr);
     std::vector<State*> addTransition(std::vector<State*> from, char sym, State* to=nullptr);
     State m_state;
