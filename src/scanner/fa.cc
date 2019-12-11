@@ -7,7 +7,7 @@
 int FA::state_id = 0;
 
 void FA::printTPaths() {
-    std::vector<bool> visited(state_id);
+    std::vector<bool> visited(state_id+1);
     traversePath(m_state, visited);
 }
 

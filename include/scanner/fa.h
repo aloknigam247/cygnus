@@ -16,10 +16,10 @@ class FA {
             State* link;
             Pair(char s, State* l): sym(s), link(l) {}
         };
-        bool is_final;
-        int id;
         std::vector<Pair> next;
-        State(int id): is_final(false), id(id), next() {}
+        int id;
+        bool is_final;
+        State(int id): next(), id(id), is_final(false) {}
     };
 
     FA(): m_state(0) {}

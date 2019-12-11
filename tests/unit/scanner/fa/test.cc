@@ -9,6 +9,12 @@ class TestFA : public FA {
     }
 };
 
+void emptyFA() {
+    TestFA f;
+    f.printTPaths();
+    f.printTGraph("out2");
+}
+
 void printFA() {
     TestFA f;
     f.addTransition('a', true);
@@ -19,6 +25,7 @@ void printFA() {
 
 int main() {
     cytest::Testcase testcase;
+    testcase.add(emptyFA);
     testcase.add(printFA);
     testcase.run();
 }
