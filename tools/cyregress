@@ -79,12 +79,13 @@ runFuncTest() {
 
 runUnitTest() {
     gen-make -i $CYGNUS_HOME/include/base -i $CYGNUS_HOME/include/scanner -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/base/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src/base -s $CYGNUS_HOME/src/scanner -s $CYGNUS_HOME/tests/utils/src test.cc || return 1
-    make --no-print-directory $TEST_MODE 2>&1 | TEE make.log || return 1
-    $tool ./test 2>&1 > TESTLOG || return 1
+    make --no-print-directory $TEST_MODE 2>&1 | TEE make.log 
+    $tool ./test 2>&1 > TESTLOG 
 }
 
 runTest() {
     local test=$1
+    local status=0
     declare -A DIFFS
     if [[ $test =~ func.*cyt ]]; then
         local testcase=$(echo $test | egrep -o "func.*cyt")
@@ -94,7 +95,7 @@ runTest() {
         cd $OUT_DIR/`dirname $testcase`
         echo "|TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt | $testcase"
         source `basename $1`
-        runFuncTest $testcase || ret=1
+        runFuncTest $testcase || status=1
     else
         local testcase=$(echo $test | egrep -o "unit.*cyt")
         local testcase_dir=${test%/$testcase}
@@ -103,14 +104,13 @@ runTest() {
         cd $OUT_DIR/`dirname $testcase`
         echo "|TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt | $testcase"
         source `basename $1`
-        runUnitTest $testcase || ret=1
+        runUnitTest $testcase || status=1
     fi
 
-    local status=1
     for ref in ${!DIFFS[@]}; do
         diff -N --color=always $ref ${DIFFS[$ref]}
-        if [[ $? -ne 0 || $ret -eq 1 ]]; then
-            status=0
+        if [[ $? -ne 0 ]]; then
+            status=1
             if [[ ${VALUES['-r']} ]]; then
                 cp ${DIFFS[$ref]} $ref
                 echo "$ref updated"
@@ -118,7 +118,7 @@ runTest() {
         fi
     done
 
-    if [[ $status -eq 1 ]]; then
+    if [[ $status -eq 0 ]]; then
         echo "status: PASS"
     else
         echo "status: FAIL"
