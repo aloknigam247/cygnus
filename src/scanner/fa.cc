@@ -4,20 +4,57 @@
 #include <cstring>
 #include <iostream>
 
-void FA::printTPaths() {
-    std::vector<bool> visited(state_id+1);
-    traversePath(m_state, visited);
+void StateTable::addEntry(int from, char sym, int to) {
+    if(!state_entry[from])
+        state_entry[from] = new StateEntry;
+
+    if(state_entry[from]->tag.size() == 1)
+        state_entry[from]->tag += std::to_string(from);
+
+    state_entry[from]->transition_list.push_back(StateEntry::Transition{sym, to});
+
+    if(!state_entry[to]) {
+        state_entry[to] = new StateEntry;
+        state_entry[to]->tag += std::to_string(to);
+    }
 }
 
-void FA::printTGraph(const char* file_stem) {
+void StateTable::print() {
+    std::cout << "index\ttag\tfinal\tsym\tto...\n";
+    for(int i=0; i<state_entry.size(); ++i) {
+        if(state_entry[i]) {
+            StateEntry* entry = state_entry[i];
+            std::cout << i << '\t';
+            std::cout << entry->tag << '\t' << entry->is_final << '\t';
+            for(auto transition: entry->transition_list) {
+                std::cout << transition.sym << '\t' << transition.state_id << '\t';
+            }
+            std::cout << "\n";
+        }
+    }
+}
+
+void StateTable::printDot(std::ofstream& file) {
+    file << "digraph fa {\n"
+         << "    rankdir=LR;\n";
+    for(auto entry: state_entry) {
+        if(entry) {
+            for(auto transition: entry->transition_list) {
+                file << "    " << entry->tag << " -> " << state_entry[transition.state_id]->tag << " [label=\"" << transition.sym << "\"]\n";
+            }
+        }
+    }
+    file << "}\n";
+}
+
+
+void FA::printTable() {
+    table.print();
+}
+
+void FA::printGraph(const char* file_stem) {
     std::ofstream dotfile(file_stem);
-    dotfile << 
-R"(digraph fa {
-    rankdir=LR;
-)";
-    std::vector<bool> visited(state_id);
-    traverseGraph(m_state, dotfile, visited);
-    dotfile << "}\n";
+    table.printDot(dotfile);
     dotfile.close();
 
     char command[std::strlen(file_stem)*2+17];
@@ -29,53 +66,9 @@ R"(digraph fa {
     std::system(command);
 }
 
-void FA::traversePath(State& st, std::vector<bool>& visited) {
-    if(visited[st.id])
-        return;
-    visited[st.id] = true;
-    const FA::State* cur = &st;
-    for(auto p: cur->next) {
-        if(cur->is_final)
-            std::cout << "((q" << cur->id << "))--" << p.sym << "-->";
-        else
-            std::cout << "(q" << cur->id << ")--" << p.sym << "-->";
-        if(p.link->id > cur->id)
-            traversePath(*p.link, visited);
-    }
-    if(cur->next.empty())
-        if(cur->is_final)
-            std::cout << "((q" << cur->id << "))\n";
-        else
-            std::cout << "(q" << cur->id << ")\n";
-}
-
-void FA::traverseGraph(State& st, std::ofstream& out, std::vector<bool>& visited) {
-    if(visited[st.id])
-        return;
-    visited[st.id] = true;
-    for(auto p: st.next) {
-        out << "    {";
-        if(st.is_final)
-            out << "node [shape=doublecircle] ";
-        out << "q" << st.id  << "} -> {";
-        if(p.link->is_final)
-            out << "node [shape=doublecircle] ";
-        out << "q" << p.link->id << "} [label=\"" << p.sym << "\"]\n";
-        if(p.link->id > st.id)
-            traverseGraph(*p.link, out, visited);
-    }
-}
-
-FA::State* FA::addTransition(State* from, char sym, State* to) {
-    State* new_state = to ? to : new State(++state_id);
-    from->next.push_back(State::Pair(sym, new_state));
-    return new_state;
-}
-
-std::vector<FA::State*> FA::addTransition(std::vector<State*> from, char sym, State* to) {
-    State* new_state = to ? to : new State(++state_id);
-    for(auto from_st: from) {
-        from_st->next.push_back(State::Pair(sym, new_state));
-    }
-    return std::vector<State*>(1, new_state);
+int FA::addTransition(int from, char sym, int to) {
+    if(to == -1)
+        to = ++state_id;
+    table.addEntry(from, sym, to);
+    return to;
 }

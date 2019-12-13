@@ -2,33 +2,46 @@
 #define FA_H
 
 #include <fstream>
+#include <list>
+#include <string>
 #include <vector>
+
+
+struct StateEntry {
+    struct Transition {
+        char sym;
+        int state_id;
+    };
+
+    std::string tag;
+    bool is_final;
+    std::list<Transition> transition_list;
+    StateEntry(): tag("q"), is_final(false), transition_list(0) {}
+};
+
+class StateTable {
+    public:
+    StateTable(): state_entry(100, nullptr) {}
+    void addEntry(int from, char sym, int to);
+    void print();
+    void printDot(std::ofstream& file);
+
+    private:
+    std::vector<StateEntry*> state_entry;
+};
 
 class FA {
     public:
-    void printTPaths();
-    void printTGraph(const char* file_stem = "fa");
+    void printTable();
+    void printGraph(const char* file_stem = "fa");
 
     protected:
-    struct State {
-        struct Pair {
-            char sym;
-            State* link;
-            Pair(char s, State* l): sym(s), link(l) {}
-        };
-        std::vector<Pair> next;
-        int id;
-        bool is_final;
-        State(int id): next(), id(id), is_final(false) {}
-    };
+    StateTable table;
+    FA(): state_id(0) {}
+    int addTransition(int from, char sym, int to=-1);
 
-    FA(): m_state(0) {}
+    private:
     int state_id;
-    State* addTransition(State* from, char sym, State* to=nullptr);
-    std::vector<State*> addTransition(std::vector<State*> from, char sym, State* to=nullptr);
-    State m_state;
-    void traversePath(State& st, std::vector<bool>& visited);
-    void traverseGraph(State& st, std::ofstream& out, std::vector<bool>& visited);
 };
 
 #endif

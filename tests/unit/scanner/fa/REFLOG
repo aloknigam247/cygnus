@@ -1,4 +1,12 @@
-Number of cases: 1
+Number of cases: 2
 CASE 1
-(q0)--a-->((q1))
-(q0)--b-->(q2)
+index	tag	final	sym	to...
+CASE 2
+index	tag	final	sym	to...
+0	q0	0	a	1	x	4	
+1	q1	0	b	2	
+2	q2	0	c	3	
+3	q3	0	
+4	q4	0	y	5	
+5	q5	0	z	6	
+6	q6	0	
