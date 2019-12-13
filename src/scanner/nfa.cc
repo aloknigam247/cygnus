@@ -6,8 +6,8 @@ void NFA::addPattern(const char* patt) {
 
 void NFA::compile() {
     for(auto patt: m_patt_list) {
-        std::vector<State*> curr, prev;
-        curr.push_back(&m_state);
+        std::vector<int> curr, prev;
+        curr.push_back(0);
         for(int i=0; patt[i]!='\0'; ++i) {
             switch(patt[i]) {
                 case '+':
@@ -22,10 +22,11 @@ void NFA::compile() {
                     break;
                 default:
                     prev = move(curr);
-                    curr = addTransition(prev, patt[i]);
+                    curr.clear();
+                    curr.push_back(addTransition(prev, patt[i]));
             }
         }
         for(auto curr_st: curr)
-            curr_st->is_final = true;
+            table.set_final(curr_st);
     }
 }

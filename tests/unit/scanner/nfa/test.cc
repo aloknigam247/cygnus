@@ -13,8 +13,8 @@ void allSupportedPatterns() {
     //nfa.addPattern("*");
     nfa.addPattern("rRs*Sq?Qp+PD");
     nfa.compile();
-    nfa.printTPaths();
-    nfa.printTGraph();
+    nfa.printTable();
+    nfa.printGraph();
 }
 
 int main() {

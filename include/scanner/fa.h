@@ -25,6 +25,7 @@ class StateTable {
     void addEntry(int from, char sym, int to);
     void print();
     void printDot(std::ofstream& file);
+    void set_final(int i) { state_entry[i]->is_final = true; }
 
     private:
     std::vector<StateEntry*> state_entry;
@@ -39,6 +40,7 @@ class FA {
     StateTable table;
     FA(): state_id(0) {}
     int addTransition(int from, char sym, int to=-1);
+    int addTransition(std::vector<int> from, char sym, int to=-1);
 
     private:
     int state_id;

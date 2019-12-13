@@ -20,14 +20,14 @@ void StateTable::addEntry(int from, char sym, int to) {
 }
 
 void StateTable::print() {
-    std::cout << "index\ttag\tfinal\tsym\tto...\n";
+    std::cout << "index\ttag\tfinal\t(sym,to)...\n";
     for(int i=0; i<state_entry.size(); ++i) {
         if(state_entry[i]) {
             StateEntry* entry = state_entry[i];
             std::cout << i << '\t';
             std::cout << entry->tag << '\t' << entry->is_final << '\t';
             for(auto transition: entry->transition_list) {
-                std::cout << transition.sym << '\t' << transition.state_id << '\t';
+                std::cout << '(' <<transition.sym << ',' << transition.state_id << ')' << '\t';
             }
             std::cout << "\n";
         }
@@ -40,7 +40,13 @@ void StateTable::printDot(std::ofstream& file) {
     for(auto entry: state_entry) {
         if(entry) {
             for(auto transition: entry->transition_list) {
-                file << "    " << entry->tag << " -> " << state_entry[transition.state_id]->tag << " [label=\"" << transition.sym << "\"]\n";
+                file << "    {";
+                if(entry->is_final)
+                    file << "node [shape=doublecircle] ";
+                file << entry->tag << "} -> {";
+                if(state_entry[transition.state_id]->is_final)
+                    file << "node [shape=doublecircle] ";
+                file << state_entry[transition.state_id]->tag << "} [label=\"" << transition.sym << "\"]\n";
             }
         }
     }
@@ -70,5 +76,13 @@ int FA::addTransition(int from, char sym, int to) {
     if(to == -1)
         to = ++state_id;
     table.addEntry(from, sym, to);
+    return to;
+}
+
+int FA::addTransition(std::vector<int> from, char sym, int to) {
+    if(to == -1)
+        to = ++state_id;
+    for(auto f: from)
+        table.addEntry(f, sym, to);
     return to;
 }
