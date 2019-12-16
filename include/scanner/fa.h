@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include "log.h"
 
 struct StateEntry {
     struct Transition {
@@ -23,8 +24,8 @@ class StateTable {
     public:
     StateTable(): state_entry(100, nullptr) {}
     void addEntry(int from, char sym, int to);
-    void print();
-    void printDot(std::ofstream& file);
+    void print() const;
+    void printDot(std::ofstream& file) const;
     void set_final(int i) { state_entry[i]->is_final = true; }
 
     private:
@@ -33,8 +34,8 @@ class StateTable {
 
 class FA {
     public:
-    void printTable();
-    void printGraph(const char* file_stem = "fa");
+    void printTable() const;
+    void printGraph(const char* file_stem = "fa") const;
 
     protected:
     StateTable table;

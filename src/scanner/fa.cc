@@ -19,7 +19,7 @@ void StateTable::addEntry(int from, char sym, int to) {
     }
 }
 
-void StateTable::print() {
+void StateTable::print() const {
     std::cout << "index\ttag\tfinal\t(sym,to)...\n";
     for(int i=0; i<state_entry.size(); ++i) {
         if(state_entry[i]) {
@@ -34,7 +34,7 @@ void StateTable::print() {
     }
 }
 
-void StateTable::printDot(std::ofstream& file) {
+void StateTable::printDot(std::ofstream& file) const {
     file << "digraph fa {\n"
          << "    rankdir=LR;\n";
     for(auto entry: state_entry) {
@@ -54,11 +54,11 @@ void StateTable::printDot(std::ofstream& file) {
 }
 
 
-void FA::printTable() {
+void FA::printTable() const {
     table.print();
 }
 
-void FA::printGraph(const char* file_stem) {
+void FA::printGraph(const char* file_stem) const {
     std::ofstream dotfile(file_stem);
     table.printDot(dotfile);
     dotfile.close();
