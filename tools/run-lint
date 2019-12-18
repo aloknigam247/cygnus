@@ -2,7 +2,7 @@
 
 mkdir -p reports/lint
 
-includes="-I include/base -I include/utils/ -I src/base/tcc"
+includes="-I include/base -I include/scanner -I src/base/tcc"
 
 echo "cppcheck:"
 cppcheck --enable=all --check-config src $includes --template= '{file}:{line}: linterror: ({severity},{id}): {message}' > reports/lint/cppcheck 2>&1
