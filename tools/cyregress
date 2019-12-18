@@ -78,7 +78,7 @@ runFuncTest() {
 }
 
 runUnitTest() {
-    gen-make -i $CYGNUS_HOME/include/base -i $CYGNUS_HOME/include/scanner -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/base/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src/base -s $CYGNUS_HOME/src/scanner -s $CYGNUS_HOME/tests/utils/src test.cc || return 1
+    gen-make -i $CYGNUS_HOME/include/base -i $CYGNUS_HOME/include/scanner -i $CYGNUS_HOME/src/base/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src/base -s $CYGNUS_HOME/src/scanner -s $CYGNUS_HOME/tests/utils/src test.cc || return 1
     make --no-print-directory $TEST_MODE 2>&1 | TEE make.log || return 1
     $tool ./test 2>&1 > TESTLOG || return 1
 }
