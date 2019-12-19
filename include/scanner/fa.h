@@ -27,6 +27,7 @@ class StateTable {
     void print() const;
     void printDot(std::ofstream& file) const;
     void set_final(int i) { state_entry[i]->is_final = true; }
+    StateEntry* get_entry(int i) { return state_entry[i]; }
 
     private:
     std::vector<StateEntry*> state_entry;
