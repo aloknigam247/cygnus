@@ -1,5 +1,29 @@
-#ifndef FA_H
-#define FA_H
+/************************************************************************************
+ * MIT License                                                                      *
+ *                                                                                  *
+ * Copyright (c) 2019 Alok Nigam                                                    *
+ *                                                                                  *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy     *
+ * of this software and associated documentation files (the "Software"), to deal    *
+ * in the Software without restriction, including without limitation the rights     *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell        *
+ * copies of the Software, and to permit persons to whom the Software is            *
+ * furnished to do so, subject to the following conditions:                         *
+ *                                                                                  *
+ * The above copyright notice and this permission notice shall be included in all   *
+ * copies or substantial portions of the Software.                                  *
+ *                                                                                  *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR       *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,         *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE      *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER           *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,    *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE    *
+ * SOFTWARE.                                                                        *
+ ************************************************************************************/
+
+#ifndef SCANNER_FA_H
+#define SCANNER_FA_H
 
 #include <fstream>
 #include <list>
@@ -14,15 +38,17 @@ struct StateEntry {
         int state_id;
     };
 
-    std::string tag;
-    bool is_final;
+    std::string tag = "q";
+    bool is_final = false;
     std::list<Transition> transition_list;
-    StateEntry(): tag("q"), is_final(false), transition_list(0) {}
+    StateEntry(): transition_list(0) {}
 };
 
 class StateTable {
+    const int MAX_ENTRY = 100;
+
     public:
-    StateTable(): state_entry(100, nullptr) {}
+    StateTable(): state_entry(MAX_ENTRY, nullptr) {}
     void addEntry(int from, char sym, int to);
     void print() const;
     void printDot(std::ofstream& file) const;
@@ -39,13 +65,13 @@ class FA {
     void printGraph(const char* file_stem = "fa") const;
 
     protected:
-    StateTable table;
-    FA(): state_id(0) {}
     int addTransition(int from, char sym, int to=-1);
-    int addTransition(std::vector<int> from, char sym, int to=-1);
+    int addTransition(const std::vector<int>& from, char sym, int to=-1);
+    StateTable get_table() { return table; }
 
     private:
-    int state_id;
+    StateTable table;
+    int state_id = 0;
 };
 
 #endif

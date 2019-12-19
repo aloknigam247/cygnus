@@ -25,6 +25,7 @@
 #include "options.h"
 
 #include <cstring>
+#include <exception>
 
 #include "log.h"
 

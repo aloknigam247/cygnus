@@ -31,8 +31,8 @@
  * @author Alok Nigam
  */
 
-#ifndef UTILS_LOG_H
-#define UTILS_LOG_H
+#ifndef BASE_LOG_H
+#define BASE_LOG_H
 
 #include <iostream>
 

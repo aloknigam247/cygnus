@@ -1,7 +1,7 @@
 export INCLUDE_DIR += -I . \
 	-I ../../include/base \
 	-I ../../include/scanner \
-	-I tcc
+	-I ../base/tcc
 
 SRC_FILES = $(wildcard *.cc)
 DEP_FILES = $(addprefix $(DEP)/,$(SRC_FILES:.cc=.d))

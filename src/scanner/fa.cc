@@ -1,3 +1,27 @@
+/************************************************************************************
+ * MIT License                                                                      *
+ *                                                                                  *
+ * Copyright (c) 2019 Alok Nigam                                                    *
+ *                                                                                  *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy     *
+ * of this software and associated documentation files (the "Software"), to deal    *
+ * in the Software without restriction, including without limitation the rights     *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell        *
+ * copies of the Software, and to permit persons to whom the Software is            *
+ * furnished to do so, subject to the following conditions:                         *
+ *                                                                                  *
+ * The above copyright notice and this permission notice shall be included in all   *
+ * copies or substantial portions of the Software.                                  *
+ *                                                                                  *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR       *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,         *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE      *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER           *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,    *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE    *
+ * SOFTWARE.                                                                        *
+ ************************************************************************************/
+
 #include "fa.h"
 
 #include <cstdlib>
@@ -5,7 +29,7 @@
 #include <iostream>
 
 void StateTable::addEntry(int from, char sym, int to) {
-    if(!state_entry[from])
+    if(state_entry[from] == nullptr)
         state_entry[from] = new StateEntry;
 
     if(state_entry[from]->tag.size() == 1)
@@ -13,7 +37,7 @@ void StateTable::addEntry(int from, char sym, int to) {
 
     state_entry[from]->transition_list.push_back(StateEntry::Transition{sym, to});
 
-    if(!state_entry[to]) {
+    if(state_entry[to] == nullptr) {
         state_entry[to] = new StateEntry;
         state_entry[to]->tag += std::to_string(to);
     }
@@ -21,8 +45,8 @@ void StateTable::addEntry(int from, char sym, int to) {
 
 void StateTable::print() const {
     std::cout << "index\ttag\tfinal\t(sym,to)...\n";
-    for(int i=0; i<state_entry.size(); ++i) {
-        if(state_entry[i]) {
+    for(std::size_t i=0; i<state_entry.size(); ++i) {
+        if(state_entry[i] != nullptr) {
             StateEntry* entry = state_entry[i];
             std::cout << i << '\t';
             std::cout << entry->tag << '\t' << entry->is_final << '\t';
@@ -36,9 +60,9 @@ void StateTable::print() const {
 
 void StateTable::printDot(std::ofstream& file) const {
     file << "digraph fa {\n"
-         << "    rankdir=LR;\n";
+        << "    rankdir=LR;\n";
     for(auto entry: state_entry) {
-        if(entry) {
+        if(entry != nullptr) {
             for(auto transition: entry->transition_list) {
                 file << "    {";
                 if(entry->is_final)
@@ -63,13 +87,14 @@ void FA::printGraph(const char* file_stem) const {
     table.printDot(dotfile);
     dotfile.close();
 
-    char command[std::strlen(file_stem)*2+17];
-    std::strcpy(command, "dot -Tpng ");
-    std::strcpy(command+10, file_stem);
-    std::strcpy(command+10+std::strlen(file_stem), " > ");
-    std::strcpy(command+10+std::strlen(file_stem)+3, file_stem);
-    std::strcpy(command+10+std::strlen(file_stem)+3+std::strlen(file_stem), ".png");
-    std::system(command);
+    std::string command;
+
+    command = "dot -Tpng ";
+    command += file_stem;
+    command += " > ";
+    command += file_stem;
+    command += ".png";
+    std::system(command.c_str());
 }
 
 int FA::addTransition(int from, char sym, int to) {
@@ -79,7 +104,7 @@ int FA::addTransition(int from, char sym, int to) {
     return to;
 }
 
-int FA::addTransition(std::vector<int> from, char sym, int to) {
+int FA::addTransition(const std::vector<int>& from, char sym, int to) {
     if(to == -1)
         to = ++state_id;
     for(auto f: from)
