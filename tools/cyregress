@@ -231,14 +231,21 @@ main() {
             if [[ $FUNC_COUNT -gt 0 ]]; then
                 echo -e "\nFunctional Coverage:"
                 mkdir -p reports/coverage/func
-                lcov --gcov-tool=gcov-7 -c -d build/obj/coverage -d include --no-external -o reports/coverage/func/coverage.info -q #2> /dev/null
-                #genhtml reports/coverage/func/coverage.info --output-directory reports/coverage/func/html --demangle-cpp #> reports/coverage/func/genhtml.log 2> /dev/null
-                egrep -A 1 "  lines\.\.\.\.\.\.: " reports/coverage/func/genhtml.log
+                rm -f reports/coverage/func/coverage.info
+                for dir in $(find build/obj/coverage -mindepth 1 -type d); do
+                    lcov --gcov-tool=gcov-7 -c -b src/${dir#build/obj/coverage/} -d $dir -d include --no-external -q >> reports/coverage/func/coverage.info 2> /dev/null
+                done
+                genhtml reports/coverage/func/coverage.info --output-directory reports/coverage/func/html --demangle-cpp > reports/coverage/func/genhtml.log 2> /dev/null
+                egrep -A 1 'lines\.\.\.\.\.\.:' reports/coverage/func/genhtml.log
             fi
+
             if [[ $UNIT_COUNT -gt 0 ]]; then
                 echo -e "\nUnit Coverage:"
                 mkdir -p reports/coverage/unit
-                lcov --gcov-tool=gcov-7 -b src/base -b src/scanner -c -d $OUT_DIR -d include --no-external -o reports/coverage/unit/coverage.info -q 2> /dev/null
+                rm -f reports/coverage/unit/coverage.info
+                for dir in $(find src -mindepth 1 -type d); do
+                    lcov --gcov-tool=gcov-7 -b $dir -c -d $OUT_DIR -d include --no-external -q >> reports/coverage/unit/coverage.info 2> /dev/null
+                done
 
                 # Put missing files in coverage.info when all testcases in directory run
                 if [[ ${VALUES['-a']} ]]; then
@@ -258,8 +265,10 @@ main() {
                 # remove test.cc from coverage.info
                 sed -i '/test.cc$/,/end_of_record/ d' reports/coverage/unit/coverage.info
 
-                genhtml --ignore-errors source reports/coverage/unit/coverage.info --output-directory reports/coverage/unit/html --demangle-cpp | tee reports/coverage/unit/genhtml.log 2> /dev/null
+                genhtml --ignore-errors source reports/coverage/unit/coverage.info --output-directory reports/coverage/unit/html --demangle-cpp > reports/coverage/unit/genhtml.log #2> /dev/null
+                egrep -A 1 'lines\.\.\.\.\.\.:' reports/coverage/unit/genhtml.log
             fi
+
             if [[ ${VALUES['-a']} ]]; then
                 echo -e "\nComplete Coverage:"
                 mkdir -p reports/coverage/comp
@@ -268,7 +277,8 @@ main() {
                 # remove test.cc from coverage.info
                 sed -i '/test.cc$/,/end_of_record/ d' reports/coverage/comp/coverage.info
 
-                genhtml --ignore-errors source reports/coverage/comp/coverage.info --output-directory reports/coverage/comp/html --demangle-cpp | tee reports/coverage/comp/genhtml.log 2> /dev/null
+                genhtml --ignore-errors source reports/coverage/comp/coverage.info --output-directory reports/coverage/comp/html --demangle-cpp > reports/coverage/comp/genhtml.log 2> /dev/null
+                egrep -A 1 'lines\.\.\.\.\.\.:' reports/coverage/comp/genhtml.log
             fi
             ;;
         mem-check)
