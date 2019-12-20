@@ -217,6 +217,12 @@ class Options {
      */
     ~Options();
 
+    // Default Functions
+    Options(const Options&)             = default;
+    Options(Options&&)                  = default;
+    Options& operator=(const Options&)  = default;
+    Options& operator=(Options&&)       = default;
+
     /**
      * Adds Option to option list
      *

@@ -151,11 +151,6 @@ runTest() {
 }
 
 main() {
-    if [[ ! $0 =~ $CYGNUS_HOME ]]; then
-        LOG E "$(basename $0) is not inside $CYGNUS_HOME"
-        return 1
-    fi
-
     mkdir -p logs
     parseCmdLine $@
     TEST_DIR=${VALUES['-d']:-$TEST_DIR}
@@ -234,13 +229,14 @@ main() {
     case $TEST_MODE in
         coverage)
             if [[ $FUNC_COUNT -gt 0 ]]; then
+                echo -e "\nFunctional Coverage:"
                 mkdir -p reports/coverage/func
-                lcov --gcov-tool=gcov-7 -b src/base -c -d build/obj/coverage -d include --no-external -o reports/coverage/func/coverage.info -q 2> /dev/null
-                genhtml reports/coverage/func/coverage.info --output-directory reports/coverage/func/html --demangle-cpp > reports/coverage/func/genhtml.log 2> /dev/null
-                echo "Functional Coverage:"
+                lcov --gcov-tool=gcov-7 -c -d build/obj/coverage -d include --no-external -o reports/coverage/func/coverage.info -q #2> /dev/null
+                #genhtml reports/coverage/func/coverage.info --output-directory reports/coverage/func/html --demangle-cpp #> reports/coverage/func/genhtml.log 2> /dev/null
                 egrep -A 1 "  lines\.\.\.\.\.\.: " reports/coverage/func/genhtml.log
             fi
             if [[ $UNIT_COUNT -gt 0 ]]; then
+                echo -e "\nUnit Coverage:"
                 mkdir -p reports/coverage/unit
                 lcov --gcov-tool=gcov-7 -b src/base -b src/scanner -c -d $OUT_DIR -d include --no-external -o reports/coverage/unit/coverage.info -q 2> /dev/null
 
@@ -265,6 +261,7 @@ main() {
                 genhtml --ignore-errors source reports/coverage/unit/coverage.info --output-directory reports/coverage/unit/html --demangle-cpp | tee reports/coverage/unit/genhtml.log 2> /dev/null
             fi
             if [[ ${VALUES['-a']} ]]; then
+                echo -e "\nComplete Coverage:"
                 mkdir -p reports/coverage/comp
                 lcov --gcov-tool=gcov-7 -b src/base -c -d build/obj/coverage -d $OUT_DIR -d include --no-external -o reports/coverage/comp/coverage.info -q 2> /dev/null
 

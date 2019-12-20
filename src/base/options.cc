@@ -34,8 +34,13 @@ Options::Options(): m_option_list(), m_pos_args() {
 }
 
 Options::~Options() {
-    for(auto opt : m_option_list)
-        delete opt;
+    try {
+        for(auto opt : m_option_list)
+            delete opt;
+    }
+    catch(std::exception& e) {
+        Log::e(e.what());
+    }
 }
 
 void Options::addOption(const std::string& option_name,

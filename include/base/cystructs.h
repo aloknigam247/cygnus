@@ -208,7 +208,7 @@ class Tree {
          * Parametrised Constructor
          * @param[in] d takes data to store
          */
-        Node(const T d) : data(d), left(nullptr), right(nullptr) {}
+        explicit Node(const T d) : data(d), left(nullptr), right(nullptr) {}
 
         /**
          * Copy Constructor
