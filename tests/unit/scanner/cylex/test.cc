@@ -15,7 +15,7 @@ void analyseFile() {
 
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end-start;
-    Log::i("elapsed time: ", std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed_seconds).count());
+//    Log::i("elapsed time: ", std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed_seconds).count());
 }
 
 int main() {
