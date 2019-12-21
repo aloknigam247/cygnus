@@ -23,7 +23,7 @@
  ************************************************************************************/
 
 /**
- * @file Log.h
+ * @file log.h
  * @brief All logs from Cygnus should use this
  *
  * Provides logging for all types of logs thrown from Cygnus
