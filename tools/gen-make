@@ -157,7 +157,7 @@ def main():
                 "############# Targets #############\n" +
                 "all: $(OBJ_COMMON) $(OBJ_LOCAL) " + target + "\n\n" +
                 "$(OBJ_COMMON) $(OBJ_LOCAL):\n" +
-                "\tmkdir $@\n\n" +
+                "\tmkdir -p $@\n\n" +
                 "coverage: CXX = g++-7\n" +
                 "coverage: COMP_FLAGS += --coverage\n" +
                 "coverage: all\n\n" +

@@ -10,7 +10,7 @@ cat reports/docs/undoc
 undoc=$(egrep "warning:" reports/docs/undoc | wc -l)
 
 if [[ $(tar -df docs.tar docs | egrep -v "Mod time differs|Mode differs") ]]; then
-    tar uf docs.tar docs
+    tar -cf docs.tar docs
 fi
 
 if [[ $(git status docs.tar | tail -1) == "nothing to commit, working tree clean" ]]; then
