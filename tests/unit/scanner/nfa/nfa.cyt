@@ -1,5 +1,0 @@
-DIFFS=(
-        ['REFLOG']='TESTLOG'
-        ['regex.png']='fa.png'
-    )
-
