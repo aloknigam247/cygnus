@@ -60,7 +60,7 @@ class Tree {
     class iterator {
         public:
         /**
-         * Default constructor
+         * Constructor
          */
         iterator(): m_st() {}
 
@@ -124,7 +124,7 @@ class Tree {
     };
 
     /**
-     * Default constructor
+     * Constructor
      */
     Tree() : m_root(nullptr) {}
 
@@ -143,7 +143,7 @@ class Tree {
     Tree(Tree<T>&& to_move) noexcept;
 
     /**
-     * Operator=
+     * Copy assignment operator
      *
      * @param[in] to_copy object to copy
      * @return reference to self, Tree<T> object
@@ -151,7 +151,7 @@ class Tree {
     Tree<T>& operator=(const Tree<T>& to_copy);
 
     /**
-     * Move Assignemnt
+     * Move assignemnt operator
      *
      * @param[in,out] to_move object to move
      * @return reference to self, Tree<T>
@@ -159,7 +159,7 @@ class Tree {
     Tree<T>& operator=(Tree<T>&& to_move) noexcept;
 
     /**
-     * Default destructor
+     * Destructor
      */
     ~Tree();
 
@@ -208,17 +208,17 @@ class Tree {
          * Parametrised Constructor
          * @param[in] d takes data to store
          */
-        Node(const T d) : data(d), left(nullptr), right(nullptr) {}
+        explicit Node(const T d) : data(d), left(nullptr), right(nullptr) {}
 
         /**
-         * Copy Constructor
+         * Copy constructor
          *
          * @param[in] to_copy Node to copy
          */
         Node(const Node& to_copy);
 
         /**
-         * Move Constructor
+         * Move constructor
          *
          * @param[in,out] to_move Node to move
          */
@@ -226,14 +226,14 @@ class Tree {
 
         ~Node();
         /**
-         * Operator=
+         * Copy assignment operator
          *
          * @param[in] to_copy Node to copy
          */
         Node& operator=(const Node& to_copy);
 
         /**
-         * Move Assignemnt
+         * Move assignemnt operator
          *
          * @param[in,out] to_move Node to move
          */
