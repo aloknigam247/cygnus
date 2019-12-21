@@ -130,6 +130,10 @@ runTest() {
             if [[ $(egrep -c "ERROR SUMMARY: 0 errors" valgrind.out) -ne 1 ]]; then
                 sed -nr -e 's/^=+[0-9]+=+ //' -e '/HEAP SUMMARY/,/LEAK SUMMARY/ p' valgrind.out | sed -e '/HEAP SUMMARY:\|LEAK SUMMARY:/,/^$/ d'  | \
                 while IFS= read line; do
+                    # Just a hack
+                    if [[ $line == "All heap blocks were freed -- no leaks are possible" ]]; then
+                        break
+                    fi
                     if [[ $line == "" ]]; then
                         checksum=$(echo $error | md5sum | egrep -o "[0-Z]+")
                         echo "CHECKSUM: $checksum" >> mem.err

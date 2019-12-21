@@ -28,6 +28,11 @@
 #include <cstring>
 #include <iostream>
 
+StateTable::~StateTable() {
+    for(auto entry: state_entry)
+        delete entry;
+}
+
 void StateTable::addEntry(int from, char sym, int to) {
     if(state_entry[from] == nullptr)
         state_entry[from] = new StateEntry;

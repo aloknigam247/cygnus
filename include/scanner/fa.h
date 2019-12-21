@@ -49,6 +49,7 @@ class StateTable {
 
     public:
     StateTable(): state_entry(MAX_ENTRY, nullptr) {}
+    ~StateTable();
     void addEntry(int from, char sym, int to);
     void print() const;
     void printDot(std::ofstream& file) const;

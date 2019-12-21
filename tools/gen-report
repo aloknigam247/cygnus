@@ -14,12 +14,18 @@ adder() {
 covReport() {
     local comp_cov_line=-1
     local comp_cov_func=-1
+    local comp_line_exp=94
+    local comp_func_exp=97
     local comp_log="reports/coverage/comp/genhtml.log"
     local func_cov_line=-1
     local func_cov_func=-1
+    local func_line_exp=71
+    local func_func_exp=82
     local func_log="reports/coverage/func/genhtml.log"
     local unit_cov_line=-1
     local unit_cov_func=-1
+    local unit_line_exp=98
+    local unit_func_exp=98
     local unit_log="reports/coverage/unit/genhtml.log"
 
     if [[ -f reports/coverage/comp/genhtml.log ]]; then 
@@ -34,24 +40,24 @@ covReport() {
         unit_cov_line=$(egrep 'lines......: ' $unit_log | sed 's/.*lines......: //')
         unit_cov_func=$(egrep 'functions..: ' $unit_log | sed 's/.*functions..: //')
     fi
-    if [[ ${comp_cov_line/\.*/} -lt 94 || ${comp_cov_func/\.*/} -lt 97  ]] ||
-       [[ ${func_cov_line/\.*/} -lt 71 || ${func_cov_func/\.*/} -lt 82  ]] ||
-       [[ ${unit_cov_line/\.*/} -lt 98 || ${unit_cov_func/\.*/} -lt 98 ]]; then
+    if [[ ${comp_cov_line/\.*/} -lt $comp_line_exp || ${comp_cov_func/\.*/} -lt $comp_func_exp ]] ||
+       [[ ${func_cov_line/\.*/} -lt $func_line_exp || ${func_cov_func/\.*/} -lt $func_func_exp ]] ||
+       [[ ${unit_cov_line/\.*/} -lt $unit_line_exp || ${unit_cov_func/\.*/} -lt $unit_func_exp ]]; then
         EXITCODE=1
     fi
     
     echo "Coverage Report::"
     echo "    Complete Coverage:"
-    echo "        Lines......: $comp_cov_line"
-    echo "        Functions..: $comp_cov_func"
+    echo "        Lines......: (Expected: $comp_line_exp) $comp_cov_line"
+    echo "        Functions..: (Expected: $comp_func_exp) $comp_cov_func"
     echo
     echo "    Funtional Coverage:"
-    echo "        Lines......: $func_cov_line"
-    echo "        Functions..: $func_cov_func"
+    echo "        Lines......: (Expected: $func_line_exp) $func_cov_line"
+    echo "        Functions..: (Expected: $func_func_exp) $func_cov_func"
     echo
     echo "    Unit Coverage:"
-    echo "        Lines......: $unit_cov_line"
-    echo "        Functions..: $unit_cov_func"
+    echo "        Lines......: (Expected: $unit_line_exp) $unit_cov_line"
+    echo "        Functions..: (Expected: $unit_func_exp) $unit_cov_func"
     echo
 }
 
