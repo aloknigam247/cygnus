@@ -23,7 +23,7 @@
  ************************************************************************************/
 
 /**
- * @file options.h
+ * @file Options.h
  * @brief Command line parser
  *
  * Parses command line option and perform error handling for command line
@@ -189,7 +189,7 @@ class Option {
         const char* s;
 
         /**
-         * Constructor
+         * Default constructor
          */
         Value() : s(nullptr) {}
     };
@@ -208,7 +208,7 @@ class Option {
 class Options {
     public:
     /**
-     * Constructor
+     * Default constructor
      */
     Options();
 
@@ -217,35 +217,11 @@ class Options {
      */
     ~Options();
 
-    /**
-     * Default copy constructor
-     *
-     * @param[in] rhs Options to copy
-     */
-    Options(const Options& rhs) = default;
-
-    /**
-     * Default move constructor
-     *
-     * @param[inout] rhs Options to move
-     */
-    Options(Options&& rhs) = default;
-
-    /**
-     * Default copy assignment operator
-     *
-     * @param[in] rhs Options to copy
-     * @returns reference to current object
-     */
-    Options& operator=(const Options& rhs) = default;
-
-    /**
-     * Default move assignment operator
-     *
-     * @param[inout] rhs Options to move
-     * @returns reference to current object
-     */
-    Options& operator=(Options&& rhs) = default;
+    // Default Functions
+    Options(const Options&)             = default;
+    Options(Options&&)                  = default;
+    Options& operator=(const Options&)  = default;
+    Options& operator=(Options&&)       = default;
 
     /**
      * Adds Option to option list

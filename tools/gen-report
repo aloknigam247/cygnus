@@ -24,7 +24,7 @@ covReport() {
     local func_log="reports/coverage/func/genhtml.log"
     local unit_cov_line=-1
     local unit_cov_func=-1
-    local unit_line_exp=96
+    local unit_line_exp=98
     local unit_func_exp=98
     local unit_log="reports/coverage/unit/genhtml.log"
 
