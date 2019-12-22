@@ -1,21 +1,21 @@
-############################################################
+#----------------------------------------------------------#
 # Commonn functions for logging and command line parsing   #
 # NOTE: all variable name start with _ in this file        #
-############################################################
+#----------------------------------------------------------#
 
-################################ 
+#------------------------------#
 # Wrapper for exit             #
 # Usage: EXIT <return-code>    #
-################################
+#------------------------------#
 declare _EXITCODE=0
 EXIT(){
     exit ${1:-$_EXITCODE}
 }
 
-############################
+#--------------------------#
 # Log wrapper              #
 # Usage: Log <tag> "<msg>" #
-############################
+#--------------------------#
 LOG(){
     local _msg=${2:?"message missing."}
     case $1 in
@@ -40,7 +40,7 @@ LOG(){
     esac
 }
 
-#####################################################################
+#-------------------------------------------------------------------#
 # How to create new option                                          #
 #   * eval:     : action to evaluate when option is found           #
 #   * help:     : create help statement, use . in place of space    #
@@ -53,7 +53,7 @@ LOG(){
 #                                                                   #
 #   OPTION['option-name']="list of above options"                   #
 #   OPTION['POS']="variable-name"                                   #
-#####################################################################
+#-------------------------------------------------------------------#
 declare -A OPTION
 declare -A VALUES
 declare _POS_NAME
@@ -123,8 +123,10 @@ usage(){
     EXIT
 }
 
-# Error message for option
-# Usage: optionError <option>
+#-------------------------------#
+# Error message for option      #
+# Usage: optionError <option>   #
+#-------------------------------#
 optionError(){
     local _IFS_Prev=$IFS
     local _meta=''
@@ -160,10 +162,12 @@ optionError(){
     fi
 }
 
-# Command line parser
-# It uses global variable OPTION and VALUES
-#   OPTION: associative array that has all options defined
-#   VALUES: values of options mentioned in OPTION
+#-----------------------------------------------------------#
+# Command line parser                                       #
+# It uses global variable OPTION and VALUES                 #
+#   OPTION: associative array that has all options defined  #
+#   VALUES: values of options mentioned in OPTION           #
+#-----------------------------------------------------------#
 parseCmdLine() {
     declare -A _with
     declare -A _without
