@@ -143,8 +143,8 @@ def checkFuncNames(file):
             # Check function name
             func_name_start = return_type.end()
             func_name = return_type.string[func_name_start:]
-            if(not re.fullmatch(StyleGuide.func_name, func_name)):
-                error_list.append(Error("func name is not in lower camel case",
+            if(not re.fullmatch(StyleGuide.func_name, func_name) and return_type.string == "explicit"):
+                error_list.append(Error("function name is not in lower camel case",
                                 file,
                                 line,
                                 lineno,

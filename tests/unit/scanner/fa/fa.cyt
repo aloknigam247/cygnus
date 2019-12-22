@@ -1,4 +1,0 @@
-DIFFS=(
-        ['case1.png']='out1.png'
-        ['REFLOG']='TESTLOG'
-    )

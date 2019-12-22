@@ -23,7 +23,7 @@
  ************************************************************************************/
 
 /**
- * @file Log.h
+ * @file log.h
  * @brief All logs from Cygnus should use this
  *
  * Provides logging for all types of logs thrown from Cygnus
@@ -31,8 +31,8 @@
  * @author Alok Nigam
  */
 
-#ifndef UTILS_LOG_H
-#define UTILS_LOG_H
+#ifndef BASE_LOG_H
+#define BASE_LOG_H
 
 #include <iostream>
 

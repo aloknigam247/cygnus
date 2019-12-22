@@ -6,7 +6,6 @@ declare -a valid_list
 declare -a valid_tests
 
 # DEFAULTS
-TEST_DIR='.'
 declare OUT_DIR='test_run'
 declare TEST_MODE=''
 declare FUNC_COUNT=0
@@ -20,12 +19,11 @@ TEE() {
     done
 }
 
-OPTION['-a']='value:bool,with:-d,help:run all testcases in this directory'
-OPTION['-d']='value:string,metavar:dir,help:test case directory'
-OPTION['-f']='value:bool,with:-d,without:-a,help:run unit tests only'
+OPTION['-a']='value:string,metavar:dir,help:run all tests from <dir>'
+OPTION['-f']='value:string,metavar:dir,without:-a,help:run functional tests only from <dir>'
 OPTION['-o']='value:string,metavar:dir,help:output directory of test run'
 OPTION['-r']='value:bool,help:reflog update'
-OPTION['-u']='value:bool,with:-d,without:-a,help:run functional tests only'
+OPTION['-u']='value:string,metavar:dir,without:-a,help:run unit tests only from <dir>'
 OPTION['--coverage']='value:bool,eval:TEST_MODE=coverage,help:run coverage tests'
 OPTION['--mem-check']='value:bool,eval:TEST_MODE=mem-check,help:run mem-check tests'
 OPTION['--perf']='value:bool,eval:TEST_MODE=perf,help:run mem-check tests'
@@ -33,14 +31,15 @@ OPTION['--sanitize']='value:bool,eval:TEST_MODE=sanitize,help:run sanitization t
 OPTION['POS']='dest:test_list,count:0+'
 
 validateTests() {
-    if [[ ${VALUES['-a']} || ${VALUES['-f']} || ${VALUES['-u']} ]]; then
-        if [[ ${VALUES['-f']} ]]; then
-            valid_tests=$(find $TEST_DIR -type f -path "*func*.cyt" | xargs realpath)
-        elif [[ ${VALUES['-u']} ]]; then
-            valid_tests=$(find $TEST_DIR -type f -path "*unit*.cyt" | xargs realpath)
-        else
-            valid_tests=$(find $TEST_DIR -type f -name "*.cyt" | xargs realpath)
-        fi
+    if [[ ${VALUES['-a']} ]]; then
+        test -d ${VALUES['-a']} || LOG EE "directory \`${VALUES['-a']}' does not exit";
+        valid_tests=$(find ${VALUES['-a']} -type f -name "*.cyt" | xargs realpath)
+    elif [[ ${VALUES['-f']} ]]; then
+        test -d ${VALUES['-f']} || LOG EE "directory \`${VALUES['-f']}' does not exit";
+        valid_tests=$(find ${VALUES['-f']} -type f -path "*func*.cyt" | xargs realpath)
+    elif [[ ${VALUES['-u']} ]]; then
+        test -d ${VALUES['-u']} || LOG EE "directory \`${VALUES['-u']}' does not exit";
+        valid_tests=$(find ${VALUES['-u']} -type f -path "*unit*.cyt" | xargs realpath)
     else
         for test in ${VALUES["test_list"]}; do
             abs_test=$(realpath $test)
@@ -53,8 +52,7 @@ validateTests() {
         done
     fi
     if [[ -z $valid_tests ]]; then
-      LOG E "no valid testcases found"
-      EXIT
+      LOG EE "no valid testcases found"
     fi
 }
 
@@ -79,12 +77,13 @@ runFuncTest() {
 
 runUnitTest() {
     gen-make -i $CYGNUS_HOME/include/base -i $CYGNUS_HOME/include/scanner -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/base/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src/base -s $CYGNUS_HOME/src/scanner -s $CYGNUS_HOME/tests/utils/src test.cc || return 1
-    make --no-print-directory $TEST_MODE 2>&1 | TEE make.log || return 1
-    $tool ./test 2>&1 > TESTLOG || return 1
+    make --no-print-directory $TEST_MODE 2>&1 | TEE make.log 
+    $tool ./test 2>&1 > TESTLOG 
 }
 
 runTest() {
     local test=$1
+    local status=0
     declare -A DIFFS
     if [[ $test =~ func.*cyt ]]; then
         local testcase=$(echo $test | egrep -o "func.*cyt")
@@ -94,7 +93,7 @@ runTest() {
         cd $OUT_DIR/`dirname $testcase`
         echo "|TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt | $testcase"
         source `basename $1`
-        runFuncTest $testcase || ret=1
+        runFuncTest $testcase || status=1
     else
         local testcase=$(echo $test | egrep -o "unit.*cyt")
         local testcase_dir=${test%/$testcase}
@@ -103,14 +102,13 @@ runTest() {
         cd $OUT_DIR/`dirname $testcase`
         echo "|TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt | $testcase"
         source `basename $1`
-        runUnitTest $testcase || ret=1
+        runUnitTest $testcase || status=1
     fi
 
-    local status=1
     for ref in ${!DIFFS[@]}; do
         diff -N --color=always $ref ${DIFFS[$ref]}
-        if [[ $? -ne 0 || $ret -eq 1 ]]; then
-            status=0
+        if [[ $? -ne 0 ]]; then
+            status=1
             if [[ ${VALUES['-r']} ]]; then
                 cp ${DIFFS[$ref]} $ref
                 echo "$ref updated"
@@ -118,7 +116,7 @@ runTest() {
         fi
     done
 
-    if [[ $status -eq 1 ]]; then
+    if [[ $status -eq 0 ]]; then
         echo "status: PASS"
     else
         echo "status: FAIL"
@@ -130,6 +128,10 @@ runTest() {
             if [[ $(egrep -c "ERROR SUMMARY: 0 errors" valgrind.out) -ne 1 ]]; then
                 sed -nr -e 's/^=+[0-9]+=+ //' -e '/HEAP SUMMARY/,/LEAK SUMMARY/ p' valgrind.out | sed -e '/HEAP SUMMARY:\|LEAK SUMMARY:/,/^$/ d'  | \
                 while IFS= read line; do
+                    # Just a hack
+                    if [[ $line == "All heap blocks were freed -- no leaks are possible" ]]; then
+                        break
+                    fi
                     if [[ $line == "" ]]; then
                         checksum=$(echo $error | md5sum | egrep -o "[0-Z]+")
                         echo "CHECKSUM: $checksum" >> mem.err
@@ -151,24 +153,15 @@ runTest() {
 }
 
 main() {
-    if [[ ! $0 =~ $CYGNUS_HOME ]]; then
-        LOG E "$(basename $0) is not inside $CYGNUS_HOME"
-        return 1
-    fi
-
     mkdir -p logs
     parseCmdLine $@
-    TEST_DIR=${VALUES['-d']:-$TEST_DIR}
-    OUT_DIR=${VALUES['-o']:-$OUT_DIR} 
-    echo "    TEST_DIR: $TEST_DIR"
-    echo "    OUT_DIR: $OUT_DIR"
     {
-    test -d $TEST_DIR || LOG E "directory \`$TEST_DIR' does not exit"
-    if [[ $test_out == $OUT_DIR ]]; then
-        LOG E "test directory and out directory cannot be same"
-        EXIT
-    fi
+    OUT_DIR=${VALUES['-o']:-$OUT_DIR} 
     validateTests
+    if [[ $test_out == $OUT_DIR ]]; then
+        LOG EE "test directory and out directory cannot be same"
+    fi
+    echo "    OUT_DIR: $OUT_DIR"
 
     tc_cnt=0
     for test in $valid_tests; do
@@ -208,8 +201,7 @@ main() {
     esac
 
     if [[ ${VALUES['-a']} || ${VALUES['-f']} ]] && [[ ! -x $CYGNUS ]]; then
-        LOG E "$CYGNUS does not exist"
-        EXIT
+        LOG EE "$CYGNUS does not exist"
     fi
     rm -rf reports/func reports/unit
     mkdir -p reports/func reports/unit
@@ -234,15 +226,23 @@ main() {
     case $TEST_MODE in
         coverage)
             if [[ $FUNC_COUNT -gt 0 ]]; then
+                echo -e "\nFunctional Coverage:"
                 mkdir -p reports/coverage/func
-                lcov --gcov-tool=gcov-7 -b src/base -c -d build/obj/coverage -d include --no-external -o reports/coverage/func/coverage.info -q 2> /dev/null
+                rm -f reports/coverage/func/coverage.info
+                for dir in $(find build/obj/coverage -mindepth 1 -type d); do
+                    lcov --gcov-tool=gcov-7 -c -b src/${dir#build/obj/coverage/} -d $dir -d include --no-external -q >> reports/coverage/func/coverage.info 2> /dev/null
+                done
                 genhtml reports/coverage/func/coverage.info --output-directory reports/coverage/func/html --demangle-cpp > reports/coverage/func/genhtml.log 2> /dev/null
-                echo "Functional Coverage:"
-                egrep -A 1 "  lines\.\.\.\.\.\.: " reports/coverage/func/genhtml.log
+                egrep -A 1 'lines\.\.\.\.\.\.:' reports/coverage/func/genhtml.log
             fi
+
             if [[ $UNIT_COUNT -gt 0 ]]; then
+                echo -e "\nUnit Coverage:"
                 mkdir -p reports/coverage/unit
-                lcov --gcov-tool=gcov-7 -b src/base -b src/scanner -c -d $OUT_DIR -d include --no-external -o reports/coverage/unit/coverage.info -q 2> /dev/null
+                rm -f reports/coverage/unit/coverage.info
+                for dir in $(find src -mindepth 1 -type d); do
+                    lcov --gcov-tool=gcov-7 -b $dir -c -d $OUT_DIR -d include --no-external -q >> reports/coverage/unit/coverage.info 2> /dev/null
+                done
 
                 # Put missing files in coverage.info when all testcases in directory run
                 if [[ ${VALUES['-a']} ]]; then
@@ -262,16 +262,20 @@ main() {
                 # remove test.cc from coverage.info
                 sed -i '/test.cc$/,/end_of_record/ d' reports/coverage/unit/coverage.info
 
-                genhtml --ignore-errors source reports/coverage/unit/coverage.info --output-directory reports/coverage/unit/html --demangle-cpp | tee reports/coverage/unit/genhtml.log 2> /dev/null
+                genhtml --ignore-errors source reports/coverage/unit/coverage.info --output-directory reports/coverage/unit/html --demangle-cpp > reports/coverage/unit/genhtml.log #2> /dev/null
+                egrep -A 1 'lines\.\.\.\.\.\.:' reports/coverage/unit/genhtml.log
             fi
+
             if [[ ${VALUES['-a']} ]]; then
+                echo -e "\nComplete Coverage:"
                 mkdir -p reports/coverage/comp
                 lcov --gcov-tool=gcov-7 -b src/base -c -d build/obj/coverage -d $OUT_DIR -d include --no-external -o reports/coverage/comp/coverage.info -q 2> /dev/null
 
                 # remove test.cc from coverage.info
                 sed -i '/test.cc$/,/end_of_record/ d' reports/coverage/comp/coverage.info
 
-                genhtml --ignore-errors source reports/coverage/comp/coverage.info --output-directory reports/coverage/comp/html --demangle-cpp | tee reports/coverage/comp/genhtml.log 2> /dev/null
+                genhtml --ignore-errors source reports/coverage/comp/coverage.info --output-directory reports/coverage/comp/html --demangle-cpp > reports/coverage/comp/genhtml.log 2> /dev/null
+                egrep -A 1 'lines\.\.\.\.\.\.:' reports/coverage/comp/genhtml.log
             fi
             ;;
         mem-check)

@@ -23,6 +23,10 @@ LOG(){
             echo "|ERROR| $_msg"
             _EXITCODE=1
             ;;
+        EE) # exit on error
+            echo "|ERROR| $_msg"
+            EXIT 1
+            ;;
         I)
             echo "|INFO| $_msg"
             ;;
@@ -268,7 +272,7 @@ parseCmdLine() {
     
     [[ $_EXITCODE -ne 0 ]] && EXIT
 
-    echo "Options: "
+    echo "Command Line: "
     for _i in ${!VALUES[@]}; do
         echo -e "    $_i: ${VALUES[$_i]}"
     done
