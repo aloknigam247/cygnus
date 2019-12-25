@@ -35,7 +35,7 @@ jobs:
           command: |
             cd ~/cygnus
             source sourceme
-            cyregress -a -d tests --coverage
+            cyregress -a tests --coverage
       - persist_to_workspace:
           root: ~/cygnus
           paths:
@@ -95,7 +95,7 @@ jobs:
             cd ~/cygnus
             source sourceme
             cybuild --memory
-            cyregress -a -d tests --mem-check
+            cyregress -a tests --mem-check
       - persist_to_workspace:
           root: ~/cygnus
           paths:
@@ -119,7 +119,7 @@ jobs:
           command: |
             cd ~/cygnus
             source sourceme
-            cyregress -a -d tests --perf
+            cyregress -a tests --perf
       - persist_to_workspace:
           root: ~/cygnus
           paths:
@@ -143,7 +143,7 @@ jobs:
           command: |
             cd ~/cygnus
             source sourceme
-            cyregress -a -d tests
+            cyregress -a tests
       - persist_to_workspace:
           root: ~/cygnus
           paths:
@@ -167,7 +167,7 @@ jobs:
           command: |
             cd ~/cygnus
             source sourceme
-            cyregress -a -d tests --sanitize
+            cyregress -a tests --sanitize
       - persist_to_workspace:
           root: ~/cygnus
           paths:
