@@ -157,12 +157,13 @@ rule.write("OBJ_COMMON := " + os.path.relpath("obj", os.getcwd()[os.getcwd().rfi
             "#------------ Targets ------------#\n" +
             "all: $(OBJ_COMMON) $(OBJ_LOCAL) " + target + "\n\n" +
             "$(OBJ_COMMON) $(OBJ_LOCAL):\n" +
-            "\tmkdir $@\n\n" +
+            "\tmkdir -p $@\n\n" +
             "coverage: CXX = g++-7\n" +
             "coverage: COMP_FLAGS += --coverage\n" +
             "coverage: all\n\n" +
-            "mem-check: COMP_FLAGS += -g\n" +
-            "mem-check: all\n\n" +
+            "debug: COMP_FLAGS += -g\n" +
+            "debug: all\n\n" +
+            "mem-check: debug\n\n" +
             "perf: COMP_FLAGS += -g\n" +
             "perf: all\n\n" +
             "sanitize: COMP_FLAGS += -g -D_FORTIFY_SOURCE=2 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow -fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error\n" +
