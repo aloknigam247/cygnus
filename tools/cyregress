@@ -86,8 +86,8 @@ runTest() {
     local status=0
     declare -A DIFFS
     if [[ $test =~ func.*cyt ]]; then
-        local testcase=$(echo $test | egrep -o "func.*cyt")
-        local testcase_dir=${test%/$testcase}
+        local testcase_dir=${test%/func*cyt}
+        local testcase=${test#$testcase_dir/}
         FUNC_COUNT=$((FUNC_COUNT + 1))
         makeRunDir $testcase_dir $testcase
         cd $OUT_DIR/`dirname $testcase`
@@ -95,8 +95,8 @@ runTest() {
         source `basename $1`
         runFuncTest $testcase || status=1
     else
-        local testcase=$(echo $test | egrep -o "unit.*cyt")
-        local testcase_dir=${test%/$testcase}
+        local testcase_dir=${test%/unit*cyt}
+        local testcase=${test#$testcase_dir/}
         UNIT_COUNT=$((UNIT_COUNT + 1))
         makeRunDir $testcase_dir $testcase
         cd $OUT_DIR/`dirname $testcase`
