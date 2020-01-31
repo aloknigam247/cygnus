@@ -4,10 +4,9 @@ about: Recommended template for issues
 title: ''
 labels: issue-bucket
 assignees: aloknigam247
+milestone: 1.0b
 
 ---
-
-Document change: Yes|No
 
 Description:
 ---
