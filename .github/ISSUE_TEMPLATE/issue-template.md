@@ -2,7 +2,7 @@
 name: Issue Template
 about: Recommended template for issues
 title: ''
-labels: issue-bucket
+labels: issue-bucket :package:
 assignees: aloknigam247
 milestone: 1.0b
 
