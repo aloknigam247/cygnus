@@ -4,6 +4,7 @@ source $CYGNUS_HOME/tools/funcs.bash    # source common functions
 
 declare -a valid_list
 declare -a valid_tests
+declare -a fail_list
 
 # DEFAULTS
 declare OUT_DIR='test_run'
@@ -121,6 +122,7 @@ runTest() {
     else
         echo "status: FAIL"
         fail_cnt=$((fail_cnt + 1))
+        fail_list+=($testcase)
     fi
 
     case $TEST_MODE in
@@ -215,10 +217,6 @@ main() {
         echo
         runTest $test
     done
-    echo -e "\nSummary:"
-    echo "    RUN:  $tc_cnt"
-    echo "    PASS: $((tc_cnt - fail_cnt))"
-    echo "    FAIL: $fail_cnt"
 
     #-----------#
     # Post Run  #
@@ -294,6 +292,20 @@ main() {
             ;;
         *)
     esac
+
+    #---------#
+    # Summary #
+    #---------#
+    if [[ ${#fail_list} ]]; then
+        echo -e "\nFAILED:"
+        for fail in ${fail_list[@]}; do
+            echo "$fail"
+        done
+    fi
+    echo -e "\nSummary:"
+    echo "    RUN:  $tc_cnt"
+    echo "    PASS: $((tc_cnt - fail_cnt))"
+    echo "    FAIL: $fail_cnt"
     } | TEE logs/cyregress${TEST_MODE:+-$TEST_MODE}.log
     return 0
 }
