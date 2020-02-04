@@ -14,18 +14,18 @@ adder() {
 covReport() {
     local comp_cov_line=-1
     local comp_cov_func=-1
-    local comp_line_exp=94
-    local comp_func_exp=97
+    local comp_line_exp=0
+    local comp_func_exp=0
     local comp_log="reports/coverage/comp/genhtml.log"
     local func_cov_line=-1
     local func_cov_func=-1
-    local func_line_exp=71
-    local func_func_exp=82
+    local func_line_exp=0
+    local func_func_exp=0
     local func_log="reports/coverage/func/genhtml.log"
     local unit_cov_line=-1
     local unit_cov_func=-1
-    local unit_line_exp=96
-    local unit_func_exp=98
+    local unit_line_exp=0
+    local unit_func_exp=0
     local unit_log="reports/coverage/unit/genhtml.log"
 
     if [[ -f reports/coverage/comp/genhtml.log ]]; then 
@@ -43,7 +43,7 @@ covReport() {
     if [[ ${comp_cov_line/\.*/} -lt $comp_line_exp || ${comp_cov_func/\.*/} -lt $comp_func_exp ]] ||
        [[ ${func_cov_line/\.*/} -lt $func_line_exp || ${func_cov_func/\.*/} -lt $func_func_exp ]] ||
        [[ ${unit_cov_line/\.*/} -lt $unit_line_exp || ${unit_cov_func/\.*/} -lt $unit_func_exp ]]; then
-        EXITCODE=1
+      EXITCODE=1
     fi
     
     echo "Coverage Report::"
