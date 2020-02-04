@@ -173,7 +173,7 @@ class Option {
      * @param[in] opt string to compare
      * @returns true if Option name is greater than string on the right
      */
-    bool operator>(const std::string opt) { return m_name > opt; }
+    bool operator>(const std::string& opt) { return m_name > opt; }
 
     /**
      * Operator==
@@ -181,7 +181,7 @@ class Option {
      * @param[in] opt Option to compare
      * @returns true if both options are equal
      */
-    bool operator==(const std::string opt) { return m_name == opt; }
+    bool operator==(const std::string& opt) { return m_name == opt; }
 
     /**
      * @union Value
@@ -198,12 +198,12 @@ class Option {
          * Constructor
          */
         Value() : s(nullptr) {}
-        Value(bool m_b) : b(m_b) {}
-        Value(char m_c) : c(m_c) {}
-        Value(int m_i) : i(m_i) {}
-        Value(char* m_s) : s(m_s) {}
+        explicit Value(bool m_b) : b(m_b) {}
+        explicit Value(char m_c) : c(m_c) {}
+        explicit Value(int m_i) : i(m_i) {}
+        explicit Value(const char* m_s) : s(m_s) {}
 
-        operator int() { return i; }
+        explicit operator int() { return i; }
     };
 
     private:
@@ -285,9 +285,9 @@ class Options {
      * @param[in] opt_name name of option
      * @returns true if option is set
      */
-    bool isSet(const std::string opt_name);
+    bool isSet(const std::string& opt_name);
 
-    Option::Value get_value(std::string opt_name);
+    Option::Value get_value(const std::string& opt_name);
 
     /**
      * Get positional arguments

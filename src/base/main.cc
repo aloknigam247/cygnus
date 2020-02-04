@@ -29,6 +29,6 @@ int main(const int argc, const char* argv[]) {
     opt.addOption("-v", Option::BOOL, "version");
     opt.parse(argc, argv);
     if(opt.isSet("-v"))
-        std::cout << VERSION <<"\n";
+        std::cout << "Cygnus 1.0-alpha\n";
     return 0;
 }
