@@ -2,6 +2,7 @@
 .DEFAULT_GOAL = compile
 .PHONY: src compile
 Q	:= @
+VERSION := $(shell cat .version)
 
 #---------- Modes ----------# 
 ifeq ($(MODE),coverage)
@@ -39,7 +40,7 @@ EXE 	:= $(BLD_DIR)/bin/cygnus
 export OBJ DEP
 
 #---------- Compile Flags ----------# 
-export CPP_FLAGS += -std=c++11 -fdiagnostics-color
+export CPP_FLAGS += -std=c++11 -fdiagnostics-color -DVERSION="\"$(VERSION)\""
 ifdef STRICT
 	CPP_FLAGS += -pedantic -Wall -Walloc-zero -Wcast-align -Wcast-qual -Wconversion\
 				-Wduplicated-branches -Wduplicated-cond -Weffc++ -Wextra -Wfloat-equal -Wformat=2\

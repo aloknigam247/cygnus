@@ -23,9 +23,12 @@
  ************************************************************************************/
 
 #include "options.h"
-
+#include "log.h"
 int main(const int argc, const char* argv[]) {
     Options opt;
+    opt.addOption("-v", Option::BOOL, "version");
     opt.parse(argc, argv);
+    if(opt.isSet("-v"))
+        std::cout << VERSION <<"\n";
     return 0;
 }
