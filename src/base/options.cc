@@ -117,6 +117,30 @@ bool Options::parse(const int argc, const char* argv[]) {
     return result;
 }
 
+bool Options::isSet(const std::string& opt_name) {
+    cystructs::Tree<Option*>::iterator iter = m_option_list.search(opt_name);
+    return (iter != m_option_list.end() && iter->isSet());
+}
+
+Option::Value Options::get_value(const std::string& opt_name) {
+    cystructs::Tree<Option*>::iterator iter = m_option_list.search(opt_name);
+    if(iter != m_option_list.end()) {
+        switch(iter->get_type()) {
+            case Option::BOOL:
+                return Option::Value(iter->get_bool_value());
+            case Option::CHAR:
+                return Option::Value(iter->get_char_value());
+            case Option::INT:
+                return Option::Value(iter->get_int_value());
+            case Option::STRING:
+                return Option::Value(iter->get_string_value());
+            default:
+                return {};
+        }
+    }
+    return {};
+}
+
 void Options::usage() const {
     cystructs::Tree<Option*>::iterator iter;
     std::cout << "usage: cygnus [options]\n";
