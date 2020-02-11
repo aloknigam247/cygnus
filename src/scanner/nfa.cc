@@ -30,7 +30,7 @@ void NFA::addPattern(const char* patt) {
     m_patt_list.push_back(patt);
 }
 
-void NFA::compile() {
+void NFA::build() {
     for(auto patt: m_patt_list) {
         std::vector<int> curr;
         std::vector<int> prev;

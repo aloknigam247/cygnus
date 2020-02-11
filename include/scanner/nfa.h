@@ -30,7 +30,7 @@
 class NFA: public FA {
     public:
     void addPattern(const char* patt);
-    void compile();
+    void build();
     int execute(const char* word);
 
     private:
