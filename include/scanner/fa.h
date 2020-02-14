@@ -32,38 +32,36 @@
 
 #include "log.h"
 
-struct StateEntry {
-    struct Transition {
-        char sym;
-        int state_id;
-    };
+struct State {
+    std::vector<int> sym[128];
+    bool finalState;
+    std::string tag;
+};
 
-    std::string tag = "q";
-    bool is_final = false;
-    std::list<Transition> transition_list;
-    StateEntry(): transition_list(0) {}
+struct Metrics {
+    int max_len;
+    int len[129];
+    bool is_filled[129];
 };
 
 class StateTable {
-    const int MAX_ENTRY = 100;
-
     public:
-    StateTable(): state_entry(MAX_ENTRY, nullptr) {}
-    ~StateTable();
     void addEntry(int from, char sym, int to);
     void print() const;
     void printDot(std::ofstream& file) const;
-    void set_final(int i) { state_entry[i]->is_final = true; }
-    StateEntry* get_entry(int i) { return state_entry[i]; }
+    void set_final(int i) { if(i>=row.size()) row.resize(i+1); row[i].finalState = true; }
+    State get_state(int i) { return row[i]; }
 
     private:
-    std::vector<StateEntry*> state_entry;
+    Metrics met;
+    std::vector<State> row;
+    Metrics calcMetrics() const;
 };
 
 class FA {
     public:
     void printTable() const;
-    void printGraph(const char* file_stem = "fa") const;
+    void printDot(const char* file_stem = "fa") const;
 
     protected:
     int addTransition(int from, char sym, int to=-1);

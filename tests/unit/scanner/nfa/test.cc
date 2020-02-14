@@ -14,7 +14,7 @@ void allSupportedPatterns() {
     nfa.addPattern("rRs*Sq?Qp+PD");
     nfa.build();
     nfa.printTable();
-    nfa.printGraph("nfa");
+    nfa.printDot("nfa");
 }
 
 int main() {

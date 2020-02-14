@@ -57,23 +57,3 @@ void NFA::build() {
             get_table().set_final(curr_st);
     }
 }
-
-int NFA::execute(const char* word) {
-    StateEntry* entry = get_table().get_entry(0);
-    bool invalid;
-    for(int i=0; word[i] != '\0'; ++i) {
-        invalid = true;
-        for(auto trans: entry->transition_list) {
-            if(trans.sym == word[i]) {
-                entry = get_table().get_entry(trans.state_id);
-                invalid = false;
-                break;
-            }
-        }
-        if(invalid)
-            return 0;
-    }
-    if(entry->is_final)
-        return 1;
-    return 0;
-}

@@ -31,7 +31,6 @@ class NFA: public FA {
     public:
     void addPattern(const char* patt);
     void build();
-    int execute(const char* word);
 
     private:
     std::vector<const char*> m_patt_list;

@@ -10,14 +10,12 @@ class TestFA : public FA {
             last_state = FA::addTransition(last_state, sym_list[i]);
         }
     }
-
-    private:
 };
 
 void emptyFA() {
     TestFA f;
     f.printTable();
-    f.printGraph("out1");
+    f.printDot("out1");
 }
 
 void printFA() {
@@ -25,7 +23,7 @@ void printFA() {
     f.addTransition("abc", true);
     f.addTransition("xyz", false);
     f.printTable();
-    f.printGraph("out2");
+    f.printDot("out2");
 }
 
 int main() {

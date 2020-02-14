@@ -27,59 +27,133 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
-
-StateTable::~StateTable() {
-    for(auto entry: state_entry)
-        delete entry;
-}
+#include <iomanip>
 
 void StateTable::addEntry(int from, char sym, int to) {
-    if(state_entry[from] == nullptr)
-        state_entry[from] = new StateEntry;
-
-    if(state_entry[from]->tag.size() == 1)
-        state_entry[from]->tag += std::to_string(from);
-
-    state_entry[from]->transition_list.push_back(StateEntry::Transition{sym, to});
-
-    if(state_entry[to] == nullptr) {
-        state_entry[to] = new StateEntry;
-        state_entry[to]->tag += std::to_string(to);
+    if(from >= row.size())
+        row.resize(from+1);
+    if(to >= row.size())
+        row.resize(to+1);
+    row[from].sym[sym].push_back(to);
+    if(row[from].tag.empty()) {
+        row[from].tag += 'q';
+        row[from].tag += std::to_string(from);
+    }
+    if(row[to].tag.empty()) {
+        row[to].tag += 'q';
+        row[to].tag += std::to_string(to);
     }
 }
 
-void StateTable::print() const {
-    std::cout << "index\ttag\tfinal\t(sym,to)...\n";
-    for(std::size_t i=0; i<state_entry.size(); ++i) {
-        if(state_entry[i] != nullptr) {
-            StateEntry* entry = state_entry[i];
-            std::cout << i << '\t';
-            std::cout << entry->tag << '\t' << entry->is_final << '\t';
-            for(auto transition: entry->transition_list) {
-                std::cout << '(' <<transition.sym << ',' << transition.state_id << ')' << '\t';
+Metrics StateTable::calcMetrics() const{
+    Metrics m;
+    int max_len, len, s;
+    m.len[0] = 6;
+    for(auto &a: m.is_filled)
+        a = false;
+
+    for(auto r: row) {
+        if(r.tag.size() > m.len[0])
+            m.len[0] = r.tag.size();
+        len = m.len[0];
+        for(int i=0; i<128; ++i) {
+            s=1;
+            if(!r.sym[i].size())
+                s += 1;
+            else {
+                m.is_filled[i] = true;
+                for(auto a: r.sym[i]) {
+                    s += std::to_string(a).size();
+                }
+                s += r.sym[i].size()-1;
             }
-            std::cout << "\n";
+            if(s>m.len[i])
+                m.len[i] = s;
+            if(m.is_filled[i]) {
+                len += m.len[i];
+            }
         }
+        len += 1;
+        if(len > max_len) max_len = len;
+    }
+
+    m.max_len = max_len;
+
+    return m;
+}
+
+
+template<typename T>
+void col(Metrics& m, int i, T t) {
+    std::cout << '|' << std::setw(m.len[i]-1) << t << std::setw(0);
+}
+
+void line(int len) {
+    for(int i=0; i<len; ++i)
+        std::cout << '-';
+    std::cout << '\n';
+}
+
+void StateTable::print() const {
+    Metrics m = calcMetrics();
+
+    line(m.max_len);
+    col(m, 0, "State");
+    for(int i=32; i<128; ++i) {
+        if(!m.is_filled[i])
+            continue;
+        switch(i) {
+            case 92:
+            case 127:
+                   col(m, i, ' ');
+                   break;
+            default:
+                   col(m, i, char(i));
+        }
+    }
+    std::cout << '|';
+    std::cout << '\n';
+    line(m.max_len);
+    for(auto r: row) {
+        col(m,0,r.tag);
+        for(int i=32; i<128; ++i) {
+            if(!m.is_filled[i])
+                continue;
+            if(!r.sym[i].size()) {
+                col(m, i, ' ');
+            }
+            else {
+                std::string st;
+                for(auto a: r.sym[i]) {
+                    st += std::to_string(a);
+                    st += ',';
+                }
+                st.resize(st.size()-1);
+                col(m,i,st);
+            }
+        }
+        std::cout << "|\n";
+        line(m.max_len);
     }
 }
 
 void StateTable::printDot(std::ofstream& file) const {
-    file << "digraph fa {\n"
+    /*file << "digraph fa {\n"
         << "    rankdir=LR;\n";
-    for(auto entry: state_entry) {
-        if(entry != nullptr) {
-            for(auto transition: entry->transition_list) {
+    for(int r=0; r<100; ++r) {
+        for(int c=0; c<100; ++c) {
+            if(!state_entry[r][c].empty())
                 file << "    {";
-                if(entry->is_final)
+                if(is_final[r])
                     file << "node [shape=doublecircle] ";
                 file << entry->tag << "} -> {";
-                if(state_entry[transition.state_id]->is_final)
+                if(is_final[c])
                     file << "node [shape=doublecircle] ";
                 file << state_entry[transition.state_id]->tag << "} [label=\"" << transition.sym << "\"]\n";
             }
         }
     }
-    file << "}\n";
+    file << "}\n";*/
 }
 
 
@@ -87,8 +161,8 @@ void FA::printTable() const {
     table.print();
 }
 
-void FA::printGraph(const char* file_stem) const {
-    std::ofstream dotfile(file_stem);
+void FA::printDot(const char* file_stem) const {
+    /*std::ofstream dotfile(file_stem);
     table.printDot(dotfile);
     dotfile.close();
 
@@ -99,7 +173,7 @@ void FA::printGraph(const char* file_stem) const {
     command += " > ";
     command += file_stem;
     command += ".png";
-    std::system(command.c_str());
+    std::system(command.c_str());*/
 }
 
 int FA::addTransition(int from, char sym, int to) {
