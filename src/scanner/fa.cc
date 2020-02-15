@@ -31,7 +31,7 @@
 
 void StateTable::addEntry(int from, char sym, int to) {
     if(from >= row.size())
-        row.resize(from+1);
+        row.resize(from+1); // +1 may be wrong
     if(to >= row.size())
         row.resize(to+1);
     row[from].sym[sym].push_back(to);

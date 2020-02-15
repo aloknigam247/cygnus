@@ -50,11 +50,12 @@ class StateTable {
     void print() const;
     void printDot(std::ofstream& file) const;
     void set_final(int i) { if(i>=row.size()) row.resize(i+1); row[i].finalState = true; }
-    State get_state(int i) { return row[i]; }
+    State* get_state(int i) { return &(row[i]); }
+    size_t size() { return row.size(); }
+    std::vector<State> row;
 
     private:
     Metrics met;
-    std::vector<State> row;
     Metrics calcMetrics() const;
 };
 
@@ -62,14 +63,14 @@ class FA {
     public:
     void printTable() const;
     void printDot(const char* file_stem = "fa") const;
+    StateTable get_table() { return table; }
+    StateTable table;
 
     protected:
     int addTransition(int from, char sym, int to=-1);
     int addTransition(const std::vector<int>& from, char sym, int to=-1);
-    StateTable get_table() { return table; }
 
     private:
-    StateTable table;
     int state_id = 0;
 };
 

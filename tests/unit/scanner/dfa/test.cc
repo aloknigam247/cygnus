@@ -15,10 +15,11 @@ void convertNFA2DFA() {
     //nfa.addPattern("*");
     nfa.addPattern("rRs*Sq?Qp+PD");
     nfa.build();
+    nfa.printTable();
 
     DFA dfa = nfa;
-    dfa.printTable;
-    dfa.printGraph("dfa");
+    dfa.printTable();
+    dfa.printDot("dfa");
 }
 
 int main() {
