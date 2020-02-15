@@ -185,7 +185,7 @@ main() {
     sanitizationReport
     styleReport
     docsReport
-    exit $EXITCODE
+    #exit $EXITCODE
 }
 
 main $@
