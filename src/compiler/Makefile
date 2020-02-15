@@ -6,7 +6,7 @@ export INCLUDE_DIR += -I . \
 SRC_FILES = $(wildcard *.cc)
 DEP_FILES = $(addprefix $(DEP)/,$(SRC_FILES:.cc=.d))
 
-base: $(DEP) $(OBJ) $(DEP_FILES) build
+compiler: $(DEP) $(OBJ) $(DEP_FILES) build
 
 $(DEP) $(OBJ):
 	$Qmkdir -p $@

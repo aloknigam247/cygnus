@@ -1,4 +1,4 @@
-MODULES := base
+MODULES := base compiler
 
 .PHONY: $(MODULES)
 
