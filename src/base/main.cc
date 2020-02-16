@@ -1,7 +1,7 @@
 /************************************************************************************
  * MIT License                                                                      *
  *                                                                                  *
- * Copyright (c) 2019 Alok Nigam                                                    *
+ * Copyright (c) 2020 Alok Nigam                                                    *
  *                                                                                  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy     *
  * of this software and associated documentation files (the "Software"), to deal    *
@@ -23,9 +23,12 @@
  ************************************************************************************/
 
 #include "options.h"
-
+#include "log.h"
 int main(const int argc, const char* argv[]) {
     Options opt;
+    opt.addOption("-v", Option::BOOL, "version");
     opt.parse(argc, argv);
+    if(opt.isSet("-v"))
+        std::cout << "Cygnus 1.0-alpha\n";
     return 0;
 }

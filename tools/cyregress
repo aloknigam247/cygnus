@@ -4,6 +4,7 @@ source $CYGNUS_HOME/tools/funcs.bash    # source common functions
 
 declare -a valid_list
 declare -a valid_tests
+declare -a fail_list
 
 # DEFAULTS
 declare OUT_DIR='test_run'
@@ -86,8 +87,8 @@ runTest() {
     local status=0
     declare -A DIFFS
     if [[ $test =~ func.*cyt ]]; then
-        local testcase=$(echo $test | egrep -o "func.*cyt")
-        local testcase_dir=${test%/$testcase}
+        local testcase_dir=${test%/func*cyt}
+        local testcase=${test#$testcase_dir/}
         FUNC_COUNT=$((FUNC_COUNT + 1))
         makeRunDir $testcase_dir $testcase
         cd $OUT_DIR/`dirname $testcase`
@@ -95,8 +96,8 @@ runTest() {
         source `basename $1`
         runFuncTest $testcase || status=1
     else
-        local testcase=$(echo $test | egrep -o "unit.*cyt")
-        local testcase_dir=${test%/$testcase}
+        local testcase_dir=${test%/unit*cyt}
+        local testcase=${test#$testcase_dir/}
         UNIT_COUNT=$((UNIT_COUNT + 1))
         makeRunDir $testcase_dir $testcase
         cd $OUT_DIR/`dirname $testcase`
@@ -121,6 +122,7 @@ runTest() {
     else
         echo "status: FAIL"
         fail_cnt=$((fail_cnt + 1))
+        fail_list+=($testcase)
     fi
 
     case $TEST_MODE in
@@ -169,9 +171,9 @@ main() {
     done
     echo -e "\nGenerated Testcase: $tc_cnt"
 
-    #############
+    #-----------#
     # Pre Run   #
-    #############
+    #-----------#
     case $TEST_MODE in
         coverage)
             CYGNUS=$CYGNUS_HOME/build/bin/coverage/cygnus-coverage
@@ -207,22 +209,18 @@ main() {
     mkdir -p reports/func reports/unit
     export fail_cnt=0
 
-    #############
+    #-----------#
     #    Run    #
-    #############
+    #-----------#
     for test in $valid_tests; do
         ret=0
         echo
         runTest $test
     done
-    echo -e "\nSummary:"
-    echo "    RUN:  $tc_cnt"
-    echo "    PASS: $((tc_cnt - fail_cnt))"
-    echo "    FAIL: $fail_cnt"
 
-    #############
+    #-----------#
     # Post Run  #
-    #############
+    #-----------#
     case $TEST_MODE in
         coverage)
             if [[ $FUNC_COUNT -gt 0 ]]; then
@@ -294,6 +292,20 @@ main() {
             ;;
         *)
     esac
+
+    #---------#
+    # Summary #
+    #---------#
+    if [[ ${#fail_list} ]]; then
+        echo -e "\nFAILED:"
+        for fail in ${fail_list[@]}; do
+            echo "$fail"
+        done
+    fi
+    echo -e "\nSummary:"
+    echo "    RUN:  $tc_cnt"
+    echo "    PASS: $((tc_cnt - fail_cnt))"
+    echo "    FAIL: $fail_cnt"
     } | TEE logs/cyregress${TEST_MODE:+-$TEST_MODE}.log
     return 0
 }

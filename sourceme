@@ -1,4 +1,8 @@
-rPath=`pwd`/$BASH_SOURCE
+if [[ $BASH_SOURCE =~ ^/ ]]; then
+    rPath=$BASH_SOURCE
+else
+    rPath=`pwd`/$BASH_SOURCE
+fi
 
 export CYGNUS_HOME=$(dirname $(realpath $rPath))
 

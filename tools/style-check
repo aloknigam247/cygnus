@@ -6,7 +6,7 @@ import argparse
 import re
 import sys
 
-#--------------------------------------------------------------------------------------------------
+#----------------------- Class Args -----------------------#
 class Args:
     __parser = argparse.ArgumentParser()
 
@@ -20,6 +20,7 @@ class Args:
     def parse(self):
         return self.__parser.parse_args()
 
+#----------------------- Class Error -----------------------#
 class Error:
     def __init__(self, desc, file, line=None, lineno=None, begin=-1, len=0):
         self.desc = desc
@@ -44,6 +45,7 @@ class Error:
                     print('~'*self.len, end = '')
                 print('')
 
+#----------------------- Class StylePattern -----------------------#
 class StylePattern:
     space=' +'
     type_qualifier='(const|static) +'
@@ -57,6 +59,7 @@ class StylePattern:
     param='('+var_root+'('+comma_sep+')*'+')'
     function_type=type+any_name+' *'+'\('+param+'*\)'
 
+#----------------------- Class StyleGuide -----------------------#
 class StyleGuide:
     lower_camel_case='[a-z]+[a-zA-Z]*'
     upper_camel_case='[A-Z][a-zA-Z]*'
@@ -67,21 +70,21 @@ class StyleGuide:
     func_name='('+lower_camel_case+')|((get_|set_)'+var_name+')'
     type='('+StylePattern.type_qualifier+')?'+type_name+type_mod+' *'
 
-#--------------------------------------------------------------------------------------------------
+#----------------------- collectFiles() -----------------------#
 def collectFiles(dir, ext):
     cc_list = []
     for file in Path(dir).glob('**/*.' + ext):
         cc_list.append(file)
     return cc_list
 
-#--------------------------------------------------------------------------------------------------
+#----------------------- Rule checkLicense -----------------------#
 def checkLicense(file):
     error_list=[]
     lic="""\
 /************************************************************************************
  * MIT License                                                                      *
  *                                                                                  *
- * Copyright (c) 2019 Alok Nigam                                                    *
+ * Copyright (c) 2020 Alok Nigam                                                    *
  *                                                                                  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy     *
  * of this software and associated documentation files (the "Software"), to deal    *
@@ -113,6 +116,7 @@ def checkLicense(file):
 
     return error_list
 
+#----------------------- Rule checkFuncNames -----------------------#
 def checkFuncNames(file):
     error_list=[]
     lineno=0
@@ -192,6 +196,7 @@ def checkFuncNames(file):
 
     return error_list
 
+#----------------------- Rule checkBraceStyle -----------------------#
 def checkBraceStyle(file):
     error_list = []
     lineno=0
@@ -224,6 +229,7 @@ def checkBraceStyle(file):
 
     return error_list
 
+#----------------------- Rule checkLineLength -----------------------#
 def checkLineLength(file):
     error_list = []
     lineno=0
@@ -240,6 +246,7 @@ def checkLineLength(file):
                         )
     return error_list
 
+#----------------------- Rule checkSpaces -----------------------#
 def checkSpaces(file):
     error_list = []
     lineno=0
@@ -288,35 +295,30 @@ def checkSpaces(file):
                         )
     return error_list
 
-#--------------------------------------------------------------------------------------------------
-def main():
-    args = Args()
-    opt = args.parse()
+#----------------------- main() -----------------------#
+args = Args()
+opt = args.parse()
 
-    ccList = []
-    hList = []
+ccList = []
+hList = []
 
-    common_rule_list = [
-                        checkLicense,
-                        checkBraceStyle,
-                        checkFuncNames,
-                        checkLineLength,
-                        checkSpaces
-                        ]
+common_rule_list = [
+                    checkLicense,
+                    checkBraceStyle,
+                    checkFuncNames,
+                    checkLineLength,
+                    checkSpaces
+                    ]
 
-    for dir in opt.dir:
-        ccList += (collectFiles(dir, "cc"))
-        ccList += (collectFiles(dir, "tcc"))
-        hList += (collectFiles(dir, "h"))
+for dir in opt.dir:
+    ccList += (collectFiles(dir, "cc"))
+    ccList += (collectFiles(dir, "tcc"))
+    hList += (collectFiles(dir, "h"))
 
-    for file in ccList+hList:
-        for rule in common_rule_list:
-            for error in rule(file):
-                error.show()
-
-if __name__ == "__main__":
-    ret = main()
-    sys.exit(ret)
+for file in ccList+hList:
+    for rule in common_rule_list:
+        for error in rule(file):
+            error.show()
 
 # TODO: rule to check }; ends with /* class|struct|namespace <name> */
 # TODO: check tabs in source code
