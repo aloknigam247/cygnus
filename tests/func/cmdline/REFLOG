@@ -1,9 +1,13 @@
 |CASE 1| cygnus
 
-|CASE 2| cygnus -h
+|CASE 2| cygnus -v
+>   Cygnus 1.0-alpha
+
+|CASE 3| cygnus -h
 >   usage: cygnus [options]
 >       -h: print help message
+>       -v: version
 
-|CASE 3| cygnus -a abc
+|CASE 4| cygnus -a abc
 >   |WARN| ignoring unknown option -a
 

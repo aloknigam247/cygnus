@@ -1,7 +1,7 @@
 /************************************************************************************
  * MIT License                                                                      *
  *                                                                                  *
- * Copyright (c) 2019 Alok Nigam                                                    *
+ * Copyright (c) 2020 Alok Nigam                                                    *
  *                                                                                  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy     *
  * of this software and associated documentation files (the "Software"), to deal    *
@@ -46,9 +46,9 @@
  * Represents single option and is supposed to handle one option at a time
  */
 class Option {
+    public:
     union Value;
 
-    public:
     /**
      * @enum Type
      * Option types
@@ -73,7 +73,14 @@ class Option {
      * @param[in] help help of option
      */
     Option(const std::string& name, Type type, const std::string& help) :
-        m_name(name), m_help(help), m_type(type), m_value() {}
+        is_set(false), m_name(name), m_help(help), m_type(type), m_value() {}
+
+    /**
+     * Tells if options is set
+     *
+     * @return true if option set
+     */
+    bool isSet() { return is_set; }
 
     /**
      * Get help
@@ -101,21 +108,21 @@ class Option {
      *
      * @returns bool value
      */
-    bool  get_bool_value() const { return m_value.b; }
+    bool get_bool_value() const { return m_value.b; }
 
     /**
      * Get char value
      *
      * @returns char value
      */
-    char  get_char_value() const { return m_value.c; }
+    char get_char_value() const { return m_value.c; }
 
     /**
      * Get int value
      *
      * @returns int value
      */
-    int   get_int_value() const { return m_value.i; }
+    int get_int_value() const { return m_value.i; }
 
     /**
      * Get string value
@@ -129,28 +136,28 @@ class Option {
      *
      * @param[in] value bool value
      */
-    void set_value(const bool value) { m_value.b = value; }
+    void set_value(const bool value) { is_set = true; m_value.b = value; }
 
     /**
      * Set char value
      *
      * @param[in] value char value
      */
-    void set_value(const char value) { m_value.c = value; }
+    void set_value(const char value) { is_set = true; m_value.c = value; }
 
     /**
      * Set int value
      *
      * @param[in] value int value
      */
-    void set_value(const int value) { m_value.i = value; }
+    void set_value(const int value) { is_set = true; m_value.i = value; }
 
     /**
      * Set string value
      *
      * @param[in] value string value
      */
-    void set_value(const char* value) { m_value.s = value; }
+    void set_value(const char* value) { is_set = true; m_value.s = value; }
 
     /**
      * Operator>
@@ -166,7 +173,7 @@ class Option {
      * @param[in] opt string to compare
      * @returns true if Option name is greater than string on the right
      */
-    bool operator>(const char* opt) { return m_name > opt; }
+    bool operator>(const std::string& opt) { return m_name > opt; }
 
     /**
      * Operator==
@@ -174,16 +181,15 @@ class Option {
      * @param[in] opt Option to compare
      * @returns true if both options are equal
      */
-    bool operator==(const char* opt) { return m_name == opt; }
+    bool operator==(const std::string& opt) { return m_name == opt; }
 
-    private:
     /**
      * @union Value
      *
      * Stores value of different types in a single union
      */
     union Value {
-        bool b;
+        bool b; /* TODO: obsolete */
         char c;
         int i;
         const char* s;
@@ -192,8 +198,16 @@ class Option {
          * Default constructor
          */
         Value() : s(nullptr) {}
+        explicit Value(bool m_b) : b(m_b) {}
+        explicit Value(char m_c) : c(m_c) {}
+        explicit Value(int m_i) : i(m_i) {}
+        explicit Value(const char* m_s) : s(m_s) {}
+
+        explicit operator int() { return i; }
     };
 
+    private:
+    bool is_set;
     const std::string m_name, m_help;
     const Type m_type;
     Value m_value;
@@ -240,6 +254,16 @@ class Options {
      * @returns true if command line is parsed without error
      */
     bool parse(int argc, const char* argv[]);
+
+    /**
+     * Tells if option is set
+     *
+     * @param[in] opt_name name of option
+     * @returns true if option is set
+     */
+    bool isSet(const std::string& opt_name);
+
+    Option::Value get_value(const std::string& opt_name);
 
     /**
      * Get positional arguments

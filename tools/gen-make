@@ -5,7 +5,7 @@ import os
 import subprocess
 import sys
 
-######################## CLASS ########################
+#----------------------- Class IO -----------------------#
 class IO:
     tag_id = {
                 "C":"CMD",      # Command tag
@@ -32,6 +32,7 @@ class IO:
     def fileAppend(fd, msg, line_end='\n'):
         print(msg, end=line_end, file=fd)
 
+#----------------------- Class Args -----------------------#
 class Args:
     __parser = argparse.ArgumentParser()
 
@@ -45,7 +46,7 @@ class Args:
         return self.__parser.parse_args()
 
 
-######################### FUNCTIONS ########################
+#----------------------- Class Rules -----------------------#
 class Rules:
     src_list = []
     inc_list = []
@@ -129,51 +130,47 @@ class Rules:
                 self.write(' '.join(self.allDepends(inc)), ' ')
             self.write('\n\t$(CY_COMP) -c -o $@ $<\n')
 
-######################## MAIN ########################
-def main():
-    args = Args()
-    opt = args.parse()
+#----------------------- Main() -----------------------#
+args = Args()
+opt = args.parse()
 
-    os.chdir(opt.cDir)
-    target = "test"
+os.chdir(opt.cDir)
+target = "test"
 
-    rule = Rules()
-    rule.src_list = opt.srcDir
-    rule.inc_list = opt.incDir
-    rule.makefile = open('Makefile', 'w')
-    rule.write("############# Configs #############")
-    
-    # Print Makefile
-    rule.write("CXX     = g++\n" +
-                "COMP_FLAGS = -std=c++11 -fdiagnostics-color\n"+
-                "CY_COMP    = $(CXX) $(COMP_FLAGS) $(INC)\n\n" +
-                "INC := ", '')
-    for i in opt.incDir:
-        rule.write(" \\\n    -I " + i, '')
-    rule.write('\n')
+rule = Rules()
+rule.src_list = opt.srcDir
+rule.inc_list = opt.incDir
+rule.makefile = open('Makefile', 'w')
+rule.write("#------------ Configs ------------#")
 
-    rule.write("OBJ_COMMON := " + os.path.relpath("obj", os.getcwd()[os.getcwd().rfind("unit/")+5:]) + "\n" +
-                "OBJ_LOCAL  := obj\n\n" +
-                "############# Targets #############\n" +
-                "all: $(OBJ_COMMON) $(OBJ_LOCAL) " + target + "\n\n" +
-                "$(OBJ_COMMON) $(OBJ_LOCAL):\n" +
-                "\tmkdir -p $@\n\n" +
-                "coverage: CXX = g++-7\n" +
-                "coverage: COMP_FLAGS += --coverage\n" +
-                "coverage: all\n\n" +
-                "mem-check: COMP_FLAGS += -g\n" +
-                "mem-check: all\n\n" +
-                "perf: COMP_FLAGS += -g\n" +
-                "perf: all\n\n" +
-                "sanitize: COMP_FLAGS += -g -D_FORTIFY_SOURCE=2 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow -fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error\n" +
-                "sanitize: all\n")
+# Print Makefile
+rule.write("CXX     = g++\n" +
+            "COMP_FLAGS = -std=c++11 -fdiagnostics-color\n"+
+            "CY_COMP    = $(CXX) $(COMP_FLAGS) $(INC)\n\n" +
+            "INC := ", '')
+for i in opt.incDir:
+    rule.write(" \\\n    -I " + i, '')
+rule.write('\n')
 
-    rule.createRule(opt.file)
-    rule.write(target + ": " + ' '.join(rule.obj_list))
-    rule.write("\t$(CY_COMP) -o $@ $^")
-    rule.write("\nclean: " + ' '.join(rule.obj_list))
-    rule.write("\t rm -f $^")
+rule.write("OBJ_COMMON := " + os.path.relpath("obj", os.getcwd()[os.getcwd().rfind("unit/")+5:]) + "\n" +
+            "OBJ_LOCAL  := obj\n\n" +
+            "#------------ Targets ------------#\n" +
+            "all: $(OBJ_COMMON) $(OBJ_LOCAL) " + target + "\n\n" +
+            "$(OBJ_COMMON) $(OBJ_LOCAL):\n" +
+            "\tmkdir -p $@\n\n" +
+            "coverage: CXX = g++-7\n" +
+            "coverage: COMP_FLAGS += --coverage\n" +
+            "coverage: all\n\n" +
+            "debug: COMP_FLAGS += -g\n" +
+            "debug: all\n\n" +
+            "mem-check: debug\n\n" +
+            "perf: COMP_FLAGS += -g\n" +
+            "perf: all\n\n" +
+            "sanitize: COMP_FLAGS += -g -D_FORTIFY_SOURCE=2 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow -fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error\n" +
+            "sanitize: all\n")
 
-if __name__ == "__main__":
-    ret = main()
-    sys.exit(ret)
+rule.createRule(opt.file)
+rule.write(target + ": " + ' '.join(rule.obj_list))
+rule.write("\t$(CY_COMP) -o $@ $^")
+rule.write("\nclean: " + ' '.join(rule.obj_list))
+rule.write("\t rm -f $^")
