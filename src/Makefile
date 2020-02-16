@@ -1,4 +1,4 @@
-MODULES := base compiler
+MODULES := base compiler scanner
 
 .PHONY: $(MODULES)
 
