@@ -1,6 +1,7 @@
 export INCLUDE_DIR += -I . \
 	-I ../../include/base \
 	-I ../../include/compiler \
+	-I ../../include/scanner \
 	-I tcc
 
 SRC_FILES = $(wildcard *.cc)
