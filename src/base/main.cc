@@ -23,6 +23,7 @@
  ************************************************************************************/
 
 #include "options.h"
+#include "cycompile.h"
 #include "log.h"
 int main(const int argc, const char* argv[]) {
     Options opt;
@@ -30,5 +31,11 @@ int main(const int argc, const char* argv[]) {
     opt.parse(argc, argv);
     if(opt.isSet("-v"))
         std::cout << "Cygnus 1.0-alpha\n";
+
+    const std::vector<std::string> &pos = opt.get_positional();
+
+    Log::i("File: ", pos.front());
+
+    CyCompile compile(pos.front());
     return 0;
 }

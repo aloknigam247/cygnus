@@ -1,8 +1,10 @@
-#include "nfa.h"
-
 #include "cytest.h"
 
-void allSupportedPatterns() {
+#include "nfa.h"
+
+#include "dfa.h"
+
+void convertNFA2DFA() {
     NFA nfa;
     nfa.addPattern("r");
     nfa.addPattern("p+");
@@ -14,11 +16,14 @@ void allSupportedPatterns() {
     nfa.addPattern("rRs*Sq?Qp+PD");
     nfa.build();
     nfa.printTable();
-    nfa.printDot("nfa");
+
+    DFA dfa = nfa;
+    dfa.printTable();
+    dfa.printDot("dfa");
 }
 
 int main() {
     cytest::Testcase testcase;
-    testcase.add(allSupportedPatterns);
+    testcase.add(convertNFA2DFA);
     testcase.run();
 }

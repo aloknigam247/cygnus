@@ -23,7 +23,7 @@
  ************************************************************************************/
 
 #include "cylex.h"
-
+#include "dfa.h"
 #include "log.h"
 
 void CyLex::addPattern(const char* patt) {
@@ -34,14 +34,25 @@ void CyLex::readFile(const char* file_name) {
     file.open(file_name);
 }
 
-void CyLex::analyse() {
-    std::string word;
-    lex_fa.compile();
-    while(file >> word) {
-        Log::d("word: ", word);
-        if(lex_fa.execute(word.c_str()) != 0)
-            Log::d("M");
-        else
-            Log::d("U");
+ void CyLex::analyse() {
+    std::string line, word;
+    lex_fa.build();
+    DFA dfa(lex_fa);
+    while(std::getline(file, line)) {
+        int b=0, e;
+        for(int i = 0; i<line.size(); ++i) {
+            if(line[i] == ' ') {
+                e = i;
+                std::string word = line.substr(b, e-b);
+                if(dfa.execute(word.c_str())) {
+                    std::cout << line << '\n';
+                    break;
+                }
+                b = e+1;
+            }
+        }
+        std::string word = line.substr(b);
+        if(dfa.execute(word.c_str()))
+            std::cout << line << '\n';
     }
 }
