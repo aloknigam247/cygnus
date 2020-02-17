@@ -30,9 +30,12 @@ int main(const int argc, const char* argv[]) {
     opt.addOption("-v", Option::BOOL, "version");
     opt.parse(argc, argv);
     if(opt.isSet("-v"))
-        std::cout << "Cygnus 1.0-alpha\n";
+        std::cout << "Cygnus v1.0.0-alpha\n";
 
     const std::vector<std::string> &pos = opt.get_positional();
+
+    if(pos.empty())
+        return 0;
 
     Log::i("File: ", pos.front());
 
