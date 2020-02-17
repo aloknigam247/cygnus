@@ -49,7 +49,7 @@ class StateTable {
     void addEntry(int from, char sym, int to);
     void print() const;
     void printDot(std::ofstream& file) const;
-    void set_final(int i) { if(i>=row.size()) row.resize(i+1); row[i].finalState = true; }
+    void set_final(int i) { if(i>=row.size()) row.resize(i+1); row[i].finalState = true;}
     State* get_state(int i) { return &(row[i]); }
     size_t size() { return row.size(); }
     std::vector<State> row;
@@ -63,7 +63,7 @@ class FA {
     public:
     void printTable() const;
     void printDot(const char* file_stem = "fa") const;
-    StateTable get_table() { return table; }
+    StateTable& get_table() { return table; }
     StateTable table;
 
     protected:

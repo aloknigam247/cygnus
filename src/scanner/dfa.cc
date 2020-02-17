@@ -25,3 +25,19 @@ DFA::DFA(NFA nfa) {
         }
     }
 }
+
+bool DFA::execute(const char* word) {
+    State curr = table.row[0];
+
+    for(int i=0; word[i]!='\0'; ++i) {
+        std::vector<int> n_state = curr.sym[word[i]];
+        if(n_state.empty())
+            return false;
+
+        curr = table.row[n_state.front()];
+    }
+
+    if(curr.finalState)
+        return true;
+    return false;
+}

@@ -34,7 +34,7 @@ int main(const int argc, const char* argv[]) {
 
     const std::vector<std::string> &pos = opt.get_positional();
 
-    Log::d("File: ", pos.front());
+    Log::i("File: ", pos.front());
 
     CyCompile compile(pos.front());
     return 0;

@@ -115,7 +115,15 @@ void StateTable::print() const {
     std::cout << '\n';
     line(m.max_len);
     for(auto r: row) {
-        col(m,0,r.tag);
+        if(r.finalState) {
+            std::string s;
+            s = '(';
+            s+= r.tag;
+            s += ')';
+            col(m, 0, s);
+        }
+        else
+            col(m,0,r.tag);
         for(int i=32; i<128; ++i) {
             if(!m.is_filled[i])
                 continue;

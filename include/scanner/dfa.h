@@ -6,6 +6,7 @@
 class DFA: public FA {
     public:
         DFA(NFA nfa);
+        bool execute(const char* word);
 };
 
 #endif
