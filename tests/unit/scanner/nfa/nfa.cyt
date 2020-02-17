@@ -1,0 +1,5 @@
+DIFFS=(
+        ['REFLOG']='TESTLOG'
+        ['regex.png']='nfa.png'
+    )
+

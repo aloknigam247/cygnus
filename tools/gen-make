@@ -1,0 +1,176 @@
+#!/usr/bin/python3.7
+
+import argparse
+import os
+import subprocess
+import sys
+
+#----------------------- Class IO -----------------------#
+class IO:
+    tag_id = {
+                "C":"CMD",      # Command tag
+                "E":"ERROR",    # Error tag
+                "F":"FAIL",     # Fail tag
+                "I":"INFO",     # Info tag
+                "W":"WARN"      # Warning tag
+            }
+
+    @staticmethod
+    def log(mode, msg):
+        tag = IO.tag_id.get(mode)
+        if(tag == None):
+            raise Exception("unknown mode \`" + mode + "' specified")
+        
+        print("|%s| %s" %(tag, msg))
+
+    @staticmethod
+    def cmdOut(msg):
+        for line in msg.split('\n'):
+            print(" >  " + line)
+
+    @staticmethod
+    def fileAppend(fd, msg, line_end='\n'):
+        print(msg, end=line_end, file=fd)
+
+#----------------------- Class Args -----------------------#
+class Args:
+    __parser = argparse.ArgumentParser()
+
+    def __init__(self):
+        self.__parser.add_argument("file", help="genrate Makefile for this file")
+        self.__parser.add_argument("-d", dest="cDir", metavar="dir", default=".", help="alternate location of file if not current directory")
+        self.__parser.add_argument("-i", dest="incDir", metavar="dir", action="append", help="path of include directory")
+        self.__parser.add_argument("-s", dest="srcDir", metavar="dir", action="append", help="path to source directory")
+
+    def parse(self):
+        return self.__parser.parse_args()
+
+
+#----------------------- Class Rules -----------------------#
+class Rules:
+    src_list = []
+    inc_list = []
+    obj_list = []
+    node = {}
+    makefile = ''
+
+    def write(self, msg, end='\n'):
+        IO.fileAppend(self.makefile, msg, end)
+
+    def allIncludes(self, file):
+        includes = []
+        for line in open(file, 'r').readlines():
+            if(line.startswith("#include") and len(line.split('"')) > 1):
+                f = self.findFile(line.split('"')[1])
+                if(f):
+                    includes.append(f)
+        return includes
+
+    def allDepends(self, file):
+        l = [file]
+        try:
+            for dep in self.node[file]:
+                l += self.allDepends(dep)
+        finally:
+            return l
+
+    def findFile(self, file):
+        if(os.path.exists(file)):
+            return file
+        elif(file.endswith(".cc")):
+            lookup = self.src_list
+        else:
+            lookup = self.inc_list
+        if(not lookup):
+            return None
+        for dir in lookup:
+            if(os.path.exists(dir + '/' + file)):
+                return dir + '/' + file
+        #IO.log('W', "included file " + file + " does not exist")
+        return None
+
+    def h2cc(self, h_file):
+        cc = os.path.basename(h_file).replace(".h", ".cc")
+        cc_file = self.findFile(cc)
+        if(cc_file):
+            return cc_file
+        return None
+
+    def cc2o(self, file):
+        obj_dir = '$(OBJ_LOCAL)'
+        for src in self.src_list:
+            if(file.startswith(src)):
+                obj_dir = '$(OBJ_COMMON)'
+        dot_o = obj_dir + '/' + os.path.basename(file).replace(".cc", ".o")
+        return dot_o
+
+    def createRule(self, file):
+        if(file in self.node):
+            return None
+        if(not file):
+            return None
+        incs = self.allIncludes(file)
+        if(incs):
+            self.node[file] = incs
+        ret_list = set()
+        for inc in incs:
+            ret = self.createRule(inc)
+
+        if(file.endswith(".h")):
+            src = self.h2cc(file)
+            if(src):
+                ret = self.createRule(src)
+                if(ret):
+                    ret_list.union(ret)
+        elif(file.endswith(".cc")):
+            dot_o = self.cc2o(file)
+            self.obj_list.append(dot_o)
+            self.write(dot_o + ": " + file + ' ', '')
+            for inc in incs:
+                self.write(' '.join(self.allDepends(inc)), ' ')
+            self.write('\n\t$(CY_COMP) -c -o $@ $<\n')
+
+#----------------------- Main() -----------------------#
+args = Args()
+opt = args.parse()
+
+os.chdir(opt.cDir)
+target = "test"
+
+rule = Rules()
+rule.src_list = opt.srcDir
+rule.inc_list = opt.incDir
+rule.makefile = open('Makefile', 'w')
+rule.write("#------------ Configs ------------#")
+
+# Print Makefile
+rule.write("CXX     = g++\n" +
+            "COMP_FLAGS = -std=c++11 -fdiagnostics-color\n"+
+            "CY_COMP    = $(CXX) $(COMP_FLAGS) $(INC)\n\n" +
+            "INC := ", '')
+for i in opt.incDir:
+    rule.write(" \\\n    -I " + i, '')
+rule.write('\n')
+
+rule.write("OBJ_COMMON := " + os.path.relpath("obj", os.getcwd()[os.getcwd().rfind("unit/")+5:]) + "\n" +
+            "OBJ_LOCAL  := obj\n\n" +
+            "#------------ Targets ------------#\n" +
+            "all: $(OBJ_COMMON) $(OBJ_LOCAL) " + target + "\n\n" +
+            "$(OBJ_COMMON) $(OBJ_LOCAL):\n" +
+            "\tmkdir -p $@\n\n" +
+            "coverage: CXX = g++-7\n" +
+            "coverage: COMP_FLAGS += --coverage\n" +
+            "coverage: all\n\n" +
+            "debug: COMP_FLAGS += -g\n" +
+            "debug: all\n\n" +
+            "mem-check: debug\n\n" +
+            "perf: COMP_FLAGS += -g\n" +
+            "perf: all\n\n" +
+            "sanitize: COMP_FLAGS += -g -D_FORTIFY_SOURCE=2 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow -fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error\n" +
+            "sanitize: all\n")
+
+rule.createRule(opt.file)
+rule.write(target + ": " + ' '.join(rule.obj_list))
+rule.write("\t$(CY_COMP) -o $@ $^")
+rule.write("\nclean: " + ' '.join(rule.obj_list))
+rule.write("\t rm -f $^")

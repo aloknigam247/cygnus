@@ -1,0 +1,326 @@
+#!/usr/bin/python3.7
+
+from pathlib import Path
+
+import argparse
+import re
+import sys
+
+#----------------------- Class Args -----------------------#
+class Args:
+    __parser = argparse.ArgumentParser()
+
+    def __init__(self):
+        self.__parser.add_argument("dir", 
+                metavar="dir",
+                default=".",
+                nargs='+',
+                help="directory to scan for source files")
+
+    def parse(self):
+        return self.__parser.parse_args()
+
+#----------------------- Class Error -----------------------#
+class Error:
+    def __init__(self, desc, file, line=None, lineno=None, begin=-1, len=0):
+        self.desc = desc
+        self.file = file
+        self.line = line
+        self.lineno = lineno
+        self.begin = 4+begin
+        self.len = len-1
+
+    def show(self):
+        print(self.file, end = ':')
+        if(self.lineno):
+            print(self.lineno, end = ':')
+            if(self.begin > 3):
+                print(self.begin - 3, end = ':')
+        print(' error: ' + self.desc)
+        if(self.line):
+            print(' '*4 + self.line)
+            if(self.begin > 3):
+                print(' '*self.begin + '^', end = '')
+                if(self.len > 0):
+                    print('~'*self.len, end = '')
+                print('')
+
+#----------------------- Class StylePattern -----------------------#
+class StylePattern:
+    space=' +'
+    type_qualifier='(const|static) +'
+    type_name='[a-zA-Z]+'
+    type_mod='( +\*+|\*+ +| +&|& +| +)'
+    type='('+type_qualifier+')?'+type_name+type_mod
+    any_name=r'[a-zA-Z_]+'
+    array='\[\d*]'
+    comma_sep=r' *, *'
+    var_root=type+any_name+'('+array+')?'
+    param='('+var_root+'('+comma_sep+')*'+')'
+    function_type=type+any_name+' *'+'\('+param+'*\)'
+
+#----------------------- Class StyleGuide -----------------------#
+class StyleGuide:
+    lower_camel_case='[a-z]+[a-zA-Z]*'
+    upper_camel_case='[A-Z][a-zA-Z]*'
+    snake_case='[a-z][a-z_]*'
+    type_name='([a-z]*|'+upper_camel_case+')'
+    type_mod='(\*+ +|& +)?'
+    var_name='[a-z_]+'
+    func_name='('+lower_camel_case+')|((get_|set_)'+var_name+')'
+    type='('+StylePattern.type_qualifier+')?'+type_name+type_mod+' *'
+
+#----------------------- collectFiles() -----------------------#
+def collectFiles(dir, ext):
+    cc_list = []
+    for file in Path(dir).glob('**/*.' + ext):
+        cc_list.append(file)
+    return cc_list
+
+#----------------------- Rule checkLicense -----------------------#
+def checkLicense(file):
+    error_list=[]
+    lic="""\
+/************************************************************************************
+ * MIT License                                                                      *
+ *                                                                                  *
+ * Copyright (c) 2020 Alok Nigam                                                    *
+ *                                                                                  *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy     *
+ * of this software and associated documentation files (the "Software"), to deal    *
+ * in the Software without restriction, including without limitation the rights     *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell        *
+ * copies of the Software, and to permit persons to whom the Software is            *
+ * furnished to do so, subject to the following conditions:                         *
+ *                                                                                  *
+ * The above copyright notice and this permission notice shall be included in all   *
+ * copies or substantial portions of the Software.                                  *
+ *                                                                                  *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR       *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,         *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE      *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER           *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,    *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE    *
+ * SOFTWARE.                                                                        *
+ ************************************************************************************/\
+""".split('\n')
+    lineno=0
+    for line in open(file, 'r').read().splitlines():
+        lineno = lineno+1
+        if(lineno >= len(lic)):
+            break
+        if(lic[lineno-1] != line):
+            error_list.append(Error("LICENSE is missing", file))
+            break
+
+    return error_list
+
+#----------------------- Rule checkFuncNames -----------------------#
+def checkFuncNames(file):
+    error_list=[]
+    lineno=0
+    for line in open(file, 'r').read().splitlines():
+        lineno=lineno+1
+        # Checks in function prototype
+        func_proto_iter = re.finditer(StylePattern.function_type, line)
+        for func_proto in func_proto_iter:  # 1 iter for one function
+            param_start_pos = func_proto.start()
+            func_temp = re.search(' *\(', func_proto.group(0))
+
+            # Check function return type
+            return_type = re.search(StylePattern.type, func_proto.group(0)[:func_temp.start()])
+            if(not re.fullmatch(StyleGuide.type, return_type.group(0))):
+                error_list.append(Error("function return type should be like <type>(*|&| )",
+                                file,
+                                line,
+                                lineno,
+                                func_proto.start() + return_type.start(),
+                                len(return_type.group(0))
+                                )
+                            )
+
+            # Check function name
+            func_name_start = return_type.end()
+            func_name = return_type.string[func_name_start:]
+            if(not re.fullmatch(StyleGuide.func_name, func_name)):
+                error_list.append(Error("func name is not in lower camel case",
+                                file,
+                                line,
+                                lineno,
+                                func_proto.start() + func_name_start,
+                                len(func_name)
+                                )
+                            )
+
+            # Check parameter
+            param_dec_iter = re.finditer('\('+StylePattern.param+'+\)', func_proto.group(0))
+            for param_dec in param_dec_iter:
+                param_list = param_dec.group(0)[1:-1]
+                param_start_pos += param_dec.start()+1
+                for param in param_list.split(','):
+                    # Check paramter type
+                    param_type = re.search(StylePattern.type, param)
+                    if(not re.fullmatch(StyleGuide.type, param_type.group(0))):
+                        error_list.append(Error("parameter type should be like <type>(*|&| )",
+                                        file,
+                                        line,
+                                        lineno,
+                                        param_start_pos+param_type.start()+1,
+                                        len(param_type.group(0))
+                                        )
+                                    )
+
+                    # Check paramter name
+                    # TODO: add rule to check pi_ is with const
+                    param_name = param[param_type.end():].replace('[','').replace(']','')
+                    #if(not re.match('pi_|po_|pio_', param_name)):
+                    #    error_list.append(Error("parameter name should start with pi_|po_|pio_",
+                    #                    file,
+                    #                    line,
+                    #                    lineno,
+                    #                    param_start_pos + param_type.end() + 1,
+                    #                    len(param_name)
+                    #                    )
+                    #                )
+                    if(not re.match(StyleGuide.snake_case, param_name)):
+                        error_list.append(Error("parameter name should be in lower snake case",
+                                        file,
+                                        line,
+                                        lineno,
+                                        param_start_pos + param_type.end(),
+                                        len(param_name)
+                                        )
+                                    )
+                    param_start_pos += len(param) + 1
+
+    return error_list
+
+#----------------------- Rule checkBraceStyle -----------------------#
+def checkBraceStyle(file):
+    error_list = []
+    lineno=0
+    for line in open(file, 'r').read().splitlines():
+        lineno=lineno+1
+        # Check brace open
+        brace_open_iter = re.finditer('\{', line)
+        for brace_open in brace_open_iter:
+            if(re.search(' +\{', brace_open.string) == None):
+                error_list.append(Error("wrong brace style",
+                                file,
+                                line,
+                                lineno,
+                                brace_open.start()
+                                )
+                            )
+
+        # Check brace close
+        brace_close_iter = re.finditer('\}', line)
+        for brace_close in brace_close_iter:
+            if(re.match(' *\}', brace_close.string) == None and
+               re.search('\{.*\}', brace_close.string) == None):
+                error_list.append(Error("wrong brace style",
+                                file,
+                                line,
+                                lineno,
+                                brace_close.start()
+                                )
+                            )
+
+    return error_list
+
+#----------------------- Rule checkLineLength -----------------------#
+def checkLineLength(file):
+    error_list = []
+    lineno=0
+    for line in open(file, 'r').read().splitlines():
+        lineno=lineno+1
+        if(len(line) > 100):
+            error_list.append(Error("line length is more than 100",
+                            file,
+                            line,
+                            lineno,
+                            101,
+                            len(line)-100
+                            )
+                        )
+    return error_list
+
+#----------------------- Rule checkSpaces -----------------------#
+def checkSpaces(file):
+    error_list = []
+    lineno=0
+
+    for line in open(file, 'r').read().splitlines():
+        lineno = lineno+1
+        # Check space only in line
+        line_space = re.match('^ +$', line)
+        if(line_space):
+            error_list.append(Error("line has spaces only",
+                            file,
+                            line.replace(' ','.'),
+                            lineno,
+                            line_space.start(),
+                            len(line)
+                            )
+                        )
+            continue
+
+        # Check leading space
+        leading_space = re.match(' +', line)
+        if(
+            leading_space != None                   # there are leading spaces
+            and leading_space.end()%4               # multiple of 4
+            and line[leading_space.end()] != '*'    # ignore if spaces end with '*'
+        ):
+            error_list.append(Error("leading space is not multiple of 4",
+                            file,
+                            line.replace(' ','.'),
+                            lineno,
+                            int(leading_space.end()/4)*4,
+                            leading_space.end()%4
+                            )
+                        )
+
+            # Check trailing space
+        trailing_space = re.search(' +$', line)
+        if(trailing_space):
+            error_list.append(Error("trailing spaces are not allowed",
+                            file,
+                            line.replace(' ','.'),
+                            lineno,
+                            trailing_space.start(),
+                            len(trailing_space.group(0))
+                            )
+                        )
+    return error_list
+
+#----------------------- main() -----------------------#
+args = Args()
+opt = args.parse()
+
+ccList = []
+hList = []
+
+common_rule_list = [
+                    checkLicense,
+                    checkBraceStyle,
+                    checkFuncNames,
+                    checkLineLength,
+                    checkSpaces
+                    ]
+
+for dir in opt.dir:
+    ccList += (collectFiles(dir, "cc"))
+    ccList += (collectFiles(dir, "tcc"))
+    hList += (collectFiles(dir, "h"))
+
+for file in ccList+hList:
+    for rule in common_rule_list:
+        for error in rule(file):
+            error.show()
+
+# TODO: rule to check }; ends with /* class|struct|namespace <name> */
+# TODO: check tabs in source code
+# TODO: check if style and function style for spaces
+# TODO: check for param to be with in, out, in,out in docs
