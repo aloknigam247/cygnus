@@ -1,0 +1,250 @@
+version: 2.0
+
+jobs:
+  checkout:
+    docker:
+      - image: aloknigam247/cygnus
+    working_directory: ~/cygnus
+    steps:
+      - checkout
+      - run:
+          name: Initial setup
+          command: |
+            cd ~/cygnus
+            mkdir logs
+            mkdir reports
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - cygnus
+
+  coverage:
+    docker:
+      - image: aloknigam247/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Coverage Build
+          command: |
+            cd ~/cygnus
+            source sourceme
+            cybuild --coverage
+      - run:
+          name: Coverage Run
+          command: |
+            cd ~/cygnus
+            source sourceme
+            #cyregress -a tests --coverage
+      - persist_to_workspace:
+          root: ~/cygnus
+          paths:
+            - logs
+            - reports
+
+  docs-checks:
+    docker:
+      - image: aloknigam247/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Generate Docs
+          command: |
+            cd ~/cygnus
+            source sourceme
+            gen-docs -r
+      - persist_to_workspace:
+          root: ~/cygnus
+          paths:
+            - reports
+            - docs
+
+  lint-checks:
+    docker:
+      - image: aloknigam247/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Lint Run
+          command: |
+            cd ~/cygnus
+            source sourceme
+            run-lint
+      - persist_to_workspace:
+          root: ~/cygnus
+          paths:
+            - reports
+
+  mem-checks:
+    docker:
+      - image: aloknigam247/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Debug Build (Strict)
+          command: |
+            cd ~/cygnus
+            source sourceme
+            # cybuild --strict --debug
+      - run:
+          name: Memory Checks
+          command: |
+            cd ~/cygnus
+            source sourceme
+            cybuild --memory
+            # cyregress -a tests --mem-check
+      - persist_to_workspace:
+          root: ~/cygnus
+          paths:
+            - logs
+            - reports
+
+  performance:
+    docker:
+      - image: aloknigam247/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Performance Build
+          command: |
+            cd ~/cygnus
+            source sourceme
+            cybuild --perf
+      - run:
+          name: Performance Checks
+          command: |
+            cd ~/cygnus
+            source sourceme
+            cyregress -a tests --perf
+      - persist_to_workspace:
+          root: ~/cygnus
+          paths:
+            - logs
+            - reports
+
+  release-tests:
+    docker:
+      - image: aloknigam247/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Release Build (Strict)
+          command: |
+            cd ~/cygnus
+            source sourceme
+            #cybuild --strict --release
+      - run:
+          name: Run Tests
+          command: |
+            cd ~/cygnus
+            source sourceme
+            #cyregress -a tests
+      - persist_to_workspace:
+          root: ~/cygnus
+          paths:
+            - logs
+            - reports
+
+  sanitization:
+    docker:
+      - image: aloknigam247/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Sanitization Checks
+          command: |
+            cd ~/cygnus
+            source sourceme
+            cybuild --sanitize
+      - run:
+          name: Sanitization Checks
+          command: |
+            cd ~/cygnus
+            source sourceme
+            cyregress -a tests --sanitize
+      - persist_to_workspace:
+          root: ~/cygnus
+          paths:
+            - logs
+            - reports
+
+  style-checks:
+    docker:
+      - image: aloknigam247/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Source Code Style Check
+          command: |
+            cd ~/cygnus
+            source sourceme
+            style-check include src | tee reports/style.log
+      - persist_to_workspace:
+          root: ~/cygnus
+          paths:
+            - reports
+
+  gen-report:
+    docker:
+      - image: aloknigam247/cygnus
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Report Generation
+          command: |
+              cd ~
+              source cygnus/sourceme
+              gen-report | tee reports/report.log
+      - store_artifacts:
+          path: ~/docs
+          destination: API
+      - store_artifacts:
+          path: ~/logs
+          destination: Logs
+      - store_artifacts:
+          path: ~/reports
+          destination: Reports
+
+workflows:
+  version: 2
+  Commit-Regression:
+    jobs:
+      - checkout
+      - coverage:
+          requires:
+            - checkout
+      - docs-checks:
+          requires:
+            - checkout
+      - lint-checks:
+          requires:
+            - checkout
+      - mem-checks:
+          requires:
+            - checkout
+      - release-tests:
+          requires:
+            - checkout
+      - sanitization:
+          requires:
+            - checkout
+      - style-checks:
+          requires:
+            - checkout
+              #      - gen-report:
+              #          requires:
+              #            - coverage
+              #            - docs-checks
+              #            - lint-checks
+              #            - mem-checks
+              #            - release-tests
+              #            - sanitization
+              #            - style-checks

@@ -176,15 +176,15 @@ warnReport() {
 }
 
 main() {
-    warnReport
-    lintReport
-    covReport
-    releaseTestReport
-    memReport
-    #perfReport
-    sanitizationReport
-    styleReport
-    docsReport
+    #warnReport
+    #lintReport
+    #covReport
+    #releaseTestReport
+    #memReport
+    ##perfReport
+    #sanitizationReport
+    #styleReport
+    #docsReport
     #exit $EXITCODE
 }
 
