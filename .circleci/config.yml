@@ -35,7 +35,7 @@ jobs:
           command: |
             cd ~/cygnus
             source sourceme
-            cyregress -a tests --coverage
+            #cyregress -a tests --coverage
       - persist_to_workspace:
           root: ~/cygnus
           paths:
@@ -137,13 +137,13 @@ jobs:
           command: |
             cd ~/cygnus
             source sourceme
-            cybuild --strict --release
+            #cybuild --strict --release
       - run:
           name: Run Tests
           command: |
             cd ~/cygnus
             source sourceme
-            cyregress -a tests
+            #cyregress -a tests
       - persist_to_workspace:
           root: ~/cygnus
           paths:
@@ -218,33 +218,33 @@ workflows:
   Commit-Regression:
     jobs:
       - checkout
-        #      - coverage:
-        #          requires:
-        #            - checkout
-        #      - docs-checks:
-        #          requires:
-        #            - checkout
-        #      - lint-checks:
-        #          requires:
-        #            - checkout
-        #      - mem-checks:
-        #          requires:
-        #            - checkout
-        #      - release-tests:
-        #          requires:
-        #            - checkout
-        #      - sanitization:
-        #          requires:
-        #            - checkout
-        #      - style-checks:
-        #          requires:
-        #            - checkout
-        #      - gen-report:
-        #          requires:
-        #            - coverage
-        #            - docs-checks
-        #            - lint-checks
-        #            - mem-checks
-        #            - release-tests
-        #            - sanitization
-        #            - style-checks
+      - coverage:
+          requires:
+            - checkout
+      - docs-checks:
+          requires:
+            - checkout
+      - lint-checks:
+          requires:
+            - checkout
+      - mem-checks:
+          requires:
+            - checkout
+      - release-tests:
+          requires:
+            - checkout
+      - sanitization:
+          requires:
+            - checkout
+      - style-checks:
+          requires:
+            - checkout
+      - gen-report:
+          requires:
+            - coverage
+            - docs-checks
+            - lint-checks
+            - mem-checks
+            - release-tests
+            - sanitization
+            - style-checks
