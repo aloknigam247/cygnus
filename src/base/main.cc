@@ -25,12 +25,14 @@
 #include "options.h"
 #include "cycompile.h"
 #include "log.h"
+#include "utils.h"
+
 int main(const int argc, const char* argv[]) {
     Options opt;
     opt.addOption("-v", Option::BOOL, "version");
     opt.parse(argc, argv);
     if(opt.isSet("-v"))
-        std::cout << "Cygnus v1.0.0-alpha\n";
+        std::cout << "Cygnus " << MAKE_STRING(VERSION) << '\n';
 
     const std::vector<std::string> &pos = opt.get_positional();
 
