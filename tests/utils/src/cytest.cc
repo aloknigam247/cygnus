@@ -1,5 +1,6 @@
-#include "cytest.h"
 #include <iostream>
+
+#include "cytest.h"
 
 namespace cytest {
 void Testcase::add(caseType p) {
