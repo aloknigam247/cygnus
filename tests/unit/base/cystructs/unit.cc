@@ -1,9 +1,9 @@
 #include <stdexcept>
 #include <string>
 
-#include "cystructs.h"
-
 #include "cytest.h"
+
+#include "cystructs.h"
 
 struct TestStruct {
     std::string name;
