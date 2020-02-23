@@ -16,7 +16,7 @@ TEE() {
     echo "" > $1
     while IFS= read line; do
         echo "$line"
-        echo "$line" | sed 's|\x1b\[[;0-9]*m\x1b\[K||g' >> $1
+        echo "$line" | sed -r -e 's|\x1b\[[;0-9]*m\x1b\[K||g' -e 's/\x1b\[[0-9]+m//g' >> $1
     done
 }
 
