@@ -77,7 +77,7 @@ runFuncTest() {
 }
 
 runUnitTest() {
-    gen-make -i $CYGNUS_HOME/include/base -i $CYGNUS_HOME/include/scanner -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/base/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src/base -s $CYGNUS_HOME/src/scanner -s $CYGNUS_HOME/tests/utils/src test.cc || return 1
+    gen-make -i $CYGNUS_HOME/include/base -i $CYGNUS_HOME/include/scanner -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/base/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src/base -s $CYGNUS_HOME/src/scanner -s $CYGNUS_HOME/tests/utils/src unit.cc || return 1
     make --no-print-directory $TEST_MODE 2>&1 | TEE make.log 
     $tool ./test 2>&1 > TESTLOG 
 }
@@ -257,8 +257,8 @@ main() {
                     } >> reports/coverage/unit/coverage.info
                 fi
 
-                # remove test.cc from coverage.info
-                sed -i '/test.cc$/,/end_of_record/ d' reports/coverage/unit/coverage.info
+                # remove unit.cc from coverage.info
+                sed -i '/unit.cc$/,/end_of_record/ d' reports/coverage/unit/coverage.info
 
                 genhtml --ignore-errors source reports/coverage/unit/coverage.info --output-directory reports/coverage/unit/html --demangle-cpp > reports/coverage/unit/genhtml.log #2> /dev/null
                 egrep -A 1 'lines\.\.\.\.\.\.:' reports/coverage/unit/genhtml.log
@@ -269,8 +269,8 @@ main() {
                 mkdir -p reports/coverage/comp
                 lcov --gcov-tool=gcov-7 -b src/base -c -d build/obj/coverage -d $OUT_DIR -d include --no-external -o reports/coverage/comp/coverage.info -q 2> /dev/null
 
-                # remove test.cc from coverage.info
-                sed -i '/test.cc$/,/end_of_record/ d' reports/coverage/comp/coverage.info
+                # remove unit.cc from coverage.info
+                sed -i '/unit.cc$/,/end_of_record/ d' reports/coverage/comp/coverage.info
 
                 genhtml --ignore-errors source reports/coverage/comp/coverage.info --output-directory reports/coverage/comp/html --demangle-cpp > reports/coverage/comp/genhtml.log 2> /dev/null
                 egrep -A 1 'lines\.\.\.\.\.\.:' reports/coverage/comp/genhtml.log
