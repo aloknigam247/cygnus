@@ -14,7 +14,7 @@ EXIT(){
 
 #--------------------------#
 # Log wrapper              #
-# Usage: Log <tag> "<msg>" #
+# Usage: LOG <tag> "<msg>" #
 #--------------------------#
 LOG(){
     local _msg=${2:?"message missing."}

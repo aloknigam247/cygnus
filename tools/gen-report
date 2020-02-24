@@ -129,14 +129,18 @@ perfReport() {
 }
 
 releaseTestReport() {
-    #EXITCODE=7
     echo -n "Release Test "
-    test -f logs/cyregress.log && sed -n '/Summary:/,+3 p' logs/cyregress.log || echo "Summary: Not Run"
+    if [[ -f logs/cyregress.log ]]; then
+        sed -n '/Summary:/,+3 p' logs/cyregress.log
+        egrep -q "FAIL: 0" logs/cyregress.log || EXITCODE=1
+    else
+        echo "Summary: Not Run"
+        EXITCODE=1
+    fi
     echo
 }
 
 sanitizationReport() {
-    #EXITCODE=8
     echo -n "Sanitization "
     test -f logs/cyregress-sanitize.log && sed -n '/Summary:/,+3 p' logs/cyregress-sanitize.log || echo "Summary: Not Run"
     echo
@@ -176,16 +180,16 @@ warnReport() {
 }
 
 main() {
-    #warnReport
-    #lintReport
     #covReport
-    #releaseTestReport
+    #docsReport
+    #lintReport
     #memReport
     ##perfReport
+    releaseTestReport
     #sanitizationReport
     #styleReport
-    #docsReport
-    #exit $EXITCODE
+    #warnReport
+    exit $EXITCODE
 }
 
 main $@

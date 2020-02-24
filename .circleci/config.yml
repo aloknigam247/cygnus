@@ -239,12 +239,12 @@ workflows:
       - style-checks:
           requires:
             - checkout
-              #      - gen-report:
-              #          requires:
+      - gen-report:
+          requires:
               #            - coverage
               #            - docs-checks
               #            - lint-checks
               #            - mem-checks
-              #            - release-tests
+            - release-tests
               #            - sanitization
               #            - style-checks

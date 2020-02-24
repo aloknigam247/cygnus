@@ -6,7 +6,6 @@ declare -a valid_list
 declare -a valid_tests
 declare -a fail_list
 
-# DEFAULTS
 declare OUT_DIR='test_run'
 declare TEST_MODE=''
 declare FUNC_COUNT=0
@@ -307,8 +306,6 @@ main() {
     echo "    PASS: $((tc_cnt - fail_cnt))"
     echo "    FAIL: $fail_cnt"
     } | TEE logs/cyregress${TEST_MODE:+-$TEST_MODE}.log
-    return 0
 }
 
 main $@
-
