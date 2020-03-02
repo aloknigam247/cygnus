@@ -143,7 +143,7 @@ jobs:
           command: |
             cd ~/cygnus
             source sourceme
-            #cyregress -a tests
+            cyregress -a tests
       - persist_to_workspace:
           root: ~/cygnus
           paths:

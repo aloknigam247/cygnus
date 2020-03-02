@@ -1,22 +1,38 @@
-#----------------------------------------------------------#
-# Commonn functions for logging and command line parsing   #
-# NOTE: all variable name start with _ in this file        #
-#----------------------------------------------------------#
+#-----------------------------------------------------------#
+# Commonn functions for logging and command line parsing    #
+# NOTE: all variable name should start with _ in this file  #
+#-----------------------------------------------------------#
 
+declare _EXITCODE=0
 #------------------------------#
 # Wrapper for exit             #
 # Usage: EXIT <return-code>    #
 #------------------------------#
-declare _EXITCODE=0
-EXIT(){
+EXIT() {
     exit ${1:-$_EXITCODE}
+}
+
+#-----------------------#
+# Wrapper for return    #
+# Usage: RETURN_ERROR   #
+#-----------------------#
+RETURN_ERROR() {
+    return $_EXITCODE
+}
+
+#---------------------------#
+# Set error status          #
+# Usage: SET_ERROR <error>  #
+#---------------------------#
+SET_ERROR() {
+    _EXITCODE=$1
 }
 
 #--------------------------#
 # Log wrapper              #
 # Usage: LOG <tag> "<msg>" #
 #--------------------------#
-LOG(){
+LOG() {
     local _msg=${2:?"message missing."}
     case $1 in
         E)
@@ -63,7 +79,7 @@ OPTION['-h']='value:bool,help:print help'
 OPTION['--help']='value:bool,help:print help'
 
 # Print usage
-usage(){
+usage() {
     # scan all options for tabular alignments
     local _max_len=0
     local _pos_name=''
@@ -127,7 +143,7 @@ usage(){
 # Error message for option      #
 # Usage: optionError <option>   #
 #-------------------------------#
-optionError(){
+optionError() {
     local _IFS_Prev=$IFS
     local _meta=''
     local _help=''

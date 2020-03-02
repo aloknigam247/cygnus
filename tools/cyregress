@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source $CYGNUS_HOME/tools/funcs.bash    # source common functions
+source cmdline.bash    # command line parser
 
 declare -a valid_list
 declare -a valid_tests
@@ -295,17 +295,21 @@ main() {
     #---------#
     # Summary #
     #---------#
-    if [[ ${#fail_list} ]]; then
+    if [[ ${#fail_list} -ne 0 ]]; then
         echo -e "\nFAILED:"
         for fail in ${fail_list[@]}; do
             echo "$fail"
         done
+        SET_ERROR 1
     fi
     echo -e "\nSummary:"
     echo "    RUN:  $tc_cnt"
     echo "    PASS: $((tc_cnt - fail_cnt))"
     echo "    FAIL: $fail_cnt"
+    RETURN_ERROR
     } | TEE logs/cyregress${TEST_MODE:+-$TEST_MODE}.log
+    return ${PIPESTATUS[0]}
 }
 
 main $@
+EXIT $?
