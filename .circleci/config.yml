@@ -119,7 +119,7 @@ jobs:
           command: |
             cd ~/cygnus
             source sourceme
-            cyregress -a tests --perf
+            #cyregress -a tests --perf
       - persist_to_workspace:
           root: ~/cygnus
           paths:
@@ -167,7 +167,7 @@ jobs:
           command: |
             cd ~/cygnus
             source sourceme
-            cyregress -a tests --sanitize
+            #cyregress -a tests --sanitize
       - persist_to_workspace:
           root: ~/cygnus
           paths:

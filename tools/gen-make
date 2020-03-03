@@ -135,7 +135,7 @@ args = Args()
 opt = args.parse()
 
 os.chdir(opt.cDir)
-target = "test"
+target = "unit"
 
 rule = Rules()
 rule.src_list = opt.srcDir
