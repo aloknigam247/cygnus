@@ -52,7 +52,7 @@ Metrics StateTable::calcMetrics() const{
         m.is_filled[i] = false;
     }
 
-    int max_len, len, s;
+    int max_len=0, len=0, s;
     m.len[0] = 6;
     for(auto &a: m.is_filled)
         a = false;
