@@ -47,7 +47,12 @@ void StateTable::addEntry(int from, char sym, int to) {
 
 Metrics StateTable::calcMetrics() const{
     Metrics m;
-    int max_len, len, s;
+    for(int i=0; i<129; ++i) {
+        m.len[i] = 0;
+        m.is_filled[i] = false;
+    }
+
+    int max_len=0, len=0, s;
     m.len[0] = 6;
     for(auto &a: m.is_filled)
         a = false;
