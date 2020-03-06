@@ -19,6 +19,11 @@ TEE() {
     done
 }
 
+GENHTML() {
+    genhtml -f --ignore-errors source reports/coverage/$1/coverage.info --output-directory reports/coverage/$1/html --demangle-cpp -t "$1 coverage" --legend --rc genhtml_hi_limit=98 --rc genhtml_med_limit=80 > reports/coverage/$1/genhtml.log 2> /dev/null
+    egrep -A 1 'lines\.\.\.\.\.\.:' reports/coverage/$1/genhtml.log
+}
+
 OPTION['-a']='value:string,metavar:dir,help:run all tests from <dir>'
 OPTION['-f']='value:string,metavar:dir,without:-a,help:run functional tests only from <dir>'
 OPTION['-o']='value:string,metavar:dir,help:output directory of test run'
@@ -229,8 +234,7 @@ main() {
                 for dir in $(find build/obj/coverage -mindepth 1 -type d); do
                     lcov --gcov-tool=gcov-7 -c -b src/${dir#build/obj/coverage/} -d $dir -d include --no-external -q >> reports/coverage/func/coverage.info 2> /dev/null
                 done
-                genhtml reports/coverage/func/coverage.info --output-directory reports/coverage/func/html --demangle-cpp > reports/coverage/func/genhtml.log 2> /dev/null
-                egrep -A 1 'lines\.\.\.\.\.\.:' reports/coverage/func/genhtml.log
+                GENHTML func
             fi
 
             if [[ $UNIT_COUNT -gt 0 ]]; then
@@ -259,8 +263,7 @@ main() {
                 # remove unit.cc from coverage.info
                 sed -i '/unit.cc$/,/end_of_record/ d' reports/coverage/unit/coverage.info
 
-                genhtml --ignore-errors source reports/coverage/unit/coverage.info --output-directory reports/coverage/unit/html --demangle-cpp > reports/coverage/unit/genhtml.log #2> /dev/null
-                egrep -A 1 'lines\.\.\.\.\.\.:' reports/coverage/unit/genhtml.log
+                GENHTML unit
             fi
 
             if [[ ${VALUES['-a']} ]]; then
@@ -271,8 +274,7 @@ main() {
                 # remove unit.cc from coverage.info
                 sed -i '/unit.cc$/,/end_of_record/ d' reports/coverage/comp/coverage.info
 
-                genhtml --ignore-errors source reports/coverage/comp/coverage.info --output-directory reports/coverage/comp/html --demangle-cpp > reports/coverage/comp/genhtml.log 2> /dev/null
-                egrep -A 1 'lines\.\.\.\.\.\.:' reports/coverage/comp/genhtml.log
+                GENHTML comp
             fi
             ;;
         mem-check)

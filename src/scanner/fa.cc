@@ -175,11 +175,11 @@ void FA::printTable() const {
 }
 
 void FA::printDot(const char* file_stem) const {
-    /*std::ofstream dotfile(file_stem);
+    std::ofstream dotfile(file_stem);
     table.printDot(dotfile);
     dotfile.close();
 
-    std::string command;
+    /*std::string command;
 
     command = "dot -Tpng ";
     command += file_stem;
