@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source $CYGNUS_HOME/tools/funcs.bash    # source common functions
+source cmdline.bash    # command line parser
 
 declare BUILD_MODE=debug
 
