@@ -17,8 +17,23 @@ void allOptionsType() {
 
     const char* arg0[] = {"cygnus"};
     opt.parse(1, arg0);
-    const char* arg1[] = {"cygnus", "-b", "-c", "d", "-i","77", "-s", "string", "positional"};  /* expected arguments */
-    opt.parse(9, arg1);
+    const char* arg1[] = {"cygnus", "-b", "-c", "d", "-i","77", "-s", "string", "pos_param1", "pos_param2"};  /* expected arguments */
+    opt.parse(10, arg1);
+    if(opt.isSet("-b"))
+        cytest::Log::i("-b: ", static_cast<bool>(opt.get_value("-b")));
+    if(opt.isSet("-c"))
+        cytest::Log::i("-c: ", static_cast<char>(opt.get_value("-c")));
+    if(opt.isSet("-i"))
+        cytest::Log::i("-i: ", static_cast<int>(opt.get_value("-i")));
+    if(opt.isSet("-s"))
+        cytest::Log::i("-s: ", static_cast<const char*>(opt.get_value("-s")));
+
+    const std::vector<std::string> &pos = opt.get_positional();
+    if(!pos.empty()) {
+        for(auto p: pos)
+        cytest::Log::i("positional: ", p);
+    }
+
     const char* arg2[] = {"cygnus", "-c", "-i", "-s"};
     opt.parse(4, arg2);
     const char* arg3[] = {"cygnus", "-c", "ac", "-i", "cd", "-u"};  /* invalid arguments */
@@ -58,11 +73,18 @@ void reParse() {
         cytest::Log::i("Not set");
 }
 
+void exceptionOnDelete() {
+}
+
 int main() {
     cytest::Testcase testcase;
     testcase.add(helpOption);
     testcase.add(allOptionsType);
-    testcase.add(reParse);
+
+    testcase.simulation_set(cytest::ExceptionDelete);
+    testcase.add(exceptionOnDelete);
+    testcase.simulation_reset(cytest::ExceptionDelete);
+
     testcase.run();
     return 0;
 }
