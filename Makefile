@@ -36,7 +36,7 @@ MOD_EXE	:= $(BIN)/cygnus-$(MODE)
 DUMP 	:= $(BIN)
 EXE 	:= $(BLD_DIR)/bin/cygnus
 
-export OBJ DEP
+export OBJ DEP BLD_DIR
 
 #---------- Compile Flags ----------# 
 export CPP_FLAGS += -std=c++11 -fdiagnostics-color

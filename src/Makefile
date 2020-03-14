@@ -1,8 +1,8 @@
-MODULES := base compiler scanner
+MODULES := base clg compiler scanner
 
 .PHONY: $(MODULES)
 
 all: $(MODULES)
 
 $(MODULES):
-	$(MAKE) -C $@ DEP=$(DEP)/$@ OBJ=$(OBJ)/$@
+	$(MAKE) -C $@ DEP=$(DEP)/$@ OBJ=$(OBJ)/$@ BIN=$(BLD_DIR)/bin
