@@ -10,9 +10,9 @@ S: /* nothing */ {printf("EMPTY\n");}
  | S NL S
  | ID WS PATT SC {printf("Statement\n");}
 %%
-main(int argc, char **argv)
+void callme(const *file)
 {
-  FILE *myfile = fopen(argv[1], "r");
+  FILE *myfile = fopen(file, "r");
   // Set flex to read from it instead of defaulting to STDIN:
   yyin = myfile;
   yyparse();

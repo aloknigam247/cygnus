@@ -1434,9 +1434,9 @@ yyreturn:
 }
 #line 12 "clg.y" /* yacc.c:1906  */
 
-main(int argc, char **argv)
+void callme(const *file)
 {
-  FILE *myfile = fopen(argv[1], "r");
+  FILE *myfile = fopen(file, "r");
   // Set flex to read from it instead of defaulting to STDIN:
   yyin = myfile;
   yyparse();

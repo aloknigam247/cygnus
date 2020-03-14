@@ -26,6 +26,7 @@
 #include "cycompile.h"
 #include "log.h"
 #include "utils.h"
+#include "clg.h"
 
 int main(const int argc, const char* argv[]) {
     Options opt;
@@ -42,5 +43,7 @@ int main(const int argc, const char* argv[]) {
     Log::i("File: ", pos.front());
 
     CyCompile compile(pos.front());
+
+    CLG clg(pos.front());
     return 0;
 }

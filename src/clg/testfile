@@ -1,4 +1,4 @@
-type                          /a*c/;
+type                          /ac/;
 type 	/abc/;
 type   /abc/;
 type  /abc/;

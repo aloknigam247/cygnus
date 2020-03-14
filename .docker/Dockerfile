@@ -9,6 +9,7 @@ RUN apt-get upgrade -y
 RUN apt-get install -y software-properties-common
 RUN apt-add-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main"
 RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
+RUN apt-get update
 
 RUN apt-get install -y clang-tidy
 RUN apt-get install -y cppcheck

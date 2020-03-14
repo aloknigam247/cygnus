@@ -50,7 +50,7 @@ endif
 export CY_COMPILE := $(CXX) $(CPP_FLAGS)
 
 #---------- Make Flags ----------#
-export MAKE_FLAGS	:= --no-print-directory 
+export MAKE_FLAGS	:= --no-print-directory -r -R 
 export MAKE			 = $Qmake $(MAKE_FLAGS)
 
 #---------- Rules ----------#
@@ -66,7 +66,7 @@ $(EXE): $(MOD_EXE)
 	ln -sfr $< $@
 
 $(MOD_EXE): INCLUDE_DIR=''
-$(MOD_EXE): $(subst src,$(OBJ),$(subst .cc,.o,$(wildcard src/*/*.cc)))
+$(MOD_EXE): $(subst src,$(OBJ),$(subst .cc,.o,$(wildcard src/*/*.cc))) $(OBJ)/clg/clg.flex.o $(OBJ)/clg/clg.tab.o
 	$(CY_COMPILE) -o $@ $^
 
 clean:
