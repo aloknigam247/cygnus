@@ -120,7 +120,7 @@ void StateTable::print() const {
     std::cout << '\n';
     line(m.max_len);
     for(auto r: row) {
-        if(r.finalState) {
+        if(r.final_state) {
             std::string s;
             s = '(';
             s+= r.tag;
