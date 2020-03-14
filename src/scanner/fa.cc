@@ -52,34 +52,38 @@ Metrics StateTable::calcMetrics() const{
         m.is_filled[i] = false;
     }
 
-    int max_len=0, len=0, s;
-    m.len[0] = 6;
-    for(auto &a: m.is_filled)
-        a = false;
+    int max_len=0, s;
+    m.len[0] = 5;   /* strlen(STATE) */
 
     for(auto r: row) {
-        if(r.tag.size() > m.len[0])
-            m.len[0] = r.tag.size();
-        len = m.len[0];
-        for(int i=0; i<128; ++i) {
-            s=1;
-            if(!r.sym[i].size())
-                s += 1;
-            else {
+        int tag_size = r.tag.size();
+
+        if(r.final_state)
+            tag_size += 2;  /* for round bracket */
+
+        if(tag_size > m.len[0])
+            m.len[0] = tag_size;
+
+        int len = m.len[0]+1;   /* +1 for | */
+        for(int i=1; i<128; ++i) {
+            s=0;
+            if(r.sym[i].size()) {
                 m.is_filled[i] = true;
                 for(auto a: r.sym[i]) {
                     s += std::to_string(a).size();
                 }
                 s += r.sym[i].size()-1;
+
+                if(s>m.len[i])
+                    m.len[i] = s;
             }
-            if(s>m.len[i])
-                m.len[i] = s;
-            if(m.is_filled[i]) {
-                len += m.len[i];
-            }
+
+            if(m.is_filled[i])
+                len += m.len[i]+1;  /* +1 for | */
         }
-        len += 1;
-        if(len > max_len) max_len = len;
+        len += 1;   /* +1 for | */
+        if(len > max_len)
+            max_len = len;
     }
 
     m.max_len = max_len;
@@ -90,7 +94,10 @@ Metrics StateTable::calcMetrics() const{
 
 template<typename T>
 void col(Metrics& m, int i, T t) {
-    std::cout << '|' << std::setw(m.len[i]-1) << t << std::setw(0);
+    std::cout << '|';
+    std::cout.width(m.len[i]);
+    std::cout << t;
+    std::cout.width(0);
 }
 
 void line(int len) {

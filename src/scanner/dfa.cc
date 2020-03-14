@@ -37,7 +37,7 @@ bool DFA::execute(const char* word) {
         curr = table.row[n_state.front()];
     }
 
-    if(curr.finalState)
+    if(curr.final_state)
         return true;
     return false;
 }
