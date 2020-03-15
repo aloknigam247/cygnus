@@ -206,7 +206,7 @@ main() {
             ;;
     esac
 
-    if [[ ${VALUES['-a']} || ${VALUES['-f']} ]] && [[ ! -x $CYGNUS ]]; then
+    if [[ $FUNC_COUNT -gt 0 ]] && [[ ! -x $CYGNUS ]]; then
         LOG EE "$CYGNUS does not exist"
     fi
     rm -rf reports/func reports/unit
