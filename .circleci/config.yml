@@ -245,6 +245,6 @@ workflows:
               #            - docs-checks
               #            - lint-checks
               #            - mem-checks
-            - release-tests
+              - release-tests
               #            - sanitization
               #            - style-checks

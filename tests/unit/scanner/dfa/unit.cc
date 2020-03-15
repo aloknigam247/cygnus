@@ -19,11 +19,42 @@ void convertNFA2DFA() {
 
     DFA dfa = nfa;
     dfa.printTable();
-    dfa.printDot("dfa");
+    dfa.printDot("case1");
+
+    const char *s = "ssssss";
+    if(dfa.execute(s))
+        cytest::Log::i(s, ": Accept");
+    else
+        cytest::Log::i(s, ": Reject");
+
+    s = "qqq";
+    if(dfa.execute(s))
+        cytest::Log::i(s, ": Accept");
+    else
+        cytest::Log::i(s, ": Reject");
+
+    s = "";
+    if(dfa.execute(s))
+        cytest::Log::i(s, ": Accept");
+    else
+        cytest::Log::i(s, ": Reject");
+
+    s = "rRsss";
+    if(dfa.execute(s))
+        cytest::Log::i(s, ": Accept");
+    else
+        cytest::Log::i(s, ": Reject");
+}
+
+void emptyDFA() {
+    NFA nfa;
+    DFA dfa = nfa;
+    dfa.execute(nullptr);
 }
 
 int main() {
     cytest::Testcase testcase;
     testcase.add(convertNFA2DFA);
+    testcase.add(emptyDFA);
     testcase.run();
 }

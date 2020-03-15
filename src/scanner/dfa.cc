@@ -27,6 +27,9 @@ DFA::DFA(NFA nfa) {
 }
 
 bool DFA::execute(const char* word) {
+    if(!word)
+        return false;
+
     State curr = table.row[0];
 
     for(int i=0; word[i]!='\0'; ++i) {
