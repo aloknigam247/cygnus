@@ -1,0 +1,7 @@
+CASE=(
+        "cygnus text"
+    )
+
+DIFFS=(
+        ['REFLOG']='TESTLOG'
+    )

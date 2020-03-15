@@ -24,12 +24,15 @@ void intPointer() {
     t.insert(new int(3));
     t.insert(new int(9));
     cystructs::Tree<int*>::iterator iter;
+
+    iter = t.search(4);
     try {
-        iter = t.search(4);
-        int* p = *iter;
+        int* p = *iter; // exception should come for empty iterator
     }
-    catch(...) {
+    catch(std::exception& e) {
+        cytest::Log::e(e.what());
     }
+
     iter = t.search(9);
     if(iter != t.end())
         int* p = *iter;
@@ -43,12 +46,15 @@ void objPointer() {
     t.insert(new TestStruct("test"));
     cystructs::Tree<TestStruct*>::iterator iter = t.search("test");
     std::string name = iter->name;
+
+    iter = t.search("not exist");
     try {
-        iter = t.search("not exist");
         name = iter->name;
     }
-    catch(...) {
+    catch(std::exception& e) {
+        cytest::Log::e(e.what());
     }
+
     for(auto iter : t) {
         delete iter;
     }

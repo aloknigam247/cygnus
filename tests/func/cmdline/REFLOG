@@ -9,6 +9,5 @@
 >       -v: version
 
 |CASE 4| cygnus -a abc
->   |WARN| ignoring unknown option -a
->   |INFO| File: abc
+>   |ERROR| unknown option -a
 

@@ -22,35 +22,6 @@
  * SOFTWARE.                                                                        *
  ************************************************************************************/
 
-/* Copy Constructor */
-template <typename T>
-Tree<T>::Tree(const Tree<T>& to_copy) {
-    m_root = new Node(*to_copy);
-}
-
-/* Move Constructor */
-template <typename T>
-Tree<T>::Tree(Tree<T>&& to_move) noexcept {
-    m_root = to_move.m_root;
-    to_move = nullptr;
-}
-
-template <typename T>
-Tree<T>& Tree<T>::operator=(const Tree<T>& to_copy) {
-    if(this == &to_copy)
-        return *this;
-    m_root = new Node(*to_copy.root);
-    return *this;
-}
-
-/* Move Assignment */
-template <typename T>
-Tree<T>& Tree<T>::operator=(Tree<T>&& to_move) noexcept {
-    m_root = to_move.m_root;
-    to_move = nullptr;
-    return *this;
-}
-
 template <typename T>
 Tree<T>::~Tree() {
     delete m_root;
@@ -67,7 +38,7 @@ typename Tree<T>::iterator Tree<T>::search(const K& key) {
     Node* p = binarySearch(m_root, key);
     if(p)
         return iterator(p);
-    return iterator();
+    return end();
 }
 
 template <typename T>
@@ -119,73 +90,15 @@ typename Tree<T>::iterator Tree<T>::begin() const {
 }
 
 template <typename T>
-typename Tree<T>::iterator Tree<T>::end() const {
+typename Tree<T>::iterator& Tree<T>::end() const {
     static iterator iter;
     return iter;
-}
-
-/* Copy Constructor */
-template<typename T>
-Tree<T>::Node::Node(const Tree<T>::Node& to_copy) {
-    if(std::is_pointer<T>::value)
-        data = new std::remove_pointer<T>(*to_copy.data);
-    else
-        data = to_copy.data;
-
-    left = to_copy.left ? new Node(*to_copy.left) : nullptr;
-    right = to_copy.right ? new Node(*to_copy.right) : nullptr;
-}
-
-/* Move Constructor */
-template<typename T>
-Tree<T>::Node::Node(Tree<T>::Node&& to_move) noexcept {
-    data = to_move.data;
-    left = to_move.left;
-    right = to_move.right;
-
-    if(std::is_pointer<T>::value) {
-        to_move.data = nullptr;
-    }
-    to_move.left = nullptr;
-    to_move.right = nullptr;
 }
 
 template<typename T>
 Tree<T>::Node::~Node() {
     delete left;
     delete right;
-}
-
-template<typename T>
-typename Tree<T>::Node& Tree<T>::Node::operator=(const Tree<T>::Node& to_copy) {
-    if(this == &to_copy)
-        return *this;
-
-    if(std::is_pointer<T>::value)
-        data = new std::remove_pointer<T>(*to_copy.data);
-    else
-        data = to_copy.data;
-
-    left = to_copy.left ? new Node(*to_copy.left) : nullptr;
-    right = to_copy.right ? new Node(*to_copy.right) : nullptr;
-
-    return *this;
-}
-
-/* Move Assignment */
-template<typename T>
-typename Tree<T>::Node& Tree<T>::Node::operator=(Tree<T>::Node&& to_move) noexcept {
-    data = to_move.data;
-    left = to_move.left;
-    right = to_move.right;
-
-    if(std::is_pointer<T>::value) {
-        to_move.data = nullptr;
-    }
-    to_move.left = nullptr;
-    to_move.right = nullptr;
-
-    return *this;
 }
 
 /** @cond */
