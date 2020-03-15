@@ -11,6 +11,7 @@ DFA::DFA(NFA nfa) {
         for(int j=0; j<128; ++j) {
             if(s->sym[j].size() <= 1)
                 continue;
+#ifdef EXTENDED_FEATURE
             for(auto a: s->sym[j]) {
                 t = table.get_state(a);
                 for(int k=0; k<128; ++k) {
@@ -22,13 +23,13 @@ DFA::DFA(NFA nfa) {
             }
             s->sym[j].clear();
             addTransition(i, j, n_state++);
+#endif
         }
     }
 }
 
 bool DFA::execute(const char* word) {
-    if(!word)
-        return false;
+    if(!word) return false;
 
     State curr = table.row[0];
 

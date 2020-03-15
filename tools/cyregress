@@ -96,7 +96,7 @@ runTest() {
         FUNC_COUNT=$((FUNC_COUNT + 1))
         makeRunDir $testcase_dir $testcase
         cd $OUT_DIR/`dirname $testcase`
-        echo "|TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt | $testcase"
+        echo "|TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt| $testcase"
         source `basename $1`
         runFuncTest $testcase || status=1
     else
@@ -105,7 +105,7 @@ runTest() {
         UNIT_COUNT=$((UNIT_COUNT + 1))
         makeRunDir $testcase_dir $testcase
         cd $OUT_DIR/`dirname $testcase`
-        echo "|TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt | $testcase"
+        echo "|TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt| $testcase"
         source `basename $1`
         runUnitTest $testcase || status=1
     fi
@@ -206,7 +206,7 @@ main() {
             ;;
     esac
 
-    if [[ $FUNC_COUNT -gt 0 ]] && [[ ! -x $CYGNUS ]]; then
+    if [[ ${VALUES['-a']} || ${VALUES['-f']} ]] && [[ ! -x $CYGNUS ]]; then
         LOG EE "$CYGNUS does not exist"
     fi
     rm -rf reports/func reports/unit

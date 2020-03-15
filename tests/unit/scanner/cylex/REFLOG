@@ -1,4 +1,4 @@
 Number of cases: 1
 CASE 1
-int
-float
+int i;
+float f;

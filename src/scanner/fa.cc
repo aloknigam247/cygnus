@@ -45,6 +45,7 @@ void StateTable::addEntry(int from, char sym, int to) {
     }
 }
 
+#ifdef EXTENDED_FEATURE
 Metrics StateTable::calcMetrics() const{
     Metrics m;
     for(int i=0; i<129; ++i) {
@@ -202,6 +203,7 @@ int FA::addTransition(int from, char sym, int to) {
     table.addEntry(from, sym, to);
     return to;
 }
+#endif
 
 int FA::addTransition(const std::vector<int>& from, char sym, int to) {
     if(to == -1)

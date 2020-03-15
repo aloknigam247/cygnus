@@ -110,6 +110,7 @@ class Option {
      */
     bool get_bool_value() const { return m_value.b; }
 
+#ifdef EXTENDED_FEATURE
     /**
      * Get char value
      *
@@ -130,6 +131,7 @@ class Option {
      * @returns string value
      */
     const char* get_string_value() const { return m_value.s; }
+#endif
 
     /**
      * Set bool value
@@ -138,6 +140,7 @@ class Option {
      */
     void set_value(const bool value) { is_set = true; m_value.b = value; }
 
+#ifdef EXTENDED_FEATURE
     /**
      * Set char value
      *
@@ -158,6 +161,7 @@ class Option {
      * @param[in] value string value
      */
     void set_value(const char* value) { is_set = true; m_value.s = value; }
+#endif
 
     /**
      * Operator>
@@ -198,10 +202,12 @@ class Option {
          * Default constructor
          */
         Value() : s(nullptr) {}
+#ifdef EXTENDED_FEATURE
         explicit Value(bool m_b) : b(m_b) {}
         explicit Value(char m_c) : c(m_c) {}
         explicit Value(int m_i) : i(m_i) {}
         explicit Value(const char* m_s) : s(m_s) {}
+#endif
 
         explicit operator bool() { return b; }
         explicit operator char() { return c; }
