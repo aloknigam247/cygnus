@@ -58,9 +58,10 @@ void hiddenChar() {
 
 void hundredStates() {
     TestFA f;
-    char str[99];
+    char str[100];
     for(int i=0; i<99; ++i)
         str[i] = 'a';
+    str[99] = '\0';
 
     f.addTransition(str);
     f.setEndWord('$');
