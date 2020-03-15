@@ -145,7 +145,7 @@ rule.write("#------------ Configs ------------#")
 
 # Print Makefile
 rule.write("CXX     = g++\n" +
-            "COMP_FLAGS = -std=c++11 -fdiagnostics-color\n"+
+            "COMP_FLAGS = -std=c++11 -fdiagnostics-color -DEXTENDED_FEATURE\n"+
             "CY_COMP    = $(CXX) $(COMP_FLAGS) $(INC)\n\n" +
             "INC := ", '')
 for i in opt.incDir:

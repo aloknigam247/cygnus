@@ -31,7 +31,9 @@
 int main(const int argc, const char* argv[]) {
     Options opt;
     opt.addOption("-v", Option::BOOL, "version");
-    opt.parse(argc, argv);
+    if(!opt.parse(argc, argv))
+        return 1;
+
     if(opt.isSet("-v"))
         std::cout << "Cygnus " << MAKE_STRING(VERSION) << '\n';
 

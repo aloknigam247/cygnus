@@ -15,8 +15,13 @@ TEE() {
     echo "" > $1
     while IFS= read line; do
         echo "$line"
-        echo "$line" | sed 's|\x1b\[[;0-9]*m\x1b\[K||g' >> $1
+        echo "$line" | sed -r -e 's|\x1b\[[;0-9]*m\x1b\[K||g' -e 's/\x1b\[[0-9]+m//g' >> $1
     done
+}
+
+GENHTML() {
+    genhtml -f --ignore-errors source reports/coverage/$1/coverage.info --output-directory reports/coverage/$1/html --demangle-cpp -t "$1 coverage" --legend --rc genhtml_hi_limit=98 --rc genhtml_med_limit=80 > reports/coverage/$1/genhtml.log 2> /dev/null
+    egrep -A 1 'lines\.\.\.\.\.\.:' reports/coverage/$1/genhtml.log
 }
 
 OPTION['-a']='value:string,metavar:dir,help:run all tests from <dir>'
@@ -76,7 +81,7 @@ runFuncTest() {
 }
 
 runUnitTest() {
-    gen-make -i $CYGNUS_HOME/include/base -i $CYGNUS_HOME/include/scanner -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/base/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src/base -s $CYGNUS_HOME/src/scanner -s $CYGNUS_HOME/tests/utils/src unit.cc || return 1
+    gen-make -i $CYGNUS_HOME/include/base -i $CYGNUS_HOME/include/compiler -i $CYGNUS_HOME/include/scanner -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/base/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src/base -s $CYGNUS_HOME/src/compiler -s $CYGNUS_HOME/src/scanner -s $CYGNUS_HOME/tests/utils/src unit.cc || return 1
     make --no-print-directory $TEST_MODE 2>&1 | TEE make.log 
     $tool ./unit 2>&1 > TESTLOG 
 }
@@ -91,7 +96,7 @@ runTest() {
         FUNC_COUNT=$((FUNC_COUNT + 1))
         makeRunDir $testcase_dir $testcase
         cd $OUT_DIR/`dirname $testcase`
-        echo "|TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt | $testcase"
+        echo "|TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt| $testcase"
         source `basename $1`
         runFuncTest $testcase || status=1
     else
@@ -100,7 +105,7 @@ runTest() {
         UNIT_COUNT=$((UNIT_COUNT + 1))
         makeRunDir $testcase_dir $testcase
         cd $OUT_DIR/`dirname $testcase`
-        echo "|TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt | $testcase"
+        echo "|TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt| $testcase"
         source `basename $1`
         runUnitTest $testcase || status=1
     fi
@@ -229,8 +234,7 @@ main() {
                 for dir in $(find build/obj/coverage -mindepth 1 -type d); do
                     lcov --gcov-tool=gcov-7 -c -b src/${dir#build/obj/coverage/} -d $dir -d include --no-external -q >> reports/coverage/func/coverage.info 2> /dev/null
                 done
-                genhtml reports/coverage/func/coverage.info --output-directory reports/coverage/func/html --demangle-cpp > reports/coverage/func/genhtml.log 2> /dev/null
-                egrep -A 1 'lines\.\.\.\.\.\.:' reports/coverage/func/genhtml.log
+                GENHTML func
             fi
 
             if [[ $UNIT_COUNT -gt 0 ]]; then
@@ -259,8 +263,7 @@ main() {
                 # remove unit.cc from coverage.info
                 sed -i '/unit.cc$/,/end_of_record/ d' reports/coverage/unit/coverage.info
 
-                genhtml --ignore-errors source reports/coverage/unit/coverage.info --output-directory reports/coverage/unit/html --demangle-cpp > reports/coverage/unit/genhtml.log #2> /dev/null
-                egrep -A 1 'lines\.\.\.\.\.\.:' reports/coverage/unit/genhtml.log
+                GENHTML unit
             fi
 
             if [[ ${VALUES['-a']} ]]; then
@@ -271,8 +274,7 @@ main() {
                 # remove unit.cc from coverage.info
                 sed -i '/unit.cc$/,/end_of_record/ d' reports/coverage/comp/coverage.info
 
-                genhtml --ignore-errors source reports/coverage/comp/coverage.info --output-directory reports/coverage/comp/html --demangle-cpp > reports/coverage/comp/genhtml.log 2> /dev/null
-                egrep -A 1 'lines\.\.\.\.\.\.:' reports/coverage/comp/genhtml.log
+                GENHTML comp
             fi
             ;;
         mem-check)

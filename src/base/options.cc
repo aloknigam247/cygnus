@@ -51,7 +51,7 @@ void Options::addOption(const std::string& option_name,
 
 bool Options::parse(const int argc, const char* argv[]) {
     if(argc == 1)
-        return false;
+        return true;
 
     bool result = true;
     for(int i=1; i<argc; ++i) {
@@ -64,6 +64,7 @@ bool Options::parse(const int argc, const char* argv[]) {
                     case Option::BOOL:
                         iter->set_value(true);
                         break;
+#ifdef EXTENDED_FEATURE
                     case Option::CHAR:
                         if(i+1 < argc && strlen(argv[i+1]) == 1)
                             iter->set_value(*argv[++i]);
@@ -98,12 +99,15 @@ bool Options::parse(const int argc, const char* argv[]) {
                             result = false;
                         }
                         break;
+#endif
                     default:
                         Log::e("Option not suppoted");
                 }
             }
-            else
-                Log::w("ignoring unknown option ", opt);
+            else {
+                Log::e("unknown option ", opt);
+                result = false;
+            }
         }
         else {
             m_pos_args.emplace_back(opt);
@@ -122,6 +126,7 @@ bool Options::isSet(const std::string& opt_name) {
     return (iter != m_option_list.end() && iter->isSet());
 }
 
+#ifdef EXTENDED_FEATURE
 Option::Value Options::get_value(const std::string& opt_name) {
     cystructs::Tree<Option*>::iterator iter = m_option_list.search(opt_name);
     if(iter != m_option_list.end()) {
@@ -140,6 +145,7 @@ Option::Value Options::get_value(const std::string& opt_name) {
     }
     return {};
 }
+#endif
 
 void Options::usage() const {
     cystructs::Tree<Option*>::iterator iter;

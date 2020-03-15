@@ -128,35 +128,6 @@ class Tree {
      */
     Tree() : m_root(nullptr) {}
 
-    /**
-     * Copy Constructor
-     *
-     * @param[in] to_copy object to copy
-     */
-    Tree(const Tree<T>& to_copy);
-
-    /**
-     * Move Constructor
-     *
-     * @param[in,out] to_move object to move
-     */
-    Tree(Tree<T>&& to_move) noexcept;
-
-    /**
-     * Operator=
-     *
-     * @param[in] to_copy object to copy
-     * @return reference to self, Tree<T> object
-     */
-    Tree<T>& operator=(const Tree<T>& to_copy);
-
-    /**
-     * Move Assignemnt
-     *
-     * @param[in,out] to_move object to move
-     * @return reference to self, Tree<T>
-     */
-    Tree<T>& operator=(Tree<T>&& to_move) noexcept;
 
     /**
      * Default destructor
@@ -192,7 +163,13 @@ class Tree {
      *
      * @returns iterator to first position
      */
-    iterator end() const;
+    iterator& end() const;
+
+    /* Deleted functions */
+    Tree(const Tree<T>& to_copy)               = delete;
+    Tree(Tree<T>&& to_move)                    = delete;
+    Tree<T>& operator=(const Tree<T>& to_copy) = delete;
+    Tree<T>& operator=(Tree<T>&& to_move)      = delete;
 
     private:
     /**
@@ -210,34 +187,13 @@ class Tree {
          */
         explicit Node(const T d) : data(d), left(nullptr), right(nullptr) {}
 
-        /**
-         * Copy Constructor
-         *
-         * @param[in] to_copy Node to copy
-         */
-        Node(const Node& to_copy);
-
-        /**
-         * Move Constructor
-         *
-         * @param[in,out] to_move Node to move
-         */
-        Node(Node&& to_move) noexcept;
-
         ~Node();
-        /**
-         * Operator=
-         *
-         * @param[in] to_copy Node to copy
-         */
-        Node& operator=(const Node& to_copy);
 
-        /**
-         * Move Assignemnt
-         *
-         * @param[in,out] to_move Node to move
-         */
-        Node& operator=(Node&& to_move) noexcept;
+        /* Deleted functions */
+        Node(const Node& to_copy)            = delete;
+        Node(Node&& to_move)                 = delete;
+        Node& operator=(const Node& to_copy) = delete;
+        Node& operator=(Node&& to_move)      = delete;
     };
 
     Node* m_root;
@@ -264,5 +220,5 @@ class Tree {
 
 #include "cystructs.tcc"
 
-}   /* namespace cystructs */
+}
 #endif

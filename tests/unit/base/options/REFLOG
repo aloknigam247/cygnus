@@ -1,19 +1,18 @@
-Number of cases: 3
+Number of cases: 2
 CASE 1
 usage: cygnus [options]
     -h: print help message
 CASE 2
+|INFO| -b: 1
+|INFO| -c: d
+|INFO| -i: 77
+|INFO| -s: string
+|INFO| positional: pos_param1
+|INFO| positional: pos_param2
 |ERROR| option -c needs value character value.
 |ERROR| option -i needs value integer value.
 |ERROR| option -s needs value string value.
 |ERROR| option -c needs value character value.
 |ERROR| cd is not a valid integer.
-|WARN| ignoring unknown option -u
+|ERROR| unknown option -u
 |ERROR| 999999999999999 is out of range.
-CASE 3
-|INFO| Options value:
-|INFO| 123
-|INFO| Not set
-|INFO| Options value:
-|INFO| 123
-|INFO| 456
