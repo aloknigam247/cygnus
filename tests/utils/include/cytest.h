@@ -31,7 +31,6 @@ class Log {
 typedef void (*caseType)();
 
 enum SimulateProperty {
-    ExceptionDelete,
     NumProperty
 };
 

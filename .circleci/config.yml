@@ -221,24 +221,24 @@ workflows:
       - coverage:
           requires:
             - checkout
-      - docs-checks:
-          requires:
-            - checkout
-      - lint-checks:
-          requires:
-            - checkout
-      - mem-checks:
-          requires:
-            - checkout
+              #- docs-checks:
+              #requires:
+              #- checkout
+              #- lint-checks:
+              #requires:
+              #- checkout
+              #- mem-checks:
+              #requires:
+              #- checkout
       - release-tests:
           requires:
             - checkout
-      - sanitization:
-          requires:
-            - checkout
-      - style-checks:
-          requires:
-            - checkout
+              #- sanitization:
+              #requires:
+              #- checkout
+              #- style-checks:
+              #requires:
+              #- checkout
       - gen-report:
           requires:
               - coverage

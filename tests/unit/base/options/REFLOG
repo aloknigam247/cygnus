@@ -1,4 +1,4 @@
-Number of cases: 3
+Number of cases: 2
 CASE 1
 usage: cygnus [options]
     -h: print help message
@@ -16,4 +16,3 @@ CASE 2
 |ERROR| cd is not a valid integer.
 |ERROR| unknown option -u
 |ERROR| 999999999999999 is out of range.
-CASE 3

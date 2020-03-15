@@ -73,18 +73,10 @@ void reParse() {
         cytest::Log::i("Not set");
 }
 
-void exceptionOnDelete() {
-}
-
 int main() {
     cytest::Testcase testcase;
     testcase.add(helpOption);
     testcase.add(allOptionsType);
-
-    testcase.simulation_set(cytest::ExceptionDelete);
-    testcase.add(exceptionOnDelete);
-    testcase.simulation_reset(cytest::ExceptionDelete);
-
     testcase.run();
     return 0;
 }

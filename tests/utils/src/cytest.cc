@@ -63,8 +63,6 @@ void* operator new[](const std::size_t s) {
 
 void operator delete(void* ptr) {
     std::free(ptr);
-    if(cytest::Session::get().get_property(cytest::ExceptionDelete))
-        throw std::exception();
 }
 
 void operator delete[](void* ptr) {
