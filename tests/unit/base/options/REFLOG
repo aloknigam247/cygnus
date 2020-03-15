@@ -14,6 +14,6 @@ CASE 2
 |ERROR| option -s needs value string value.
 |ERROR| option -c needs value character value.
 |ERROR| cd is not a valid integer.
-|WARN| ignoring unknown option -u
+|ERROR| unknown option -u
 |ERROR| 999999999999999 is out of range.
 CASE 3
