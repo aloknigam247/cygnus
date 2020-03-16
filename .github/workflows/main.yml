@@ -3,12 +3,21 @@ name: CI
 on: [push]
 
 jobs:
-  build:
+  job1:
     runs-on: ubuntu-latest
-    
+  
     steps:
     - uses: actions/checkout@v1
     - name: Run a multi-line script
       run: |
         source sourceme
         cybuild
+        
+  job2:
+    runs-on: [ubuntu-latest]
+    container: aloknigam247/cygnus
+    steps:
+      - name: Build
+        run: |
+          source sourceme
+          cybuild
