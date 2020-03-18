@@ -2,5 +2,5 @@
 
 class CLG {
     public:
-    CLG(std::string file);
+    int parse(std::string file);
 };

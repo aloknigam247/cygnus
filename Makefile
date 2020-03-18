@@ -9,7 +9,7 @@ CXX          = g++-7
 CPP_FLAGS 	+= --coverage -g
 # Using ver 7 as lcov does not support ver 9 gcno file dump
 else ifeq ($(MODE),debug)
-CPP_FLAGS 	+= -g
+CPP_FLAGS 	+= -g3
 else ifeq ($(MODE),memory)
 CPP_FLAGS 	+= -g
 else ifeq ($(MODE),perf)
@@ -22,7 +22,7 @@ CPP_FLAGS 	+= -g -D_FORTIFY_SOURCE=2 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC 
 			-fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error
 else ifndef MODE
 MODE=debug
-CPP_FLAGS 	+= -g
+CPP_FLAGS 	+= -g3
 else
 $(error unknown MODE '$(MODE)')
 endif

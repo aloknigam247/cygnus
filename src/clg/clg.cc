@@ -2,6 +2,7 @@
 
 extern "C" void callme(const char *file);
 
-CLG::CLG(std::string file) {
+int CLG::parse(std::string file) {
     callme(file.c_str());
+    return 0;
 }

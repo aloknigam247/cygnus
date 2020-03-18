@@ -31,6 +31,7 @@
 int main(const int argc, const char* argv[]) {
     Options opt;
     opt.addOption("-v", Option::BOOL, "version");
+    opt.addOption("-l", Option::STRING, "language file");
     if(!opt.parse(argc, argv))
         return 1;
 
@@ -39,6 +40,12 @@ int main(const int argc, const char* argv[]) {
 
     const std::vector<std::string> &pos = opt.get_positional();
 
+    if(opt.isSet("-l")) {
+        CLG clg;
+        const char *lang_file = static_cast<const char*>(opt.get_value("-l"));
+        clg.parse(lang_file);
+    }
+
     if(pos.empty())
         return 0;
 
@@ -46,6 +53,5 @@ int main(const int argc, const char* argv[]) {
 
     CyCompile compile(pos.front());
 
-    CLG clg(pos.front());
     return 0;
 }
