@@ -25,11 +25,11 @@ $(OBJ)/clg.flex.o: clg.flex.c
 $(OBJ)/clg.tab.o: clg.tab.c
 	gcc -fdiagnostics-color -c clg.tab.c -o $@
 
-clg.flex.c: clg.l clg.tab.h
+clg.flex.c: clg.l clg.tab.h clg.tab.c
 	flex -o clg.flex.c clg.l
 
 clg.tab.c: clg.y
-	bison -d clg.y
+	bison -g -d clg.y
 
 clg.l:
 	echo "clg.l"

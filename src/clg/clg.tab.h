@@ -49,7 +49,11 @@ extern int yydebug;
     WS = 259,
     PATT = 260,
     SC = 261,
-    NL = 262
+    NL = 262,
+    RULE = 263,
+    LITERAL = 264,
+    COLON = 265,
+    PIPE = 266
   };
 #endif
 

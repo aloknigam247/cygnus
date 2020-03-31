@@ -4,10 +4,14 @@
 #include "clg.tab.h"
 %}
 %%
-[a-z]+ 		{printf("Identifier: %s\n", yytext); return ID;}
-\/[a-z]+\/ 	{printf("Pattern: %s\n", yytext); return PATT;}
-[ \t]+ 		{printf("Whitespace: \`%s\'\n", yytext); return WS;}
-; 			{printf("Semicolon: %s\n", yytext); return SC;}
-\n 			{printf("Newline:\n"); return NL;}
-. 			{printf("Ignored: \`%s\'\n", yytext);}
+[A-Z]+ 	{printf("Identifier: %s\n", yytext);        return ID;}
+[a-z]+  {printf("Rule: %s\n", yytext);              return RULE;}
+\/.*\/  {printf("Pattern: %s\n", yytext);           return PATT;}
+[ \t]+ 	{printf("Whitespace: \`%s\'\n", yytext);    return WS;}
+'[a-z]' {printf("Literal: %s", yytext);             return LITERAL;}
+; 		{printf("Semicolon: %s\n", yytext);         return SC;}
+\| 		{printf("Pipe: %s\n", yytext);              return PIPE;}
+: 		{printf("Colon: %s\n", yytext);             return COLON;}
+[\n]    {printf("Newline:\n");                      return NL;}
+. 	    {printf("Ignored: \`%s\'\n", yytext);}
 %%
