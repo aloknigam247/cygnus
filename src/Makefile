@@ -1,8 +1,8 @@
-MODULES := base compiler scanner
+MODULES := $(sort $(shell find -maxdepth 1 -mindepth 1 -type d -printf '%f '))
 
 .PHONY: $(MODULES)
 
 all: $(MODULES)
 
 $(MODULES):
-	$(MAKE) -C $@ DEP=$(DEP)/$@ OBJ=$(OBJ)/$@
+	$(MAKE) -f ../module.mk -C $@ MODULE=$@ DEP_DIR=$(DEP_DIR)/$@ OBJ_DIR=$(OBJ_DIR)/$@
