@@ -1,60 +1,70 @@
 #---------- Configs ---------- #
 .DEFAULT_GOAL = compile
 .PHONY: src compile
-Q	:= @
+export Q	:= @
 
 #---------- Modes ----------# 
+export CPP_COMPILER	= g++
+export C_COMPILER	= gcc
+
 ifeq ($(MODE),coverage)
-CXX          = g++-7
-CPP_FLAGS 	+= --coverage -g
 # Using ver 7 as lcov does not support ver 9 gcno file dump
+CPP_COMPILER	= g++-7
+C_COMPILER		= gcc-7
+COMPILER_FLAGS	+= --coverage -g
+
 else ifeq ($(MODE),debug)
-CPP_FLAGS 	+= -g
+COMPILER_FLAGS	+= -ggdb3
+
 else ifeq ($(MODE),memory)
-CPP_FLAGS 	+= -g
+COMPILER_FLAGS	+= -g3
+
 else ifeq ($(MODE),perf)
-CPP_FLAGS 	+= -g
+COMPILER_FLAGS	+= -g3
+
 else ifeq ($(MODE),release)
-CPP_FLAGS 	+= -O
+COMPILER_FLAGS	+= -Ofast
+
 else ifeq ($(MODE),sanitize)
-CPP_FLAGS 	+= -g -D_FORTIFY_SOURCE=2 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC \
-			-fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow\
-			-fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error
+COMPILER_FLAGS	+= -g3 -D_FORTIFY_SOURCE=2 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC \
+				-fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow\
+				-fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error
 else ifndef MODE
 MODE=debug
-CPP_FLAGS 	+= -g
+COMPILER_FLAGS 	+= -ggdb3
 else
 $(error unknown MODE '$(MODE)')
 endif
 
 #---------- Path Configurations ----------# 
 BLD_DIR	:= $(CURDIR)/build
-BIN		:= $(BLD_DIR)/bin/$(MODE)
-DEP		:= $(BLD_DIR)/dep/$(MODE)
-OBJ		:= $(BLD_DIR)/obj/$(MODE)
-MOD_EXE	:= $(BIN)/cygnus-$(MODE)
-DUMP 	:= $(BIN)
-EXE 	:= $(BLD_DIR)/bin/cygnus
+BIN_DIR	:= $(BLD_DIR)/bin/$(MODE)
+DEP_DIR	:= $(BLD_DIR)/dep/$(MODE)
+OBJ_DIR	:= $(BLD_DIR)/obj/$(MODE)
+EXE		:= $(BIN_DIR)/cygnus-$(MODE)
+DUMP	:= $(BIN_DIR)
+LINK	:= $(BLD_DIR)/bin/cygnus
 
-export OBJ DEP
+export OBJ_DIR DEP_DIR
 
 #---------- Compile Flags ----------# 
-export CPP_FLAGS += -std=c++11 -fdiagnostics-color
+COMPILER_FLAGS	+= -std=c++11 -fdiagnostics-color
 ifdef STRICT
-	CPP_FLAGS += -pedantic -Wall -Walloc-zero -Wcast-align -Wcast-qual -Wconversion\
+COMPILER_FLAGS	+= -pedantic -Wall -Walloc-zero -Wcast-align -Wcast-qual -Wconversion\
 				-Wduplicated-branches -Wduplicated-cond -Weffc++ -Wextra -Wfloat-equal -Wformat=2\
 				-Winline -Wlogical-op -Wmissing-include-dirs -Woverloaded-virtual -Wshadow\
 				-Wstrict-overflow=5 -Wstringop-overflow=2 -Wsuggest-attribute=const\
 				-Wswitch-default -Wswitch-enum -Wunused -Wunused-macros
 endif
-export CY_COMPILE := $(CXX) $(CPP_FLAGS)
+export C_COMPILE	:= $(C_COMPILER) $(COMPILER_FLAGS)
+export CPP_COMPILE	:= $(CPP_COMPILER) $(COMPILER_FLAGS)
 
 #---------- Make Flags ----------#
-export MAKE_FLAGS	:= --no-print-directory 
-export MAKE			 = $Qmake $(MAKE_FLAGS)
+MAKE_FLAGS	+= --no-print-directory 
+export MAKE	= $Qmake $(MAKE_FLAGS)
 
 #---------- Rules ----------#
-compile: $(DUMP) src $(EXE)
+compile: $(DUMP) src $(LINK)
 
 $(DUMP):
 	$Qmkdir -p $@
@@ -62,12 +72,11 @@ $(DUMP):
 src:
 	$(MAKE) -C $@
 
-$(EXE): $(MOD_EXE)
+$(LINK): $(EXE)
 	ln -sfr $< $@
 
-$(MOD_EXE): INCLUDE_DIR=''
-$(MOD_EXE): $(subst src,$(OBJ),$(subst .cc,.o,$(wildcard src/*/*.cc)))
-	$(CY_COMPILE) -o $@ $^
+$(EXE): $(subst src,$(OBJ_DIR),$(subst .cc,.o,$(wildcard src/*/*.cc))) $(subst src,$(OBJ_DIR),$(subst .c,.o,$(wildcard src/*/*.c)))
+	$(CPP_COMPILE) -o $@ $^
 
 clean:
 	$Qecho "cleaning ..."
