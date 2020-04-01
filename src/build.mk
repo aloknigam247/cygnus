@@ -8,7 +8,11 @@ DEFINES	= -DVERSION=$(shell cat ../../.version)
 build-$(MODULE): $(OBJ_DIR) $(OBJS)
 
 $(OBJS):	# It should be empty else it will override rule from depends file
+ifeq (, $(wildcard $(@F:.o=.c)))
+	$(C_COMPILE) $(DEFINES) $(INCLUDE_DIR) -c -o $@ $<
+else
 	$(CPP_COMPILE) $(DEFINES) $(INCLUDE_DIR) -c -o $@ $<
+endif
 ifeq ($(MODE),coverage)
 	ln -fsr $< $(OBJ_DIR)/
 endif

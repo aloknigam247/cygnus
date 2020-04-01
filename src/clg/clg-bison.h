@@ -30,8 +30,8 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_YY_CLG_TAB_H_INCLUDED
-# define YY_YY_CLG_TAB_H_INCLUDED
+#ifndef YY_YY_CLG_BISON_H_INCLUDED
+# define YY_YY_CLG_BISON_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -69,4 +69,4 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_CLG_TAB_H_INCLUDED  */
+#endif /* !YY_YY_CLG_BISON_H_INCLUDED  */

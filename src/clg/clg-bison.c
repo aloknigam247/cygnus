@@ -67,7 +67,7 @@
 #include <stdio.h>
 extern FILE *yyin;
 
-#line 71 "clg.tab.c" /* yacc.c:339  */
+#line 71 "clg-bison.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -86,9 +86,9 @@ extern FILE *yyin;
 #endif
 
 /* In a future release of Bison, this section will be replaced
-   by #include "clg.tab.h".  */
-#ifndef YY_YY_CLG_TAB_H_INCLUDED
-# define YY_YY_CLG_TAB_H_INCLUDED
+   by #include "clg-bison.h".  */
+#ifndef YY_YY_CLG_BISON_H_INCLUDED
+# define YY_YY_CLG_BISON_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -126,11 +126,11 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_CLG_TAB_H_INCLUDED  */
+#endif /* !YY_YY_CLG_BISON_H_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
 
-#line 134 "clg.tab.c" /* yacc.c:358  */
+#line 134 "clg-bison.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -1209,53 +1209,53 @@ yyreduce:
         case 2:
 #line 9 "clg.y" /* yacc.c:1646  */
     {printf("Variables -->>\n");}
-#line 1213 "clg.tab.c" /* yacc.c:1646  */
+#line 1213 "clg-bison.c" /* yacc.c:1646  */
     break;
 
   case 3:
 #line 9 "clg.y" /* yacc.c:1646  */
     {printf("Variables Done\n\n");}
-#line 1219 "clg.tab.c" /* yacc.c:1646  */
+#line 1219 "clg-bison.c" /* yacc.c:1646  */
     break;
 
   case 4:
 #line 9 "clg.y" /* yacc.c:1646  */
     {printf("Grammar -->>\n");}
-#line 1225 "clg.tab.c" /* yacc.c:1646  */
+#line 1225 "clg-bison.c" /* yacc.c:1646  */
     break;
 
   case 5:
 #line 9 "clg.y" /* yacc.c:1646  */
     {printf("Compilation Done\n");}
-#line 1231 "clg.tab.c" /* yacc.c:1646  */
+#line 1231 "clg-bison.c" /* yacc.c:1646  */
     break;
 
   case 7:
 #line 11 "clg.y" /* yacc.c:1646  */
     {printf("Empty Variable\n");}
-#line 1237 "clg.tab.c" /* yacc.c:1646  */
+#line 1237 "clg-bison.c" /* yacc.c:1646  */
     break;
 
   case 8:
 #line 12 "clg.y" /* yacc.c:1646  */
     {printf("Variable Decleration\n");}
-#line 1243 "clg.tab.c" /* yacc.c:1646  */
+#line 1243 "clg-bison.c" /* yacc.c:1646  */
     break;
 
   case 9:
 #line 14 "clg.y" /* yacc.c:1646  */
     {printf("Empty grammar\n");}
-#line 1249 "clg.tab.c" /* yacc.c:1646  */
+#line 1249 "clg-bison.c" /* yacc.c:1646  */
     break;
 
   case 10:
 #line 15 "clg.y" /* yacc.c:1646  */
     {printf("Grammar Decleration\n");}
-#line 1255 "clg.tab.c" /* yacc.c:1646  */
+#line 1255 "clg-bison.c" /* yacc.c:1646  */
     break;
 
 
-#line 1259 "clg.tab.c" /* yacc.c:1646  */
+#line 1259 "clg-bison.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires

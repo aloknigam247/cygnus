@@ -1,6 +1,6 @@
-#line 2 "clg.flex.c"
+#line 2 "clg-flex.c"
 
-#line 4 "clg.flex.c"
+#line 4 "clg-flex.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -455,9 +455,9 @@ char *yytext;
 #line 1 "clg.l"
 /* even more like Unix wc */
 #line 4 "clg.l"
-#include "clg.tab.h"
-#line 460 "clg.flex.c"
-#line 461 "clg.flex.c"
+#include "clg-bison.h"
+#line 460 "clg-flex.c"
+#line 461 "clg-flex.c"
 
 #define INITIAL 0
 
@@ -676,7 +676,7 @@ YY_DECL
 	{
 #line 6 "clg.l"
 
-#line 680 "clg.flex.c"
+#line 680 "clg-flex.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -789,7 +789,7 @@ YY_RULE_SETUP
 #line 17 "clg.l"
 ECHO;
 	YY_BREAK
-#line 793 "clg.flex.c"
+#line 793 "clg-flex.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 

@@ -1,7 +1,7 @@
 /* even more like Unix wc */
 %option noyywrap
 %{
-#include "clg.tab.h"
+#include "clg-bison.h"
 %}
 %%
 [A-Z]+ 	{printf("Identifier: %s\n", yytext);        return ID;}
