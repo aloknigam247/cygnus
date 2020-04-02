@@ -4,14 +4,12 @@
 #include "clg-bison.h"
 %}
 %%
-[A-Z]+ 	{printf("Identifier: %s\n", yytext);        return ID;}
-[a-z]+  {printf("Rule: %s\n", yytext);              return RULE;}
-\/.*\/  {printf("Pattern: %s\n", yytext);           return PATT;}
-[ \t]+ 	{printf("Whitespace: \`%s\'\n", yytext);    return WS;}
-'[a-z]' {printf("Literal: %s", yytext);             return LITERAL;}
-; 		{printf("Semicolon: %s\n", yytext);         return SC;}
-\| 		{printf("Pipe: %s\n", yytext);              return PIPE;}
-: 		{printf("Colon: %s\n", yytext);             return COLON;}
-[\n]    {printf("Newline:\n");                      return NL;}
-. 	    {printf("Ignored: \`%s\'\n", yytext);}
+: 		    { printf("COLON: %s\n", yytext);            return COLON; }
+filetype    { printf("FILETYPE: %s\n", yytext);         return FILETYPE; }
+[a-z]+      { printf("LOWER_WORD: %s\n", yytext);       return LOWER_WORD; }
+[\n]        { printf("NL:\n");                          return NL; }
+\/.*\/      { printf("PATTERN: %s\n", yytext);          return PATTERN; }
+[A-Z]+      { printf("UPPER_WORD: %s\n", yytext);       return UPPER_WORD; }
+[ \t] 	    { printf("Whitespace: \`%s\'\n", yytext);   return WS; }
+. 	        { printf("ignored: \`%s\'\n", yytext); }
 %%

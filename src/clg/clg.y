@@ -1,22 +1,17 @@
-/* simplest version of calculator */
 %{
 #include <stdio.h>
 extern FILE *yyin;
 %}
 /* declare tokens */
-%token ID WS PATT SC NL RULE LITERAL COLON PIPE
+%token COLON FILETYPE LOWER_WORD NL PATTERN UPPER_WORD WS
 %%
-stmt: {printf("Variables -->>\n");} variable_rule {printf("Variables Done\n\n");} NL {printf("Grammar -->>\n");} grammar_rule {printf("Compilation Done\n");} NL
+stmt: filetype NL variable NL grammar NL
 
-variable_rule: /* nothing */ {printf("Empty Variable\n");}
-    | ID WS PATT NL variable_rule {printf("Variable Decleration\n");}
+filetype: FILETYPE COLON WS LOWER_WORD
 
-grammar_rule: /* nothing */ {printf("Empty grammar\n");}
-    | RULE COLON WS grammar_element {printf("Grammar Decleration\n");}
+variable: UPPER_WORD WS PATTERN
 
-grammar_element: 
-    | RULE | ID | LITERAL | PIPE
-    | grammar_element WS grammar_element
+grammar: LOWER_WORD COLON WS UPPER_WORD
 %%
 void callme(const *file)
 {

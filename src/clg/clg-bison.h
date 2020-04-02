@@ -45,15 +45,13 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    ID = 258,
-    WS = 259,
-    PATT = 260,
-    SC = 261,
-    NL = 262,
-    RULE = 263,
-    LITERAL = 264,
-    COLON = 265,
-    PIPE = 266
+    COLON = 258,
+    FILETYPE = 259,
+    LOWER_WORD = 260,
+    NL = 261,
+    PATTERN = 262,
+    UPPER_WORD = 263,
+    WS = 264
   };
 #endif
 
