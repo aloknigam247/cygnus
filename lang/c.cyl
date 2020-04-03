@@ -1,6 +1,3 @@
 filetype: c
-TYPE /a-z/
-WS / /
-NAME /a-z/
-SEMICOLON /;/
-variable_dec: TYPE WS NAME SEMICOLON
+TYPE /[a-z]+/
+variable: TYPE

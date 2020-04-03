@@ -4,12 +4,12 @@
 #include "clg-bison.h"
 %}
 %%
-: 		    { printf("COLON: %s\n", yytext);            return COLON; }
-filetype    { printf("FILETYPE: %s\n", yytext);         return FILETYPE; }
-[a-z]+      { printf("LOWER_WORD: %s\n", yytext);       return LOWER_WORD; }
-[\n]        { printf("NL:\n");                          return NL; }
-\/.*\/      { printf("PATTERN: %s\n", yytext);          return PATTERN; }
-[A-Z]+      { printf("UPPER_WORD: %s\n", yytext);       return UPPER_WORD; }
-[ \t] 	    { printf("Whitespace: \`%s\'\n", yytext);   return WS; }
-. 	        { printf("ignored: \`%s\'\n", yytext); }
+: 		    { printf("flex::COLON: %s\n", yytext);            yylval.str = strdup(yytext); return COLON; }
+filetype    { printf("flex::FILETYPE: %s\n", yytext);         yylval.str = strdup(yytext); return FILETYPE; }
+[a-z]+      { printf("flex::LOWER_WORD: %s\n", yytext);       yylval.str = strdup(yytext); return LOWER_WORD; }
+[\n]        { printf("flex::NL\n");                           yylval.str = strdup(yytext); return NL; }
+\/.*\/      { printf("flex::PATTERN: %s\n", yytext);          yylval.str = strdup(yytext); return PATTERN; }
+[A-Z]+      { printf("flex::UPPER_WORD: %s\n", yytext);       yylval.str = strdup(yytext); return UPPER_WORD; }
+[ \t] 	    { printf("flex::Whitespace: \`%s\'\n", yytext);   yylval.str = strdup(yytext); return WS; }
+. 	        { printf("flex::ignored: \`%s\'\n", yytext); }
 %%

@@ -65,9 +65,12 @@
 #line 1 "clg.y" /* yacc.c:339  */
 
 #include <stdio.h>
-extern FILE *yyin;
+#include "interface.h"
 
-#line 71 "clg-bison.c" /* yacc.c:339  */
+extern FILE *yyin;
+char buff[1000];
+
+#line 74 "clg-bison.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -114,7 +117,17 @@ extern int yydebug;
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+
+union YYSTYPE
+{
+#line 9 "clg.y" /* yacc.c:355  */
+
+    char* str;
+
+#line 128 "clg-bison.c" /* yacc.c:355  */
+};
+
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
@@ -128,7 +141,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 132 "clg-bison.c" /* yacc.c:358  */
+#line 145 "clg-bison.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -426,7 +439,7 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,     8,     8,    10,    12,    14
+       0,    21,    21,    23,    25,    27
 };
 #endif
 
@@ -1197,8 +1210,26 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-      
-#line 1202 "clg-bison.c" /* yacc.c:1646  */
+        case 3:
+#line 23 "clg.y" /* yacc.c:1646  */
+    { setFileType((yyvsp[0].str)); }
+#line 1217 "clg-bison.c" /* yacc.c:1646  */
+    break;
+
+  case 4:
+#line 25 "clg.y" /* yacc.c:1646  */
+    { insertVariable((yyvsp[-2].str), (yyvsp[0].str)); }
+#line 1223 "clg-bison.c" /* yacc.c:1646  */
+    break;
+
+  case 5:
+#line 27 "clg.y" /* yacc.c:1646  */
+    { snprintf(buff, 1000, "%s%s%s%s", (yyvsp[-3].str), (yyvsp[-2].str), (yyvsp[-1].str), (yyvsp[0].str)); insertRule(buff); }
+#line 1229 "clg-bison.c" /* yacc.c:1646  */
+    break;
+
+
+#line 1233 "clg-bison.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1426,13 +1457,12 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 15 "clg.y" /* yacc.c:1906  */
+#line 28 "clg.y" /* yacc.c:1906  */
 
-void callme(const *file)
+void bisonParse(FILE *file)
 {
-  FILE *myfile = fopen(file, "r");
   // Set flex to read from it instead of defaulting to STDIN:
-  yyin = myfile;
+  yyin = file;
   yyparse();
 }
 yyerror(char *s)

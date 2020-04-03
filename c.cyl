@@ -1,3 +1,0 @@
-filetype: c
-TYPE /[a-z]+/
-variable: TYPE
