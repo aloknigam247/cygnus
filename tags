@@ -1,0 +1,315 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+.DEFAULT_GOAL	Makefile	/^.DEFAULT_GOAL = compile$/;"	m
+BASE_CYFILE_H	include/base/cyfile.h	26;"	d
+BASE_CYSTRUCTS_H	include/base/cystructs.h	35;"	d
+BASE_LOG_H	include/base/log.h	35;"	d
+BASE_OPTIONS_H	include/base/options.h	35;"	d
+BIN_DIR	Makefile	/^BIN_DIR	:= $(BLD_DIR)\/bin\/$(MODE)$/;"	m
+BISON_FILES	src/module.mk	/^BISON_FILES	= $(wildcard *.y)$/;"	m
+BISON_SRC	src/module.mk	/^BISON_SRC	= $(subst .y,-bison.c,$(BISON_FILES))$/;"	m
+BLD_DIR	Makefile	/^BLD_DIR	:= $(CURDIR)\/build$/;"	m
+BOOL	include/base/options.h	/^        BOOL,$/;"	e	enum:Option::Type
+CHAR	include/base/options.h	/^        CHAR,$/;"	e	enum:Option::Type
+CLG	include/clg/clg.h	/^class CLG {$/;"	c
+CPP_COMPILE	Makefile	/^export CPP_COMPILE	:= $(CPP_COMPILER) $(COMPILER_FLAGS)$/;"	m
+CPP_COMPILER	Makefile	/^CPP_COMPILER	= g++-7$/;"	m
+CPP_COMPILER	Makefile	/^export CPP_COMPILER	= g++$/;"	m
+CPP_DEPS	src/module.mk	/^CPP_DEPS	= $(addprefix $(DEP_DIR)\/,$(CPP_SRC:.cc=.dpp))$/;"	m
+CPP_SRC	src/build.mk	/^CPP_SRC	= $(wildcard *.cc)$/;"	m
+CPP_SRC	src/module.mk	/^CPP_SRC		= $(wildcard *.cc)$/;"	m
+CYTEST_H	tests/utils/include/cytest.h	2;"	d
+C_COMPILE	Makefile	/^export C_COMPILE	:= $(C_COMPILER) $(COMPILER_FLAGS)$/;"	m
+C_COMPILER	Makefile	/^C_COMPILER		= gcc-7$/;"	m
+C_COMPILER	Makefile	/^export C_COMPILER	= gcc$/;"	m
+C_DEPS	src/module.mk	/^C_DEPS		= $(addprefix $(DEP_DIR)\/,$(C_SRC:.c=.d))$/;"	m
+C_SRC	src/build.mk	/^C_SRC	= $(wildcard *.c)$/;"	m
+C_SRC	src/module.mk	/^C_SRC		= $(wildcard *.c)$/;"	m
+Case	tests/utils/include/cytest.h	/^struct Case {$/;"	s	namespace:cytest
+CyCompile	include/compiler/cycompile.h	/^class CyCompile {$/;"	c
+CyCompile	src/compiler/cycompile.cc	/^CyCompile::CyCompile(std::string file) {$/;"	f	class:CyCompile
+CyFile	include/base/cyfile.h	/^class CyFile: public std::fstream {$/;"	c
+CyLex	include/scanner/cylex.h	/^class CyLex {$/;"	c
+CyParse	include/scanner/cyparse.h	/^class CyParse {$/;"	c
+DEFINES	src/build.mk	/^DEFINES	= -DVERSION=$(shell cat ..\/..\/.version)$/;"	m
+DEPS	src/build.mk	/^DEPS	= $(addprefix $(DEP_DIR)\/,$(C_SRC:.c=.d)) $(addprefix $(DEP_DIR)\/,$(CPP_SRC:.cc=.dpp))$/;"	m
+DEP_DIR	Makefile	/^DEP_DIR	:= $(BLD_DIR)\/dep\/$(MODE)$/;"	m
+DFA	include/scanner/dfa.h	/^class DFA: public FA {$/;"	c
+DFA	src/scanner/dfa.cc	/^DFA::DFA(NFA nfa) {$/;"	f	class:DFA
+DUMP	Makefile	/^DUMP	:= $(BIN_DIR)$/;"	m
+EXE	Makefile	/^EXE		:= $(BIN_DIR)\/cygnus-$(MODE)$/;"	m
+EXIT	tools/cmdline.bash	/^EXIT() {$/;"	f
+FA	include/scanner/fa.h	/^class FA {$/;"	c
+FLEX_FILES	src/module.mk	/^FLEX_FILES	= $(wildcard *.l)$/;"	m
+FLEX_SRC	src/module.mk	/^FLEX_SRC	= $(subst .l,-flex.c,$(FLEX_FILES))$/;"	m
+GENHTML	tools/cyregress	/^GENHTML() {$/;"	f
+Grammar	include/clg/interface.h	/^struct Grammar {$/;"	s
+INT	include/base/options.h	/^        INT,$/;"	e	enum:Option::Type
+INTERFACE_H	include/clg/interface.h	2;"	d
+LINK	Makefile	/^LINK	:= $(BLD_DIR)\/bin\/cygnus$/;"	m
+LOG	tools/cmdline.bash	/^LOG() {$/;"	f
+Log	include/base/log.h	/^class Log {$/;"	c
+Log	tests/utils/include/cytest.h	/^class Log {$/;"	c	namespace:cytest
+MAKE	Makefile	/^export MAKE	= $Qmake $(MAKE_FLAGS)$/;"	m
+MAKE	tools/cybuild	/^MAKE() {$/;"	f
+MAKE_STRING	include/base/utils.h	2;"	d
+MODE	Makefile	/^MODE=debug$/;"	m
+MODULES	src/Makefile	/^MODULES := $(sort $(shell find -maxdepth 1 -mindepth 1 -type d -printf '%f '))$/;"	m
+Metrics	include/scanner/fa.h	/^struct Metrics {$/;"	s
+NFA	include/scanner/nfa.h	/^class NFA: public FA {$/;"	c
+Node	include/base/cystructs.h	/^        explicit Node(const T d) : data(d), left(nullptr), right(nullptr) {}$/;"	f	struct:cystructs::Tree::Node
+Node	include/base/cystructs.h	/^    struct Node {$/;"	s	class:cystructs::Tree
+NumProperty	tests/utils/include/cytest.h	/^    NumProperty$/;"	e	enum:cytest::SimulateProperty
+OBJS	src/build.mk	/^OBJS	= $(addprefix $(OBJ_DIR)\/,$(C_SRC:.c=.o)) $(addprefix $(OBJ_DIR)\/,$(CPP_SRC:.cc=.o))$/;"	m
+OBJ_DIR	Makefile	/^OBJ_DIR	:= $(BLD_DIR)\/obj\/$(MODE)$/;"	m
+Option	include/base/options.h	/^    Option(const std::string& name, Type type, const std::string& help) :$/;"	f	class:Option
+Option	include/base/options.h	/^class Option {$/;"	c
+Options	include/base/options.h	/^class Options {$/;"	c
+Options	src/base/options.cc	/^Options::Options(): m_option_list(), m_pos_args() {$/;"	f	class:Options
+Q	Makefile	/^export Q	:= @$/;"	m
+RETURN_ERROR	tools/cmdline.bash	/^RETURN_ERROR() {$/;"	f
+RuleList	include/clg/interface.h	/^struct RuleList {$/;"	s
+SCANNER_CYLEX_H	include/scanner/cylex.h	26;"	d
+SCANNER_DFA_H	include/scanner/dfa.h	2;"	d
+SCANNER_FA_H	include/scanner/fa.h	26;"	d
+SCANNER_NFA_H	include/scanner/nfa.h	26;"	d
+SET_ERROR	tools/cmdline.bash	/^SET_ERROR() {$/;"	f
+STRING	include/base/options.h	/^        STRING$/;"	e	enum:Option::Type
+STRINGIZE	include/base/utils.h	1;"	d
+Session	tests/utils/include/cytest.h	/^    Session() : property(nullptr) {}$/;"	f	class:cytest::Session
+Session	tests/utils/include/cytest.h	/^class Session {$/;"	c	namespace:cytest
+SimulateProperty	tests/utils/include/cytest.h	/^enum SimulateProperty {$/;"	g	namespace:cytest
+State	include/scanner/fa.h	/^struct State {$/;"	s
+StateTable	include/scanner/fa.h	/^class StateTable {$/;"	c
+TEE	tools/cybuild	/^TEE() {$/;"	f
+TEE	tools/cyregress	/^TEE() {$/;"	f
+TestFA	tests/unit/scanner/fa/unit.cc	/^class TestFA : public FA {$/;"	c	file:
+TestStruct	tests/unit/base/cystructs/unit.cc	/^    TestStruct(std::string name): name(name) {}$/;"	f	struct:TestStruct
+TestStruct	tests/unit/base/cystructs/unit.cc	/^struct TestStruct {$/;"	s	file:
+Testcase	tests/utils/include/cytest.h	/^class Testcase {$/;"	c	namespace:cytest
+Tree	include/base/cystructs.h	/^    Tree() : m_root(nullptr) {}$/;"	f	class:cystructs::Tree
+Tree	include/base/cystructs.h	/^class Tree {$/;"	c	namespace:cystructs
+Type	include/base/options.h	/^    enum Type {$/;"	g	class:Option
+Value	include/base/options.h	/^        Value() : s(nullptr) {}$/;"	f	union:Option::Value
+Value	include/base/options.h	/^        explicit Value(bool m_b) : b(m_b) {}$/;"	f	union:Option::Value
+Value	include/base/options.h	/^        explicit Value(char m_c) : c(m_c) {}$/;"	f	union:Option::Value
+Value	include/base/options.h	/^        explicit Value(const char* m_s) : s(m_s) {}$/;"	f	union:Option::Value
+Value	include/base/options.h	/^        explicit Value(int m_i) : i(m_i) {}$/;"	f	union:Option::Value
+Value	include/base/options.h	/^    union Value {$/;"	u	class:Option
+VariableList	include/clg/interface.h	/^struct VariableList {$/;"	s
+add	tests/utils/src/cytest.cc	/^void Testcase::add(caseType p) {$/;"	f	class:cytest::Testcase
+addEntry	src/scanner/fa.cc	/^void StateTable::addEntry(int from, char sym, int to) {$/;"	f	class:StateTable
+addOption	src/base/options.cc	/^void Options::addOption(const std::string& option_name,$/;"	f	class:Options
+addPattern	src/scanner/cylex.cc	/^void CyLex::addPattern(const char* patt) {$/;"	f	class:CyLex
+addPattern	src/scanner/nfa.cc	/^void NFA::addPattern(const char* patt) {$/;"	f	class:NFA
+addTransition	src/scanner/fa.cc	/^int FA::addTransition(const std::vector<int>& from, char sym, int to) {$/;"	f	class:FA
+addTransition	src/scanner/fa.cc	/^int FA::addTransition(int from, char sym, int to) {$/;"	f	class:FA
+addTransition	tests/unit/scanner/fa/unit.cc	/^    void addTransition(const char *sym_list) {$/;"	f	class:TestFA
+adder	tools/gen-report	/^adder() {$/;"	f
+allOptionsType	tests/unit/base/options/unit.cc	/^void allOptionsType() {$/;"	f
+allSupportedPatterns	tests/unit/scanner/nfa/unit.cc	/^void allSupportedPatterns() {$/;"	f
+analyse	src/scanner/cylex.cc	/^ void CyLex::analyse() {$/;"	f	class:CyLex
+analyseFile	tests/unit/scanner/cylex/unit.cc	/^void analyseFile() {$/;"	f
+b	include/base/options.h	/^        bool b; \/* TODO: obsolete *\/$/;"	m	union:Option::Value
+begin	src/base/tcc/cystructs.tcc	/^typename Tree<T>::iterator Tree<T>::begin() const {$/;"	f	class:Tree
+binaryInsert	src/base/tcc/cystructs.tcc	/^void Tree<T>::binaryInsert(Node*& root, const Node* data) {$/;"	f	class:Tree
+binarySearch	src/base/tcc/cystructs.tcc	/^typename Tree<T>::Node* Tree<T>::binarySearch(Node* root, K& key) const {$/;"	f	class:Tree
+build	src/scanner/nfa.cc	/^void NFA::build() {$/;"	f	class:NFA
+c	include/base/options.h	/^        char c;$/;"	m	union:Option::Value
+calcMetrics	src/scanner/fa.cc	/^Metrics StateTable::calcMetrics() const{$/;"	f	class:StateTable
+caseType	tests/utils/include/cytest.h	/^typedef void (*caseType)();$/;"	t	namespace:cytest
+case_list	tests/utils/include/cytest.h	/^    std::vector<Case> case_list;$/;"	m	class:cytest::Testcase
+case_ptr	tests/utils/include/cytest.h	/^    caseType case_ptr;$/;"	m	struct:cytest::Case
+col	src/scanner/fa.cc	/^void col(Metrics& m, int i, T t) {$/;"	f
+convertNFA2DFA	tests/unit/scanner/dfa/unit.cc	/^void convertNFA2DFA() {$/;"	f
+covReport	tools/gen-report	/^covReport() {$/;"	f
+cystructs	include/base/cystructs.h	/^namespace cystructs {$/;"	n
+cytest	tests/utils/include/cytest.h	/^namespace cytest {$/;"	n
+cytest	tests/utils/src/cytest.cc	/^namespace cytest {$/;"	n	file:
+d	include/base/log.h	/^    static void d(const Args... args) { std::cout << "|DEBUG| "; display(args...); }$/;"	f	class:Log
+d	tests/utils/include/cytest.h	/^    static void d(const Args... args) { std::cout << "|DEBUG| "; display(args...); }$/;"	f	class:cytest::Log
+data	include/base/cystructs.h	/^        T data;$/;"	m	struct:cystructs::Tree::Node
+digest	src/clg/interface.c	/^struct Grammar *digest(const char *file_name) {$/;"	f
+display	include/base/log.h	/^    static void display() { std::cout << std::endl; }$/;"	f	class:Log
+display	include/base/log.h	/^    static void display(T first, Args... args) {$/;"	f	class:Log
+display	tests/utils/include/cytest.h	/^    static void display() { std::cout << std::endl; }$/;"	f	class:cytest::Log
+display	tests/utils/include/cytest.h	/^    static void display(T first, Args... args) {$/;"	f	class:cytest::Log
+docsReport	tools/gen-report	/^docsReport() {$/;"	f
+e	include/base/log.h	/^    static void e(const Args... args) { std::cout << "|ERROR| "; display(args...); }$/;"	f	class:Log
+e	tests/utils/include/cytest.h	/^    static void e(const Args... args) { std::cout << "|ERROR| "; display(args...); }$/;"	f	class:cytest::Log
+emptyDFA	tests/unit/scanner/dfa/unit.cc	/^void emptyDFA() {$/;"	f
+emptyFA	tests/unit/scanner/fa/unit.cc	/^void emptyFA() {$/;"	f
+end	src/base/tcc/cystructs.tcc	/^typename Tree<T>::iterator& Tree<T>::end() const {$/;"	f	class:Tree
+execute	src/scanner/dfa.cc	/^bool DFA::execute(const char* word) {$/;"	f	class:DFA
+file	include/scanner/cylex.h	/^    CyFile file;$/;"	m	class:CyLex
+file_type	include/clg/interface.h	/^    char *file_type;$/;"	m	struct:Grammar
+filetype	src/clg/clg.y	/^filetype: FILETYPE COLON WS LOWER_WORD { setFileType($4); }$/;"	l
+final_state	include/scanner/fa.h	/^    bool final_state;$/;"	m	struct:State
+generateBison	src/clg/clg.cc	/^void CLG::generateBison(Grammar *g, std::string file_stem) {$/;"	f	class:CLG
+generateFlex	src/clg/clg.cc	/^void CLG::generateFlex(VariableList *variable_list, std::string file_stem) {$/;"	f	class:CLG
+generateParser	src/clg/clg.cc	/^void CLG::generateParser(Grammar *g, std::string lang_file) {$/;"	f	class:CLG
+get	tests/utils/src/cytest.cc	/^Session& Session::get() {$/;"	f	class:cytest::Session
+get_bool_value	include/base/options.h	/^    bool get_bool_value() const { return m_value.b; }$/;"	f	class:Option
+get_char_value	include/base/options.h	/^    char get_char_value() const { return m_value.c; }$/;"	f	class:Option
+get_help	include/base/options.h	/^    std::string get_help() const { return m_help; }$/;"	f	class:Option
+get_int_value	include/base/options.h	/^    int get_int_value() const { return m_value.i; }$/;"	f	class:Option
+get_name	include/base/options.h	/^    std::string get_name() const { return m_name; }$/;"	f	class:Option
+get_positional	include/base/options.h	/^    const std::vector<std::string>& get_positional() const { return m_pos_args; }$/;"	f	class:Options
+get_property	tests/utils/include/cytest.h	/^    bool get_property(SimulateProperty prop) { return property == nullptr ? false : property[prop]; }$/;"	f	class:cytest::Session
+get_state	include/scanner/fa.h	/^    State* get_state(int i) { return &(row[i]); }$/;"	f	class:StateTable
+get_string_value	include/base/options.h	/^    const char* get_string_value() const { return m_value.s; }$/;"	f	class:Option
+get_table	include/scanner/fa.h	/^    StateTable& get_table() { return table; }$/;"	f	class:FA
+get_type	include/base/options.h	/^    Type get_type() const { return m_type; }$/;"	f	class:Option
+get_value	src/base/options.cc	/^Option::Value Options::get_value(const std::string& opt_name) {$/;"	f	class:Options
+grammar	src/clg/clg.y	/^grammar: LOWER_WORD COLON WS UPPER_WORD { snprintf(buff, 1000, "%s%s%s%s", $1, $2, $3, $4); insertRule(buff); }$/;"	l
+helpOption	tests/unit/base/options/unit.cc	/^void helpOption() {$/;"	f
+hiddenChar	tests/unit/scanner/fa/unit.cc	/^void hiddenChar() {$/;"	f
+hundredStates	tests/unit/scanner/fa/unit.cc	/^void hundredStates() {$/;"	f
+i	include/base/log.h	/^    static void i(const Args... args) { std::cout << "|INFO| "; display(args...); }$/;"	f	class:Log
+i	include/base/options.h	/^        int i;$/;"	m	union:Option::Value
+i	tests/utils/include/cytest.h	/^    static void i(const Args... args) { std::cout << "|INFO| "; display(args...); }$/;"	f	class:cytest::Log
+id	include/clg/interface.h	/^    char *id;$/;"	m	struct:VariableList
+init	tests/unit/compiler/cycompile/unit.cc	/^void init() {$/;"	f
+insert	src/base/tcc/cystructs.tcc	/^void Tree<T>::insert(const T t) {$/;"	f	class:Tree
+insertRule	src/clg/interface.c	/^void insertRule(const char *rule) {$/;"	f
+insertVariable	src/clg/interface.c	/^void insertVariable(const char *var, const char *patt) {$/;"	f
+instr_digest	src/clg/interface.c	/^struct Grammar instr_digest = {NULL};$/;"	v	typeref:struct:Grammar
+intPointer	tests/unit/base/cystructs/unit.cc	/^void intPointer() {$/;"	f
+intType	tests/unit/base/cystructs/unit.cc	/^void intType() {$/;"	f
+isSet	include/base/options.h	/^    bool isSet() { return is_set; }$/;"	f	class:Option
+isSet	src/base/options.cc	/^bool Options::isSet(const std::string& opt_name) {$/;"	f	class:Options
+is_filled	include/scanner/fa.h	/^    bool is_filled[129];$/;"	m	struct:Metrics
+is_set	include/base/options.h	/^    bool is_set;$/;"	m	class:Option
+iterator	include/base/cystructs.h	/^        explicit iterator(Node* node): iterator() { m_st.push(node); }$/;"	f	class:cystructs::Tree::iterator
+iterator	include/base/cystructs.h	/^        iterator(): m_st() {}$/;"	f	class:cystructs::Tree::iterator
+iterator	include/base/cystructs.h	/^    class iterator {$/;"	c	class:cystructs::Tree
+left	include/base/cystructs.h	/^        Node* left;$/;"	m	struct:cystructs::Tree::Node
+len	include/scanner/fa.h	/^    int len[129];$/;"	m	struct:Metrics
+lex_fa	include/scanner/cylex.h	/^    NFA lex_fa;$/;"	m	class:CyLex
+line	src/scanner/fa.cc	/^void line(int len) {$/;"	f
+lintReport	tools/gen-report	/^lintReport() {$/;"	f
+m_help	include/base/options.h	/^    const std::string m_name, m_help;$/;"	m	class:Option
+m_name	include/base/options.h	/^    const std::string m_name, m_help;$/;"	m	class:Option
+m_option_list	include/base/options.h	/^    cystructs::Tree<Option*> m_option_list;$/;"	m	class:Options
+m_patt_list	include/scanner/nfa.h	/^    std::vector<const char*> m_patt_list;$/;"	m	class:NFA
+m_pos_args	include/base/options.h	/^    std::vector<std::string> m_pos_args;$/;"	m	class:Options
+m_root	include/base/cystructs.h	/^    Node* m_root;$/;"	m	class:cystructs::Tree
+m_st	include/base/cystructs.h	/^        std::stack<Node*> m_st;$/;"	m	class:cystructs::Tree::iterator
+m_type	include/base/options.h	/^    const Type m_type;$/;"	m	class:Option
+m_value	include/base/options.h	/^    Value m_value;$/;"	m	class:Option
+main	src/base/main.cc	/^int main(const int argc, const char* argv[]) {$/;"	f
+main	tests/unit/base/cystructs/unit.cc	/^int main() {$/;"	f
+main	tests/unit/base/options/unit.cc	/^int main() {$/;"	f
+main	tests/unit/compiler/cycompile/unit.cc	/^int main() {$/;"	f
+main	tests/unit/scanner/cylex/unit.cc	/^int main() {$/;"	f
+main	tests/unit/scanner/dfa/unit.cc	/^int main() {$/;"	f
+main	tests/unit/scanner/fa/fa-no-compile.cc	/^int main() {$/;"	f
+main	tests/unit/scanner/fa/unit.cc	/^int main() {$/;"	f
+main	tests/unit/scanner/nfa/unit.cc	/^int main() {$/;"	f
+main	tools/cybuild	/^main() {$/;"	f
+main	tools/cyregress	/^main() {$/;"	f
+main	tools/gen-report	/^main() {$/;"	f
+makeRunDir	tools/cyregress	/^makeRunDir(){$/;"	f
+max_len	include/scanner/fa.h	/^    int max_len;$/;"	m	struct:Metrics
+memReport	tools/gen-report	/^memReport() {$/;"	f
+met	include/scanner/fa.h	/^    Metrics met;$/;"	m	class:StateTable
+name	tests/unit/base/cystructs/unit.cc	/^    std::string name;$/;"	m	struct:TestStruct	file:
+next	include/clg/interface.h	/^    struct RuleList *next;$/;"	m	struct:RuleList	typeref:struct:RuleList::RuleList
+next	include/clg/interface.h	/^    struct VariableList *next;$/;"	m	struct:VariableList	typeref:struct:VariableList::VariableList
+objPointer	tests/unit/base/cystructs/unit.cc	/^void objPointer() {$/;"	f
+operator !=	src/base/tcc/cystructs.tcc	/^bool Tree<T>::iterator::operator!=(const iterator& iter) const {$/;"	f	class:Tree::iterator
+operator *	src/base/tcc/cystructs.tcc	/^T Tree<T>::iterator::operator*() const {$/;"	f	class:Tree::iterator
+operator ++	src/base/tcc/cystructs.tcc	/^typename Tree<T>::iterator& Tree<T>::iterator::operator++() {$/;"	f	class:Tree::iterator
+operator ->	src/base/tcc/cystructs.tcc	/^T Tree<T>::iterator::operator->() const {$/;"	f	class:Tree::iterator
+operator ==	include/base/options.h	/^    bool operator==(const std::string& opt) { return m_name == opt; }$/;"	f	class:Option
+operator ==	src/base/tcc/cystructs.tcc	/^bool Tree<T>::iterator::operator==(const iterator& iter) const {$/;"	f	class:Tree::iterator
+operator ==	tests/unit/base/cystructs/unit.cc	/^    bool operator==(const char* right)      { return name == right;     }$/;"	f	struct:TestStruct
+operator >	include/base/options.h	/^    bool operator>(const Option& opt) { return m_name > opt.m_name; }$/;"	f	class:Option
+operator >	include/base/options.h	/^    bool operator>(const std::string& opt) { return m_name > opt; }$/;"	f	class:Option
+operator >	tests/unit/base/cystructs/unit.cc	/^    bool operator>(const TestStruct& right) { return name > right.name; }$/;"	f	struct:TestStruct
+operator >	tests/unit/base/cystructs/unit.cc	/^    bool operator>(const char* right)       { return name > right;      }$/;"	f	struct:TestStruct
+operator bool	include/base/options.h	/^        explicit operator bool() { return b; }$/;"	f	union:Option::Value
+operator char	include/base/options.h	/^        explicit operator char() { return c; }$/;"	f	union:Option::Value
+operator const char*	include/base/options.h	/^        explicit operator const char*() { return s; }$/;"	f	union:Option::Value
+operator delete	tests/utils/src/cytest.cc	/^void operator delete(void* ptr) {$/;"	f
+operator delete[]	tests/utils/src/cytest.cc	/^void operator delete[](void* ptr) {$/;"	f
+operator int	include/base/options.h	/^        explicit operator int() { return i; }$/;"	f	union:Option::Value
+operator new	tests/utils/src/cytest.cc	/^void* operator new(const std::size_t s) {$/;"	f
+operator new[]	tests/utils/src/cytest.cc	/^void* operator new[](const std::size_t s) {$/;"	f
+optionError	tools/cmdline.bash	/^optionError() {$/;"	f
+parse	src/base/options.cc	/^bool Options::parse(const int argc, const char* argv[]) {$/;"	f	class:Options
+parse	src/clg/clg.cc	/^int CLG::parse(std::string lang_file) {$/;"	f	class:CLG
+parse	src/scanner/cyparse.cc	/^void CyParse::parse(std::string file) {$/;"	f	class:CyParse
+parseCmdLine	tools/cmdline.bash	/^parseCmdLine() {$/;"	f
+pattern	include/clg/interface.h	/^    char *pattern;$/;"	m	struct:VariableList
+perfReport	tools/gen-report	/^perfReport() {$/;"	f
+print	src/scanner/fa.cc	/^void StateTable::print() const {$/;"	f	class:StateTable
+printDot	src/scanner/fa.cc	/^void FA::printDot(const char* file_stem) const {$/;"	f	class:FA
+printDot	src/scanner/fa.cc	/^void StateTable::printDot(std::ofstream& file) const {$/;"	f	class:StateTable
+printFA	tests/unit/scanner/fa/unit.cc	/^void printFA() {$/;"	f
+printTable	src/scanner/fa.cc	/^void FA::printTable() const {$/;"	f	class:FA
+property	tests/utils/include/cytest.h	/^    bool *property;$/;"	m	class:cytest::Session
+property	tests/utils/include/cytest.h	/^    bool property[NumProperty];$/;"	m	class:cytest::Testcase
+property	tests/utils/include/cytest.h	/^    bool property[NumProperty];$/;"	m	struct:cytest::Case
+reParse	tests/unit/base/options/unit.cc	/^void reParse() {$/;"	f
+readFile	src/scanner/cylex.cc	/^void CyLex::readFile(const char* file_name) {$/;"	f	class:CyLex
+refObj	src/base/tcc/cystructs.tcc	/^static T& refObj(T& o) {return o;}$/;"	f	file:
+refObj	src/base/tcc/cystructs.tcc	/^static T& refObj(T* o) {return *o;}$/;"	f	file:
+refOf	tests/unit/base/cystructs/unit.cc	/^void refOf() {$/;"	f
+releaseTestReport	tools/gen-report	/^releaseTestReport() {$/;"	f
+right	include/base/cystructs.h	/^        Node* right;$/;"	m	struct:cystructs::Tree::Node
+row	include/scanner/fa.h	/^    std::vector<State> row;$/;"	m	class:StateTable
+rule_head	include/clg/interface.h	/^    struct RuleList *rule_head;$/;"	m	struct:Grammar	typeref:struct:Grammar::RuleList
+rule_tail	include/clg/interface.h	/^    struct RuleList *rule_tail;$/;"	m	struct:Grammar	typeref:struct:Grammar::RuleList
+run	tests/utils/src/cytest.cc	/^void Testcase::run() {$/;"	f	class:cytest::Testcase
+runFuncTest	tools/cyregress	/^runFuncTest() {$/;"	f
+runTest	tools/cyregress	/^runTest() {$/;"	f
+runUnitTest	tools/cyregress	/^runUnitTest() {$/;"	f
+s	include/base/options.h	/^        const char* s;$/;"	m	union:Option::Value
+s	tests/utils/include/cytest.h	/^    static Session* s;$/;"	m	class:cytest::Session
+s	tests/utils/src/cytest.cc	/^Session* Session::s = nullptr;$/;"	m	class:cytest::Session	file:
+sanitizationReport	tools/gen-report	/^sanitizationReport() {$/;"	f
+search	src/base/tcc/cystructs.tcc	/^typename Tree<T>::iterator Tree<T>::search(const K& key) {$/;"	f	class:Tree
+setEndWord	tests/unit/scanner/fa/unit.cc	/^    void setEndWord(char c) {$/;"	f	class:TestFA
+setFileType	src/clg/interface.c	/^void setFileType(const char *file_type) {$/;"	f
+set_final	include/scanner/fa.h	/^    void set_final(int i) { if(i>=row.size()) row.resize(i+1); row[i].final_state = true;}$/;"	f	class:StateTable
+set_property_ptr	tests/utils/include/cytest.h	/^    void set_property_ptr(bool *p) { property = p; }$/;"	f	class:cytest::Session
+set_value	include/base/options.h	/^    void set_value(const bool value) { is_set = true; m_value.b = value; }$/;"	f	class:Option
+set_value	include/base/options.h	/^    void set_value(const char value) { is_set = true; m_value.c = value; }$/;"	f	class:Option
+set_value	include/base/options.h	/^    void set_value(const char* value) { is_set = true; m_value.s = value; }$/;"	f	class:Option
+set_value	include/base/options.h	/^    void set_value(const int value) { is_set = true; m_value.i = value; }$/;"	f	class:Option
+simulation_reset	tests/utils/src/cytest.cc	/^void Testcase::simulation_reset(SimulateProperty prop) {$/;"	f	class:cytest::Testcase
+simulation_set	tests/utils/src/cytest.cc	/^void Testcase::simulation_set(SimulateProperty prop) {$/;"	f	class:cytest::Testcase
+size	include/scanner/fa.h	/^    size_t size() { return row.size(); }$/;"	f	class:StateTable
+state_id	include/scanner/fa.h	/^    int state_id = 0;$/;"	m	class:FA
+state_list	tests/unit/scanner/fa/unit.cc	/^    std::vector<int> state_list;$/;"	m	class:TestFA	file:
+stmt	src/clg/clg.y	/^stmt: filetype NL variable NL grammar NL$/;"	l
+str	include/clg/interface.h	/^    char *str;$/;"	m	struct:RuleList
+styleReport	tools/gen-report	/^styleReport() {$/;"	f
+sym	include/scanner/fa.h	/^    std::vector<int> sym[128];$/;"	m	struct:State
+table	include/scanner/fa.h	/^    StateTable table;$/;"	m	class:FA
+tag	include/scanner/fa.h	/^    std::string tag;$/;"	m	struct:State
+to_copy	include/base/cystructs.h	/^        Node& operator=(const Node& to_copy) = delete;$/;"	m	struct:cystructs::Tree::Node
+to_copy	include/base/cystructs.h	/^        Node(const Node& to_copy)            = delete;$/;"	m	struct:cystructs::Tree::Node
+to_copy	include/base/cystructs.h	/^    Tree(const Tree<T>& to_copy)               = delete;$/;"	m	class:cystructs::Tree
+to_copy	include/base/cystructs.h	/^    Tree<T>& operator=(const Tree<T>& to_copy) = delete;$/;"	m	class:cystructs::Tree
+to_move	include/base/cystructs.h	/^        Node& operator=(Node&& to_move)      = delete;$/;"	m	struct:cystructs::Tree::Node
+to_move	include/base/cystructs.h	/^        Node(Node&& to_move)                 = delete;$/;"	m	struct:cystructs::Tree::Node
+to_move	include/base/cystructs.h	/^    Tree(Tree<T>&& to_move)                    = delete;$/;"	m	class:cystructs::Tree
+to_move	include/base/cystructs.h	/^    Tree<T>& operator=(Tree<T>&& to_move)      = delete;$/;"	m	class:cystructs::Tree
+usage	src/base/options.cc	/^void Options::usage() const {$/;"	f	class:Options
+usage	tools/cmdline.bash	/^usage() {$/;"	f
+validateTests	tools/cyregress	/^validateTests() {$/;"	f
+variable	src/clg/clg.y	/^variable: UPPER_WORD WS PATTERN { insertVariable($1, $3); }$/;"	l
+variable_head	include/clg/interface.h	/^    struct VariableList *variable_head;$/;"	m	struct:Grammar	typeref:struct:Grammar::VariableList
+variable_tail	include/clg/interface.h	/^    struct VariableList *variable_tail;$/;"	m	struct:Grammar	typeref:struct:Grammar::VariableList
+w	include/base/log.h	/^    static void w(const Args... args) { std::cout << "|WARN| "; display(args...); }$/;"	f	class:Log
+w	tests/utils/include/cytest.h	/^    static void w(const Args... args) { std::cout << "|WARN| "; display(args...); }$/;"	f	class:cytest::Log
+warnReport	tools/gen-report	/^warnReport() {$/;"	f
+~Node	src/base/tcc/cystructs.tcc	/^Tree<T>::Node::~Node() {$/;"	f	class:Tree::Node
+~Options	src/base/options.cc	/^Options::~Options() {$/;"	f	class:Options
+~Tree	src/base/tcc/cystructs.tcc	/^Tree<T>::~Tree() {$/;"	f	class:Tree
