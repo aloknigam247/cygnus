@@ -32,6 +32,8 @@ COMPILER_FLAGS	+= -g3 -D_FORTIFY_SOURCE=2 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDA
 else ifndef MODE
 MODE=debug
 COMPILER_FLAGS 	+= -ggdb3
+else ifeq ($(MODE),clean)
+.DEFAULT_GOAL = clean
 else
 $(error unknown MODE '$(MODE)')
 endif
