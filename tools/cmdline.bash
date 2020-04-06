@@ -72,7 +72,7 @@ LOG() {
 #-------------------------------------------------------------------#
 declare -A OPTION
 declare -A VALUES
-declare _POS_NAME
+declare _POS_NAME="POS"
 
 # Default options
 OPTION['-h']='value:bool,help:print help'
@@ -187,6 +187,7 @@ optionError() {
 parseCmdLine() {
     declare -A _with
     declare -A _without
+    local _error=0
 
     # Set positional argument name
     local _IFS_Prev=$IFS
@@ -205,7 +206,6 @@ parseCmdLine() {
     while [ $1 ]; do
         _opt=$1
         _val=''
-        _error=''
         if [[ ${OPTION[$_opt]} ]]; then
             local _IFS_Prev=$IFS
             IFS=','
@@ -258,12 +258,18 @@ parseCmdLine() {
                 VALUES[$_dest]=$_val
             fi
         elif [[ $1 =~ ^- ]]; then
-            LOG I "ignoring unknown option \`$_opt'"
+            LOG W "ignoring unknown option \`$_opt'"
+            _error=1
         else
             _pos+=" $_opt"
         fi
         shift
     done
+
+    if [[ $_error -ne 0 ]]; then
+        LOG EE "invalid paramters"
+    fi
+
     if [[ -n $_pos && -n $_POS_NAME ]]; then
         VALUES[$_POS_NAME]="$_pos"
     fi

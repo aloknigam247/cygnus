@@ -29,6 +29,10 @@ else ifeq ($(MODE),sanitize)
 COMPILER_FLAGS	+= -g3 -D_FORTIFY_SOURCE=2 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC \
 				-fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow\
 				-fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error
+
+else ifeq ($(MODE),clean)
+.DEFAULT_GOAL = clean
+
 else ifndef MODE
 MODE=debug
 COMPILER_FLAGS 	+= -ggdb3
