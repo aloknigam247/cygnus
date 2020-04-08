@@ -1,0 +1,10 @@
+CASE=(
+        "cygnus"
+        "cygnus -d test_dir_not_exist"
+        "cygnus -d test_dir_empty"
+        "cygnus -d test_dir_exist"
+     )
+
+DIFFS=(
+        ['REFLOG']='TESTLOG'
+      )

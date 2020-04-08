@@ -86,7 +86,7 @@ class Rules:
         for dir in lookup:
             if(os.path.exists(dir + '/' + file)):
                 return dir + '/' + file
-        #IO.log('W', "included file " + file + " does not exist")
+        IO.log('W', "included file " + file + " does not exist")
         return None
 
     def h2cc(self, h_file):
@@ -136,6 +136,10 @@ opt = args.parse()
 
 os.chdir(opt.cDir)
 target = "unit"
+
+if(not os.path.exists(opt.file)):
+    IO.log('E', "file " + opt.file + " does not exists.");
+    quit(1)
 
 rule = Rules()
 rule.src_list = opt.srcDir
