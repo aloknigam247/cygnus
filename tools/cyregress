@@ -30,6 +30,7 @@ OPTION['-o']='value:string,metavar:dir,help:output directory of test run'
 OPTION['-r']='value:bool,help:reflog update'
 OPTION['-u']='value:string,metavar:dir,without:-a,help:run unit tests only from <dir>'
 OPTION['--coverage']='value:bool,eval:TEST_MODE=coverage,help:run coverage tests'
+OPTION['--debug']='value:bool,eval:TEST_MODE=debug,help:run mem-check tests'
 OPTION['--mem-check']='value:bool,eval:TEST_MODE=mem-check,help:run mem-check tests'
 OPTION['--perf']='value:bool,eval:TEST_MODE=perf,help:run mem-check tests'
 OPTION['--sanitize']='value:bool,eval:TEST_MODE=sanitize,help:run sanitization tests'
@@ -81,7 +82,7 @@ runFuncTest() {
 }
 
 runUnitTest() {
-    gen-make -i $CYGNUS_HOME/include/base -i $CYGNUS_HOME/include/compiler -i $CYGNUS_HOME/include/scanner -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/base/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src/base -s $CYGNUS_HOME/src/compiler -s $CYGNUS_HOME/src/scanner -s $CYGNUS_HOME/tests/utils/src unit.cc || return 1
+    gen-make -i $CYGNUS_HOME/include/base -i $CYGNUS_HOME/include/compiler -i $CYGNUS_HOME/include/crawler -i $CYGNUS_HOME/include/scanner -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/base/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src/base -s $CYGNUS_HOME/src/compiler -s $CYGNUS_HOME/src/crawler -s $CYGNUS_HOME/src/scanner -s $CYGNUS_HOME/tests/utils/src unit.cc || return 1
     make --no-print-directory $TEST_MODE 2>&1 | TEE make.log 
     $tool ./unit 2>&1 > TESTLOG 
 }
@@ -90,23 +91,39 @@ runTest() {
     local test=$1
     local status=0
     declare -A DIFFS
+    
+
     if [[ $test =~ func.*cyt ]]; then
         local testcase_dir=${test%/func*cyt}
         local testcase=${test#$testcase_dir/}
+
         FUNC_COUNT=$((FUNC_COUNT + 1))
         makeRunDir $testcase_dir $testcase
         cd $OUT_DIR/`dirname $testcase`
+
         echo "|TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt| $testcase"
+
         source `basename $1`
+        for pre_run in ${!PRE_RUN[@]}; do
+            eval ${PRE_RUN[pre_run]}
+        done
+
         runFuncTest $testcase || status=1
     else
         local testcase_dir=${test%/unit*cyt}
         local testcase=${test#$testcase_dir/}
+
         UNIT_COUNT=$((UNIT_COUNT + 1))
         makeRunDir $testcase_dir $testcase
         cd $OUT_DIR/`dirname $testcase`
+
         echo "|TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt| $testcase"
+
         source `basename $1`
+        for pre_run in ${!PRE_RUN[@]}; do
+            eval ${PRE_RUN[pre_run]}
+        done
+
         runUnitTest $testcase || status=1
     fi
 
@@ -183,6 +200,9 @@ main() {
             CYGNUS=$CYGNUS_HOME/build/bin/coverage/cygnus-coverage
             OUT_DIR="$OUT_DIR/coverage"
             mkdir -p reports/coverage
+            ;;
+        debug)
+            CYGNUS=$CYGNUS_HOME/build/bin/debug/cygnus-debug
             ;;
         mem-check)
             CYGNUS=$CYGNUS_HOME/build/bin/memory/cygnus-memory
@@ -289,9 +309,6 @@ main() {
             fi
             echo "    Memory Errors: $(find $OUT_DIR/unit $OUT_DIR/func -name "mem.err" | xargs egrep -h "CHECKSUM" | sort -u | wc -l)"
             ;;
-        perf)
-            ;;
-        *)
     esac
 
     #---------#

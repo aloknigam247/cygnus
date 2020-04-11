@@ -26,6 +26,7 @@
 #include "cycompile.h"
 #include "log.h"
 #include "utils.h"
+#include "cycrawler.h"
 
 int main(const int argc, const char* argv[]) {
     Options opt;
@@ -36,13 +37,12 @@ int main(const int argc, const char* argv[]) {
     if(opt.isSet("-v"))
         std::cout << "Cygnus " << MAKE_STRING(VERSION) << '\n';
 
-    const std::vector<std::string> &pos = opt.get_positional();
-
-    if(pos.empty())
-        return 0;
-
-    Log::i("File: ", pos.front());
-
-    CyCompile compile(pos.front());
+    else {
+        CyCrawler crawler;
+        crawler.set_path(".");
+        std::cout << "Files found:\n";
+        for(auto file: crawler.crawl())
+            std::cout << file << '\n';
+    }
     return 0;
 }

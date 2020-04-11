@@ -86,7 +86,8 @@ class Rules:
         for dir in lookup:
             if(os.path.exists(dir + '/' + file)):
                 return dir + '/' + file
-        IO.log('W', "included file " + file + " does not exist")
+        if file.endswith(".h"):
+            IO.log('W', "included file " + file + " does not exist")
         return None
 
     def h2cc(self, h_file):
@@ -135,7 +136,7 @@ args = Args()
 opt = args.parse()
 
 os.chdir(opt.cDir)
-target = "unit"
+source_file = "unit"
 
 if(not os.path.exists(opt.file)):
     IO.log('E', "file " + opt.file + " does not exists.");
@@ -151,15 +152,19 @@ rule.write("#------------ Configs ------------#")
 rule.write("CXX     = g++\n" +
             "COMP_FLAGS = -std=c++11 -fdiagnostics-color -DEXTENDED_FEATURE\n"+
             "CY_COMP    = $(CXX) $(COMP_FLAGS) $(INC)\n\n" +
+            "ifneq ($(MAKECMDGOALS),)\n"
+            "TARGET=/$(MAKECMDGOALS)\n"
+            "endif\n\n"
+            "OBJ_COMMON := " + os.path.relpath("obj", os.getcwd()[os.getcwd().rfind("unit/")+5:]) + "$(TARGET)\n" +
+            "OBJ_LOCAL  := obj$(TARGET)\n\n" +
             "INC := ", '')
+
 for i in opt.incDir:
     rule.write(" \\\n    -I " + i, '')
 rule.write('\n')
 
-rule.write("OBJ_COMMON := " + os.path.relpath("obj", os.getcwd()[os.getcwd().rfind("unit/")+5:]) + "\n" +
-            "OBJ_LOCAL  := obj\n\n" +
-            "#------------ Targets ------------#\n" +
-            "all: $(OBJ_COMMON) $(OBJ_LOCAL) " + target + "\n\n" +
+rule.write("#------------ Targets ------------#\n" +
+            "all: $(OBJ_COMMON) $(OBJ_LOCAL) " + source_file + "\n\n" +
             "$(OBJ_COMMON) $(OBJ_LOCAL):\n" +
             "\tmkdir -p $@\n\n" +
             "coverage: CXX = g++-7\n" +
@@ -174,7 +179,7 @@ rule.write("OBJ_COMMON := " + os.path.relpath("obj", os.getcwd()[os.getcwd().rfi
             "sanitize: all\n")
 
 rule.createRule(opt.file)
-rule.write(target + ": " + ' '.join(rule.obj_list))
+rule.write(source_file + ": " + ' '.join(rule.obj_list))
 rule.write("\t$(CY_COMP) -o $@ $^")
 rule.write("\nclean: " + ' '.join(rule.obj_list))
 rule.write("\t rm -f $^")

@@ -1,3 +1,13 @@
 DIFFS=(
         ['REFLOG']='TESTLOG'
       )
+
+PRE_RUN=(
+        "mkdir test_dir_empty"
+        "mkdir -p test_dir/empty_dir"
+        "touch test_dir/file"
+        "ln -s empty_dir test_dir/dir_link"
+        "ln -s test_dir/file test_dir/file_link"
+        "ln -s no_file test_dir/broken_link"
+        "ln -s ../test_dir test_dir/loop_link"
+        )

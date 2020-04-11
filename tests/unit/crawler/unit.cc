@@ -3,19 +3,12 @@
 #include "cycrawler.h"
 
 void crawl(std::string path) {
-    Crawler crawler;
+    CyCrawler crawler;
     crawler.set_path(path);
 
-    try {
-        auto file_list = crawler.crawl();
-
-        std::cout << "Files found:\n";
-        for(auto file: file_list) {
-            std::cout << file << '\n';
-        }
-    }
-    catch(not_exist) {
-        std::cout << "Path: " << path << " does not exists\n";
+    std::cout << "Files found:\n";
+    for(auto file: crawler.crawl()) {
+        std::cout << file << '\n';
     }
 }
 
@@ -23,18 +16,40 @@ void dirNotExist() {
     crawl("test_dir_not_exist");
 }
 
-void dirEmpty() {
-    crawl("test_dir_empty");
+void dirExist() {
+    crawl("test_dir");
 }
 
-void dirExist() {
-    crawl("test_dir_exist");
+void file() {
+    crawl("test_dir/file");
+}
+
+void dirLink() {
+    crawl("test_dir/dir_link");
+}
+
+void fileLink() {
+    crawl("test_dir/file_link");
+}
+
+void brokenLink() {
+    crawl("test_dir/broken_link");
+}
+
+void loopLink() {
+    crawl("test_dir/loop_link");
 }
 
 int main() {
     cytest::Testcase testcase;
 
     testcase.add(dirNotExist);
-    testcase.add(dirEmpty);
     testcase.add(dirExist);
+    testcase.add(file);
+    testcase.add(dirLink);
+    testcase.add(fileLink);
+    testcase.add(brokenLink);
+    testcase.add(loopLink);
+
+    testcase.run();
 }

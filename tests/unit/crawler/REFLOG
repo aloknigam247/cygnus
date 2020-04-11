@@ -1,0 +1,29 @@
+Number of cases: 7
+
+CASE 1
+Files found:
+|ERROR| test_dir_not_exist does not exist
+
+CASE 2
+Files found:
+test_dir/file
+
+CASE 3
+Files found:
+|ERROR| Not a directory
+
+CASE 4
+Files found:
+
+CASE 5
+Files found:
+|ERROR| test_dir/file_link does not exist
+
+CASE 6
+Files found:
+|ERROR| test_dir/broken_link does not exist
+
+CASE 7
+Files found:
+test_dir/loop_link/file
+
