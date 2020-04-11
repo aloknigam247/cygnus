@@ -1,3 +1,5 @@
+#ifdef EXTENDED_FEATURE
+
 #include "cyparse.h"
 #include "cylex.h"
 
@@ -9,3 +11,5 @@ void CyParse::parse(std::string file) {
     lex.readFile(file.c_str());
     lex.analyse();
 }
+
+#endif

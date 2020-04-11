@@ -21,6 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE    *
  * SOFTWARE.                                                                        *
  ************************************************************************************/
+#ifdef EXTENDED_FEATURE
 
 #ifndef SCANNER_CYLEX_H
 #define SCANNER_CYLEX_H
@@ -41,5 +42,7 @@ class CyLex {
     NFA lex_fa;
     CyFile file;
 };
+
+#endif
 
 #endif

@@ -4,9 +4,10 @@ DIFFS=(
 
 PRE_RUN=(
         "mkdir test_dir_empty"
-        "mkdir -p test_dir/empty_dir"
-        "touch test_dir/file"
-        "ln -s empty_dir test_dir/dir_link"
+        "mkdir -p test_dir/empty_dir test_dir/non_empty_dir"
+        "mkdir test_dir/no_access; chmod -r test_dir/no_access"
+        "touch test_dir/file test_dir/non_empty_dir/file2"
+        "ln -s non_empty_dir test_dir/dir_link"
         "ln -s test_dir/file test_dir/file_link"
         "ln -s no_file test_dir/broken_link"
         "ln -s ../test_dir test_dir/loop_link"

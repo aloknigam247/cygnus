@@ -20,7 +20,7 @@ TEE() {
 }
 
 GENHTML() {
-    genhtml -f --ignore-errors source reports/coverage/$1/coverage.info --output-directory reports/coverage/$1/html --demangle-cpp -t "$1 coverage" --legend --rc genhtml_hi_limit=98 --rc genhtml_med_limit=80 > reports/coverage/$1/genhtml.log 2> /dev/null
+    genhtml -f --ignore-errors source reports/coverage/$1/coverage.info --output-directory reports/coverage/$1/html --demangle-cpp -t "$1 coverage" --legend --rc genhtml_hi_limit=98 --rc genhtml_med_limit=90 > reports/coverage/$1/genhtml.log 2> /dev/null
     egrep -A 1 'lines\.\.\.\.\.\.:' reports/coverage/$1/genhtml.log
 }
 
@@ -90,8 +90,10 @@ runUnitTest() {
 runTest() {
     local test=$1
     local status=0
-    declare -A DIFFS
-    
+    declare -A CASES=()
+    declare -A DIFFS=()
+    declare -a PRE_RUN=()
+
 
     if [[ $test =~ func.*cyt ]]; then
         local testcase_dir=${test%/func*cyt}

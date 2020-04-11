@@ -40,6 +40,10 @@ void loopLink() {
     crawl("test_dir/loop_link");
 }
 
+void noAccess() {
+    crawl("test_dir/no_access");
+}
+
 int main() {
     cytest::Testcase testcase;
 
@@ -50,6 +54,7 @@ int main() {
     testcase.add(fileLink);
     testcase.add(brokenLink);
     testcase.add(loopLink);
+    testcase.add(noAccess);
 
     testcase.run();
 }

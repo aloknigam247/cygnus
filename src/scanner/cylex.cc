@@ -22,6 +22,8 @@
  * SOFTWARE.                                                                        *
  ************************************************************************************/
 
+#ifdef EXTENDED_FEATURE
+
 #include "cylex.h"
 #include "dfa.h"
 #include "log.h"
@@ -56,3 +58,5 @@ void CyLex::readFile(const char* file_name) {
             std::cout << line << '\n';
     }
 }
+
+#endif

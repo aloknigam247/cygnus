@@ -1,4 +1,4 @@
-Number of cases: 7
+Number of cases: 8
 
 CASE 1
 Files found:
@@ -6,6 +6,8 @@ Files found:
 
 CASE 2
 Files found:
+|ERROR| test_dir/no_access Permisson denied
+test_dir/non_empty_dir/file2
 test_dir/file
 
 CASE 3
@@ -14,6 +16,7 @@ Files found:
 
 CASE 4
 Files found:
+test_dir/dir_link/file2
 
 CASE 5
 Files found:
@@ -25,5 +28,11 @@ Files found:
 
 CASE 7
 Files found:
+|ERROR| test_dir/loop_link/no_access Permisson denied
+test_dir/loop_link/non_empty_dir/file2
 test_dir/loop_link/file
+
+CASE 8
+Files found:
+|ERROR| test_dir/no_access Permisson denied
 

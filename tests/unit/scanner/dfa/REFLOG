@@ -1,4 +1,5 @@
 Number of cases: 2
+
 CASE 1
 -------------------------------
 |State| D| P| Q|R|S| p|q|  r|s|
@@ -68,4 +69,6 @@ CASE 1
 |INFO| qqq: Reject
 |INFO| : Accept
 |INFO| rRsss: Reject
+
 CASE 2
+

@@ -30,7 +30,7 @@ void Testcase::run() {
         s.set_property_ptr(case_obj.property);
         case_obj.case_ptr();
         std::cout << '\n';
-        i++;
+        ++i;
     }
     s.set_property_ptr(nullptr);
 }
