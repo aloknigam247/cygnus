@@ -1,4 +1,4 @@
-Number of cases: 8
+Number of cases: 7
 
 CASE 1
 Files found:
@@ -31,8 +31,4 @@ Files found:
 |ERROR| test_dir/loop_link/no_access Permisson denied
 test_dir/loop_link/non_empty_dir/file2
 test_dir/loop_link/file
-
-CASE 8
-Files found:
-|ERROR| test_dir/no_access Permisson denied
 

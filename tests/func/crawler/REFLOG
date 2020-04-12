@@ -1,6 +1,5 @@
 |CASE 1| cygnus
 >   Files found:
->   |ERROR| ./test_dir/no_access Permisson denied
 >   ./TESTLOG
 >   ./test_dir/file
 >   ./test_dir/non_empty_dir/file2
@@ -27,8 +26,5 @@
 >   |ERROR| unknown option -d
 
 |CASE 9| cygnus -d test_dir/loop_link
->   |ERROR| unknown option -d
-
-|CASE 10| cygnus -d test_dir/no_access
 >   |ERROR| unknown option -d
 
