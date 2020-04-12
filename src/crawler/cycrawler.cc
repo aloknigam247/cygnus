@@ -17,10 +17,10 @@ std::forward_list<std::string> CyCrawler::createFileList(std::string path) {
     DIR *dir = opendir(path.c_str());
     if(!dir) {
         switch(errno) {
+#ifdef EXTENDED_FEATURE
             case EACCES:
                 Log::e(path, " Permisson denied");
                 break;
-#ifdef EXTENDED_FEATURE
             case ENOENT:
                 Log::e(path, " does not exist");
                 break;
