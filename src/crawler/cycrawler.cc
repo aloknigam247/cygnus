@@ -46,6 +46,9 @@ std::forward_list<std::string> CyCrawler::createFileList(std::string path) {
                 case DT_REG:
                     file_list.push_front(path + '/' + dirp->d_name);
                     break;
+                default:
+                    std::cout << "Default case\n";
+                    break;
             }
             dirp = readdir(dir);
         }
