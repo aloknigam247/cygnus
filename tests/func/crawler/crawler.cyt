@@ -25,3 +25,7 @@ PRE_RUN=(
         "ln -s no_file test_dir/broken_link"
         "ln -s ../test_dir test_dir/loop_link"
         )
+
+SORT_OUTPUT=(
+        "CASE 1" "2" "4"
+    )

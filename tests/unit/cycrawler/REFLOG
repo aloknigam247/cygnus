@@ -5,9 +5,8 @@
 
 [CASE 2]
 >   Files found:
->   |ERROR| test_dir/no_access Permisson denied
->   test_dir/non_empty_dir/file2
 >   test_dir/file
+>   test_dir/non_empty_dir/file2
 >   
 
 [CASE 3]
@@ -32,8 +31,7 @@
 
 [CASE 7]
 >   Files found:
->   |ERROR| test_dir/loop_link/no_access Permisson denied
->   test_dir/loop_link/non_empty_dir/file2
 >   test_dir/loop_link/file
+>   test_dir/loop_link/non_empty_dir/file2
 >   
 
