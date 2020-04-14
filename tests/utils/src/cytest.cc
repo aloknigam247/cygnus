@@ -23,11 +23,10 @@ void Testcase::add(caseType p) {
 
 void Testcase::run() {
     Session &s = Session::get();
-    std::cout << "Number of cases: " << case_list.size() << "\n\n";
     int i=1;
     for(auto case_obj: case_list) {
-        std::cout << "CASE " << i << '\n';
-        s.set_property_ptr(case_obj.property);
+        std::cout << "[CASE " << i << ']' << '\n';
+        //s.set_property_ptr(case_obj.property);
         case_obj.case_ptr();
         std::cout << '\n';
         ++i;

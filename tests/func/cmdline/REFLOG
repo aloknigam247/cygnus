@@ -1,17 +1,17 @@
-|CASE 1| cygnus
+[CASE 1] cygnus
 >   Files found:
 >   ./TESTLOG
 
-|CASE 2| cygnus -v
+[CASE 2] cygnus -v
 >   Cygnus v1.0.0-beta
 
-|CASE 3| cygnus -h
+[CASE 3] cygnus -h
 >   usage: cygnus [options]
 >       -h: print help message
 >       -v: version
 >   Files found:
 >   ./TESTLOG
 
-|CASE 4| cygnus -a abc
+[CASE 4] cygnus -a abc
 >   |ERROR| unknown option -a
 

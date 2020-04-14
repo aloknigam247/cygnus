@@ -74,7 +74,7 @@ makeRunDir(){
 runFuncTest() {
     {
     for i in ${!CASE[@]}; do
-        echo "|CASE $((i+1))| $(echo ${CASE[$i]} | sed "s|$CYGNUS|cygnus|")"
+        echo "[CASE $((i+1))] $(echo ${CASE[$i]} | sed "s|$CYGNUS|cygnus|")"
         $tool ${CASE[$i]} | sed 's/.*/>   &/' || return 1
         echo
     done
@@ -84,16 +84,19 @@ runFuncTest() {
 runUnitTest() {
     gen-make -i $CYGNUS_HOME/include/base -i $CYGNUS_HOME/include/compiler -i $CYGNUS_HOME/include/crawler -i $CYGNUS_HOME/include/scanner -i $CYGNUS_HOME/include/utils -i $CYGNUS_HOME/src/base/tcc -i $CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src/base -s $CYGNUS_HOME/src/compiler -s $CYGNUS_HOME/src/crawler -s $CYGNUS_HOME/src/scanner -s $CYGNUS_HOME/tests/utils/src unit.cc || return 1
     make --no-print-directory $TEST_MODE 2>&1 | TEE make.log 
-    $tool ./unit 2>&1 > TESTLOG 
+    {
+    $tool ./unit | sed -e '/\[CASE/! s/.*/>   &/' -e ' 2,$ s/\[CASE/\n[CASE/' || return 1
+    echo
+    } 2>&1 > TESTLOG 
 }
 
 runTest() {
     local test=$1
     local status=0
-    declare -A CASES=()
+    declare -a CASES=()
     declare -A DIFFS=()
     declare -a PRE_RUN=()
-
+    declare -a SORT_OUTPUT=()
 
     if [[ $test =~ func.*cyt ]]; then
         local testcase_dir=${test%/func*cyt}
@@ -102,9 +105,7 @@ runTest() {
         FUNC_COUNT=$((FUNC_COUNT + 1))
         makeRunDir $testcase_dir $testcase
         cd $OUT_DIR/`dirname $testcase`
-
-        echo "|TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt| $testcase"
-
+        echo "[TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt] $testcase"
         source `basename $1`
         for pre_run in ${!PRE_RUN[@]}; do
             eval ${PRE_RUN[pre_run]}
@@ -118,15 +119,63 @@ runTest() {
         UNIT_COUNT=$((UNIT_COUNT + 1))
         makeRunDir $testcase_dir $testcase
         cd $OUT_DIR/`dirname $testcase`
-
-        echo "|TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt| $testcase"
-
+        echo "[TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt] $testcase"
         source `basename $1`
         for pre_run in ${!PRE_RUN[@]}; do
             eval ${PRE_RUN[pre_run]}
         done
 
         runUnitTest $testcase || status=1
+    fi
+
+    #---------------#
+    #  SORT_OUTPUT  #
+    #---------------#
+    if [[ $((${#SORT_OUTPUT[@]}%3)) -eq 0 ]]; then
+        for i in $(eval echo {0..$((${#SORT_OUTPUT[@]}-1))..3}); do
+            local case=${SORT_OUTPUT[$i]}
+            local begin=${SORT_OUTPUT[$((i+1))]}
+            local end=${SORT_OUTPUT[$((i+2))]}
+            local line_cnt=0
+            local buff=""
+            local modify=""
+
+            while IFS= read line; do
+                line_cnt=$((line_cnt + 1))
+                if [[ $line =~ ^\[$case\] ]]; then
+                    echo "$line"
+                    modify="yes"
+                    line_cnt=0
+                    continue
+                fi
+
+                if [[ $modify ]] && [[ $line == "" ]]; then
+                    printf "%b" "$buff" | sort
+                    echo "$line"
+                    buff=""
+                    modify=""
+                    continue
+                fi
+
+                if [[ $modify ]] && [[ $line_cnt -eq $end ]]; then
+                    printf "$buff$line" | sort
+                    buff=""
+                    modify=""
+                    continue
+                fi
+
+                if [[ $modify ]] && [[ $line_cnt -ge $begin ]]; then
+                    buff+=$line'\n'
+                    continue
+                fi
+
+                printf "%s\n" "$line"
+            done < TESTLOG > TESTLOG.tmp
+            mv TESTLOG.tmp TESTLOG
+        done
+    else
+        LOG E "Directive SORT_OUTPUT has ${#SORT_OUTPUT[@]} elements, it should be multiple of 3"
+        status=1
     fi
 
     for ref in ${!DIFFS[@]}; do
@@ -195,7 +244,7 @@ main() {
     echo -e "\nGenerated Testcase: $tc_cnt"
 
     #-----------#
-    # Pre Run   #
+    #  Pre Run  #
     #-----------#
     case $TEST_MODE in
         coverage)
@@ -313,9 +362,9 @@ main() {
             ;;
     esac
 
-    #---------#
-    # Summary #
-    #---------#
+    #-----------#
+    #  Summary  #
+    #-----------#
     if [[ ${#fail_list} -ne 0 ]]; then
         echo -e "\nFAILED:"
         for fail in ${fail_list[@]}; do
