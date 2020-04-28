@@ -23,10 +23,9 @@
  ************************************************************************************/
 
 #include "options.h"
-#include "cycompile.h"
 #include "log.h"
 #include "utils.h"
-#include "clg.h"
+#include "lpg.h"
 
 int main(const int argc, const char* argv[]) {
     Options opt;
@@ -35,23 +34,14 @@ int main(const int argc, const char* argv[]) {
     if(!opt.parse(argc, argv))
         return 1;
 
-    if(opt.isSet("-v"))
+    if(opt.isSet("-v")) {
         std::cout << "Cygnus " << MAKE_STRING(VERSION) << '\n';
-
-    const std::vector<std::string> &pos = opt.get_positional();
-
-    if(opt.isSet("-l")) {
-        CLG clg;
-        const char *lang_file = static_cast<const char*>(opt.get_value("-l"));
-        clg.parse(lang_file);
     }
-
-    if(pos.empty())
-        return 0;
-
-    Log::i("File: ", pos.front());
-
-    CyCompile compile(pos.front());
+    else if(opt.isSet("-l")) {
+        LPG lpg(GNU);
+        const char *lang_file = static_cast<const char*>(opt.get_value("-l"));
+        lpg.generateParser(lang_file);
+    }
 
     return 0;
 }

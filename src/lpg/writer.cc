@@ -1,33 +1,31 @@
-#include "clg.h"
-#include "log.h"
-#include "cyfile.h"
+#include "writer.h"
 
-int CLG::parse(std::string lang_file) {
-    struct Grammar *g = digest(lang_file.c_str());
-    generateParser(g, lang_file);
-    return 0;
+Writer* writerFactory(WriterType type) { // TODO: can any other design pattern work here
+    Writer *w;
+    switch(type) {
+        case WriterType::Bison:
+            w = new BisonWriter;
+            break;
+#ifdef EXTENDED_FEATURE
+        case WriterType::CyLex:
+            w = new CyLexWriter;
+            break;
+        case WriterType::CyParse:
+            w = new CyParseWriter;
+            break;
+#endif
+        case WriterType::Flex:
+            w = new FlexWriter;
+            break;
+    }
+    return w;
 }
 
-void CLG::generateParser(Grammar *g, std::string lang_file) {
-    if(!g)
-        return;
-
-    std::string file_base = lang_file.substr(0, lang_file.size()-4);
-    size_t pos = file_base.rfind('/');
-    if(pos == std::string::npos)
-        pos = 0;
-    else
-        pos++;
-    std::cout << "file_base: " << file_base << '\n';
-    std::cout << "pos: " << pos << '\n';
-    std::cout << "size: " << file_base.size() << '\n';
-
-    std::string file_stem = file_base.substr(pos, file_base.size()-pos);
-    generateBison(g, file_base);
-    generateFlex(g->variable_head, file_base, file_stem);
+void BisonWriter::write() {
 }
 
-void CLG::generateBison(Grammar *g, std::string file_base) {
+/*
+void LPG::generateBison(Grammar *g, std::string file_base) {
     CyFile bison;
     bison.open(file_base + ".y", std::ios::out);
 
@@ -75,8 +73,12 @@ void CLG::generateBison(Grammar *g, std::string file_base) {
     bison << "}\n";
     bison.close();
 }
+*/
+void FlexWriter::write() {
+}
 
-void CLG::generateFlex(VariableList *variable_list, std::string file_base, std::string file_stem) {
+/*
+void LPG::generateFlex(VariableList *variable_list, std::string file_base, std::string file_stem) {
     if(!variable_list)
         return;
 
@@ -95,4 +97,4 @@ void CLG::generateFlex(VariableList *variable_list, std::string file_base, std::
         variable_list = variable_list->next;;
     }
     flex << "%%";
-}
+}*/

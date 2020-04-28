@@ -69,7 +69,7 @@ MAKE_FLAGS	+= --no-print-directory
 export MAKE	= $Qmake $(MAKE_FLAGS)
 
 #---------- Rules ----------#
-compile: $(DUMP) src $(LINK) lang
+compile: $(DUMP) src $(LINK) #lang
 
 $(DUMP):
 	$Qmkdir -p $@

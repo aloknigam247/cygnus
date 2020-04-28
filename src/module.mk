@@ -1,6 +1,6 @@
 export INCLUDE_DIR += -I . \
 	-I ../../include/base \
-	-I ../../include/clg \
+	-I ../../include/lpg \
 	-I ../../include/compiler \
 	-I ../../include/scanner \
 	-I ../base/tcc
