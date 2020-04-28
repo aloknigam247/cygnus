@@ -10,6 +10,6 @@ class CLG {
 
     private:
     void generateParser(Grammar *g, std::string lang_file);
-    void generateBison(Grammar *g, std::string file_stem);
-    void generateFlex(VariableList *variable_list, std::string file_stem);
+    void generateBison(Grammar *g, std::string file_base);
+    void generateFlex(VariableList *variable_list, std::string file_base, std::string file_stem);
 };

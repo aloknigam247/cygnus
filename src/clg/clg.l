@@ -1,4 +1,3 @@
-/* even more like Unix wc */
 %option noyywrap
 %{
 #include "clg-bison.h"

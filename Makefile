@@ -1,6 +1,6 @@
 #---------- Configs ---------- #
 .DEFAULT_GOAL = compile
-.PHONY: src compile
+.PHONY: compile lang src
 export Q	:= @
 
 #---------- Modes ----------# 
@@ -69,12 +69,12 @@ MAKE_FLAGS	+= --no-print-directory
 export MAKE	= $Qmake $(MAKE_FLAGS)
 
 #---------- Rules ----------#
-compile: $(DUMP) src $(LINK)
+compile: $(DUMP) src $(LINK) lang
 
 $(DUMP):
 	$Qmkdir -p $@
 
-src:
+lang src:
 	$(MAKE) -C $@
 
 $(LINK): $(EXE)
