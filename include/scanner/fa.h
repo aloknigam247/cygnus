@@ -30,7 +30,7 @@
 #include <string>
 #include <vector>
 
-#include "log.h"
+#include "base/log.h"
 
 struct State {
     std::vector<int> sym[128];

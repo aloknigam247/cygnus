@@ -1,5 +1,5 @@
-#include "cyparse.h"
-#include "cylex.h"
+#include "scanner/cyparse.h"
+#include "scanner/cylex.h"
 
 void CyParse::parse(std::string file) {
     CyLex lex;

@@ -22,9 +22,9 @@
  * SOFTWARE.                                                                        *
  ************************************************************************************/
 
-#include "cylex.h"
-#include "dfa.h"
-#include "log.h"
+#include "scanner/cylex.h"
+#include "scanner/dfa.h"
+#include "base/log.h"
 
 void CyLex::addPattern(const char* patt) {
     lex_fa.addPattern(patt);

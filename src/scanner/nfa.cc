@@ -22,9 +22,9 @@
  * SOFTWARE.                                                                        *
  ************************************************************************************/
 
-#include "nfa.h"
+#include "scanner/nfa.h"
 
-#include "log.h"
+#include "base/log.h"
 
 void NFA::addPattern(const char* patt) {
     m_patt_list.push_back(patt);

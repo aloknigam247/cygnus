@@ -1,8 +1,4 @@
-export INCLUDE_DIR += -I . \
-	-I ../../include/base \
-	-I ../../include/clg \
-	-I ../../include/compiler \
-	-I ../../include/scanner \
+export INCLUDE_DIR += -I ../../include \
 	-I ../base/tcc
 
 C_SRC		= $(wildcard *.c)
