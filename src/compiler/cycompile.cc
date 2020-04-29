@@ -1,6 +1,6 @@
-#include "cycompile.h"
+#include "compiler/cycompile.h"
 
-#include "cyparse.h"
+#include "scanner/cyparse.h"
 
 CyCompile::CyCompile(std::string file) {
     CyParse parser;

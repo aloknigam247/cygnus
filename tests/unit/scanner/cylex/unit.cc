@@ -1,4 +1,4 @@
-#include "cylex.h"
+#include "scanner/cylex.h"
 
 #include "cytest.h"
 

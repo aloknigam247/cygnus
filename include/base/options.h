@@ -37,7 +37,7 @@
 #include <string>
 #include <vector>
 
-#include "cystructs.h"
+#include "base/cystructs.h"
 
 /**
  * @class Option

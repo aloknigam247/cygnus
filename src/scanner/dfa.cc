@@ -1,4 +1,4 @@
-#include "dfa.h"
+#include "scanner/dfa.h"
 
 DFA::DFA(NFA nfa) {
     table = nfa.get_table();

@@ -1,6 +1,6 @@
 #include "cytest.h"
 
-#include "cycompile.h"
+#include "compiler/cycompile.h"
 
 void init() {
     CyCompile comp("testfile");
