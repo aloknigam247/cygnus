@@ -1,6 +1,6 @@
+#include "cytest.h"
 #include "base/options.h"
 
-#include "cytest.h"
 
 void helpOption() {
     Options opt;
