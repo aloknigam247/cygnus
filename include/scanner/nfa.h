@@ -25,7 +25,7 @@
 #ifndef SCANNER_NFA_H
 #define SCANNER_NFA_H
 
-#include "scanner/fa.h"
+#include "fa.h"
 
 class NFA: public FA {
     public:

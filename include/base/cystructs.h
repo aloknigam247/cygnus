@@ -218,7 +218,7 @@ class Tree {
     Node* binarySearch(Node* root, K& key) const;
 };
 
-#include "base/cystructs.tcc"
+#include "cystructs.tcc"
 
 }
 #endif

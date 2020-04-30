@@ -1,4 +1,4 @@
-#include "scanner/nfa.h"
+#include "nfa.h"
 
 #include "cytest.h"
 

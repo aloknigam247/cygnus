@@ -1,7 +1,7 @@
 #ifndef SCANNER_DFA_H
 #define SCANNER_DFA_H
 
-#include "scanner/nfa.h"
+#include "nfa.h"
 
 class DFA: public FA {
     public:

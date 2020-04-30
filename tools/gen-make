@@ -172,15 +172,15 @@ rules.write('\n')
 rules.write("OBJ_COMMON := " + os.path.relpath("obj", os.getcwd()[os.getcwd().rfind("unit/")+5:]) + "\n" +
             "OBJ_LOCAL  := obj\n\n" +
             "#------------ Targets ------------#\n" +
-            "debug: COMP_FLAGS += -g\n" +
+            "debug: COMP_FLAGS += -ggdb3\n" +
             "debug: all\n\n" +
             "coverage: CXX = g++-7\n" +
             "coverage: COMP_FLAGS += --coverage\n" +
             "coverage: all\n\n" +
             "mem-check: debug\n\n" +
-            "perf: COMP_FLAGS += -g\n" +
+            "perf: COMP_FLAGS += -ggdb3\n" +
             "perf: all\n\n" +
-            "sanitize: COMP_FLAGS += -g -D_FORTIFY_SOURCE=2 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow -fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error\n" +
+            "sanitize: COMP_FLAGS += -ggdb3 -D_FORTIFY_SOURCE=2 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow -fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error\n" +
             "sanitize: all\n")
 
 rules.createRule('.', opt.file)
