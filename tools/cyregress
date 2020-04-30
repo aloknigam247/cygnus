@@ -150,7 +150,7 @@ runTest() {
                 fi
 
                 if [[ $modify ]] && [[ $line == "" ]]; then
-                    printf "%b" "$buff" | sort
+                    printf "%b" "$buff" | LC_ALL=en_IN sort
                     echo "$line"
                     buff=""
                     modify=""
@@ -158,7 +158,7 @@ runTest() {
                 fi
 
                 if [[ $modify ]] && [[ $line_cnt -eq $end ]]; then
-                    printf "$buff$line" | sort
+                    printf "$buff$line" | LC_ALL=en_IN sort
                     buff=""
                     modify=""
                     continue
