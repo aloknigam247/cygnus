@@ -1,8 +1,8 @@
 [CASE 1] cygnus
 >   Files found:
+>   ./TESTLOG
 >   ./test_dir/file
 >   ./test_dir/non_empty_dir/file2
->   ./TESTLOG
 
 [CASE 2] cygnus -d test_dir_not_exist
 >   |ERROR| unknown option -d

@@ -194,7 +194,7 @@ rules.write("OBJ_COMMON := " + os.path.relpath("obj", os.getcwd()[os.getcwd().rf
             "sanitize: all\n")
 
 rules.createRule('.', opt.file)
-rules.write(target + ": " + ' '.join(rules.obj_list))
+rules.write(source_file + ": " + ' '.join(rules.obj_list))
 rules.write("\t$(CY_COMP) -o $@ $^\n")
 
 dir_list = []
@@ -204,7 +204,7 @@ for obj in rules.obj_list:
         dir_list.append(dir)
 
 rules.write("DIRS = " + ' '.join(dir_list) + "\n\n" +
-            "all: $(DIRS) " + target + "\n")
+            "all: $(DIRS) " + source_file + "\n")
 
 rules.write("$(DIRS):")
 rules.write("\tmkdir -p $@")
