@@ -27,7 +27,8 @@ void Testcase::run() {
         std::cout << "[CASE " << i << ']' << '\n';
         //s.set_property_ptr(case_obj.property);
         case_obj.case_ptr();
-        i++;
+        std::cout << '\n';
+        ++i;
     }
     s.set_property_ptr(nullptr);
 }

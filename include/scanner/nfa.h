@@ -22,6 +22,8 @@
  * SOFTWARE.                                                                        *
  ************************************************************************************/
 
+#ifdef EXTENDED_FEATURE
+
 #ifndef SCANNER_NFA_H
 #define SCANNER_NFA_H
 
@@ -35,5 +37,7 @@ class NFA: public FA {
     private:
     std::vector<const char*> m_patt_list;
 };
+
+#endif
 
 #endif

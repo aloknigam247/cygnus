@@ -22,6 +22,8 @@
  * SOFTWARE.                                                                        *
  ************************************************************************************/
 
+#ifdef EXTENDED_FEATURE
+
 #ifndef SCANNER_FA_H
 #define SCANNER_FA_H
 
@@ -73,5 +75,7 @@ class FA {
     private:
     int state_id = 0;
 };
+
+#endif
 
 #endif

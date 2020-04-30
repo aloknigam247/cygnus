@@ -22,6 +22,8 @@
  * SOFTWARE.                                                                        *
  ************************************************************************************/
 
+#ifdef EXTENDED_FEATURE
+
 #include "nfa.h"
 
 #include "log.h"
@@ -59,3 +61,5 @@ void NFA::build() {
             get_table().set_final(curr_st);
     }
 }
+
+#endif

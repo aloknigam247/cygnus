@@ -153,7 +153,11 @@ args = Args()
 opt = args.parse()
 
 os.chdir(opt.cDir)
-target = "unit"
+source_file = "unit"
+
+if(not os.path.exists(opt.file)):
+    IO.log('E', "file " + opt.file + " does not exists.");
+    quit(1)
 
 rules = Rules()
 rules.src_list = opt.srcDir
@@ -164,7 +168,13 @@ rules.write("#------------ Configs ------------#")
 rules.write("CXX        = g++\n" +
             "COMP_FLAGS = -std=c++11 -fdiagnostics-color -DEXTENDED_FEATURE\n"+
             "CY_COMP    = $(CXX) $(COMP_FLAGS) $(INC)\n\n" +
+            "ifneq ($(MAKECMDGOALS),)\n"
+            "TARGET=/$(MAKECMDGOALS)\n"
+            "endif\n\n"
+            "OBJ_COMMON := " + os.path.relpath("obj", os.getcwd()[os.getcwd().rfind("unit/")+5:]) + "$(TARGET)\n" +
+            "OBJ_LOCAL  := obj$(TARGET)\n\n" +
             "INC := ", '')
+
 for i in opt.incDir:
     rules.write(" \\\n    -I " + i, '')
 rules.write('\n')
@@ -184,7 +194,7 @@ rules.write("OBJ_COMMON := " + os.path.relpath("obj", os.getcwd()[os.getcwd().rf
             "sanitize: all\n")
 
 rules.createRule('.', opt.file)
-rules.write(target + ": " + ' '.join(rules.obj_list))
+rules.write(source_file + ": " + ' '.join(rules.obj_list))
 rules.write("\t$(CY_COMP) -o $@ $^\n")
 
 dir_list = []
@@ -194,7 +204,7 @@ for obj in rules.obj_list:
         dir_list.append(dir)
 
 rules.write("DIRS = " + ' '.join(dir_list) + "\n\n" +
-            "all: $(DIRS) " + target + "\n")
+            "all: $(DIRS) " + source_file + "\n")
 
 rules.write("$(DIRS):")
 rules.write("\tmkdir -p $@")

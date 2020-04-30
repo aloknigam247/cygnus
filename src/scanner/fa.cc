@@ -22,6 +22,8 @@
  * SOFTWARE.                                                                        *
  ************************************************************************************/
 
+#ifdef EXTENDED_FEATURE
+
 #include "fa.h"
 
 #include <cstdlib>
@@ -212,3 +214,5 @@ int FA::addTransition(const std::vector<int>& from, char sym, int to) {
         table.addEntry(f, sym, to);
     return to;
 }
+
+#endif

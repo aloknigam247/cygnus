@@ -1,3 +1,5 @@
+#ifdef EXTENDED_FEATURE
+
 #include "dfa.h"
 
 DFA::DFA(NFA nfa) {
@@ -45,3 +47,5 @@ bool DFA::execute(const char* word) {
         return true;
     return false;
 }
+
+#endif
