@@ -23,7 +23,6 @@
  ************************************************************************************/
 
 #include "options.h"
-#include "cycompile.h"
 #include "log.h"
 #include "utils.h"
 #include "cycrawler.h"
