@@ -26,6 +26,7 @@
 #include "log.h"
 #include "utils.h"
 #include "lpg.h"
+#include "cycrawler.h"
 
 int main(const int argc, const char* argv[]) {
     Options opt;
@@ -42,6 +43,12 @@ int main(const int argc, const char* argv[]) {
         const char *lang_file = static_cast<const char*>(opt.get_value("-l"));
         lpg.generateParser(lang_file);
     }
-
+    else {
+        CyCrawler crawler;
+        crawler.set_path(".");
+        std::cout << "Files found:\n";
+        for(auto file: crawler.crawl())
+            std::cout << file << '\n';
+    }
     return 0;
 }

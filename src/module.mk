@@ -1,9 +1,4 @@
-export INCLUDE_DIR += -I . \
-	-I ../../include/base \
-	-I ../../include/lpg \
-	-I ../../include/compiler \
-	-I ../../include/scanner \
-	-I ../base/tcc
+export INCLUDE_DIR = $(shell find ../../include -mindepth 1 -type d -printf "-I %p " ) -I ../../src/base
 
 BISON_FILES	= $(wildcard *.y)
 BISON_SRC	= $(subst .y,-bison.c,$(BISON_FILES))
@@ -27,10 +22,10 @@ $(FLEX_SRC): %-flex.c: %.l
 	flex -o $@ $^
 
 $(C_DEPS): $(DEP_DIR)/%.d : %.c
-	$(C_COMPILER) $(INCLUDE_DIR) -MM -MF $@ -MT $(OBJ_DIR)/$(^:.c=.o) $^
+	@$(C_COMPILER) $(INCLUDE_DIR) -MM -MF $@ -MT $(OBJ_DIR)/$(^:.c=.o) $^
 
 $(CPP_DEPS): $(DEP_DIR)/%.dpp : %.cc
-	$(CPP_COMPILER) $(INCLUDE_DIR) -MM -MF $@ -MT $(OBJ_DIR)/$(^:.cc=.o) $^
+	@$(CPP_COMPILER) $(INCLUDE_DIR) -MM -MF $@ -MT $(OBJ_DIR)/$(^:.cc=.o) $^
 
 $(DEP_DIR):
 	$Qmkdir -p $@

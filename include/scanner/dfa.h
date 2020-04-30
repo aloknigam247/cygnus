@@ -1,3 +1,5 @@
+#ifdef EXTENDED_FEATURE
+
 #ifndef SCANNER_DFA_H
 #define SCANNER_DFA_H
 
@@ -8,5 +10,7 @@ class DFA: public FA {
         DFA(NFA nfa);
         bool execute(const char* word);
 };
+
+#endif
 
 #endif

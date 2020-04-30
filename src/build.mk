@@ -3,7 +3,7 @@ CPP_SRC	= $(wildcard *.cc)
 OBJS	= $(addprefix $(OBJ_DIR)/,$(C_SRC:.c=.o)) $(addprefix $(OBJ_DIR)/,$(CPP_SRC:.cc=.o))
 DEPS	= $(addprefix $(DEP_DIR)/,$(C_SRC:.c=.d)) $(addprefix $(DEP_DIR)/,$(CPP_SRC:.cc=.dpp))
 
-DEFINES	= -DVERSION=$(shell cat ../../.version)
+DEFINES	= -DVERSION=$(shell cat ../../.internal/version)
 
 build-$(MODULE): $(OBJ_DIR) $(OBJS)
 

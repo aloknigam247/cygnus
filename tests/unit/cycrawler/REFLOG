@@ -1,0 +1,37 @@
+[CASE 1]
+>   Files found:
+>   |ERROR| test_dir_not_exist does not exist
+>   
+
+[CASE 2]
+>   Files found:
+>   test_dir/file
+>   test_dir/non_empty_dir/file2
+>   
+
+[CASE 3]
+>   Files found:
+>   |ERROR| Not a directory
+>   
+
+[CASE 4]
+>   Files found:
+>   test_dir/dir_link/file2
+>   
+
+[CASE 5]
+>   Files found:
+>   |ERROR| test_dir/file_link does not exist
+>   
+
+[CASE 6]
+>   Files found:
+>   |ERROR| test_dir/broken_link does not exist
+>   
+
+[CASE 7]
+>   Files found:
+>   test_dir/loop_link/file
+>   test_dir/loop_link/non_empty_dir/file2
+>   
+

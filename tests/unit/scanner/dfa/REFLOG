@@ -63,10 +63,12 @@
 >   ------------------------------
 >   |  q14|  |  |  |6| |  | |  | |
 >   ------------------------------
->   |INFO| ssssss: Accept
->   |INFO| qqq: Reject
->   |INFO| : Accept
->   |INFO| rRsss: Reject
+>   [INFO] ssssss: Accept
+>   [INFO] qqq: Reject
+>   [INFO] : Accept
+>   [INFO] rRsss: Reject
+>   
 
 [CASE 2]
+>   
 
