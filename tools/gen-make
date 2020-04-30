@@ -57,15 +57,24 @@ class Rules:
     def write(self, msg, end='\n'):
         IO.fileAppend(self.makefile, msg, end)
 
+    #---------------------------------------------------------------------#
+    # Takes file paths that exists and returns all existing include files #
+    #---------------------------------------------------------------------#
     def allIncludes(self, file):
-        includes = []
+        includes = dict()
         for line in open(file, 'r').readlines():
-            if(line.startswith("#include") and len(line.split('"')) > 1):
-                f = self.findFile(line.split('"')[1])
-                if(f):
-                    includes.append(f)
+            if (line.startswith("#include") and len(line.split('"')) > 1):
+                inc_file = line.split('"')[1]
+                dir = self.findDir(self.inc_list, inc_file)
+                if(dir):
+                    includes[inc_file] = dir
+                else:
+                    IO.log('W', "included file " + inc_file + " does not exist")
         return includes
 
+    #------------------------------------------#
+    # Find all the depeds for a file from node #
+    #------------------------------------------#
     def allDepends(self, file):
         l = [file]
         try:
@@ -74,64 +83,72 @@ class Rules:
         finally:
             return l
 
-    def findFile(self, file):
+    #-----------------------------------------------#
+    # Returns dir of the file from the lookup given #
+    #-----------------------------------------------#
+    def findDir(self, lookup, file):
         if(os.path.exists(file)):
             return file
-        elif(file.endswith(".cc")):
-            lookup = self.src_list
-        else:
-            lookup = self.inc_list
-        if(not lookup):
-            return None
         for dir in lookup:
             if(os.path.exists(dir + '/' + file)):
-                return dir + '/' + file
-        if file.endswith(".h"):
-            IO.log('W', "included file " + file + " does not exist")
+                return dir
         return None
 
+    #------------------------------------------------#
+    # Converts .h file to .cc and check if it exists #
+    #------------------------------------------------#
     def h2cc(self, h_file):
-        cc = os.path.basename(h_file).replace(".h", ".cc")
-        cc_file = self.findFile(cc)
-        if(cc_file):
-            return cc_file
-        return None
+        cc = h_file.replace(".h", ".cc")
+        dir = self.findDir(self.src_list, cc)
+        if(dir):
+            return dir, cc
+        return None, None
 
-    def cc2o(self, file):
+    #-------------------------------------------------#
+    # Converts .cc to .o and return its path for make #
+    #-------------------------------------------------#
+    def cc2o(self, dir, file):
         obj_dir = '$(OBJ_LOCAL)'
-        for src in self.src_list:
-            if(file.startswith(src)):
-                obj_dir = '$(OBJ_COMMON)'
-        dot_o = obj_dir + '/' + os.path.basename(file).replace(".cc", ".o")
+        if dir in self.src_list:
+            obj_dir = '$(OBJ_COMMON)'
+        dot_o = obj_dir + '/' + file.replace(".cc", ".o")
         return dot_o
 
-    def createRule(self, file):
-        if(file in self.node):
+    #----------------------------------#
+    # Create rules in recursive manner #
+    #----------------------------------#
+    def createRule(self, dir, file):
+        complete_file = dir + '/' + file
+        if(complete_file in self.node):
             return None
-        if(not file):
+        if(not complete_file):
             return None
-        incs = self.allIncludes(file)
-        if(incs):
-            self.node[file] = incs
+
+        incs = self.allIncludes(complete_file)
+        inc_list = []
+        for inc_file, inc_dir in incs.items():
+            inc_list.append(inc_dir + '/' + inc_file)
+
+        self.node[complete_file] = inc_list
         ret_list = set()
-        for inc in incs:
-            ret = self.createRule(inc)
+        for inc_file, inc_dir in incs.items():
+            ret = self.createRule(inc_dir, inc_file)
 
         if(file.endswith(".h")):
-            src = self.h2cc(file)
-            if(src):
-                ret = self.createRule(src)
+            src_dir, src_file = self.h2cc(file)
+            if(src_dir and src_file):
+                ret = self.createRule(src_dir, src_file)
                 if(ret):
                     ret_list.union(ret)
         elif(file.endswith(".cc")):
-            dot_o = self.cc2o(file)
+            dot_o = self.cc2o(dir, file)
             self.obj_list.append(dot_o)
-            self.write(dot_o + ": " + file + ' ', '')
-            for inc in incs:
-                self.write(' '.join(self.allDepends(inc)), ' ')
+            self.write(dot_o + ": " + complete_file + ' ', '')
+            for inc_file, inc_dir in incs.items():
+                self.write(' '.join(self.allDepends(inc_dir + '/' + inc_file)), ' ')
             self.write('\n\t$(CY_COMP) -c -o $@ $<\n')
 
-#----------------------- Main() -----------------------#
+#----------------------- main() -----------------------#
 args = Args()
 opt = args.parse()
 
@@ -142,14 +159,13 @@ if(not os.path.exists(opt.file)):
     IO.log('E', "file " + opt.file + " does not exists.");
     quit(1)
 
-rule = Rules()
-rule.src_list = opt.srcDir
-rule.inc_list = opt.incDir
-rule.makefile = open('Makefile', 'w')
-rule.write("#------------ Configs ------------#")
+rules = Rules()
+rules.src_list = opt.srcDir
+rules.inc_list = opt.incDir
+rules.makefile = open('Makefile', 'w')
+rules.write("#------------ Configs ------------#")
 
-# Print Makefile
-rule.write("CXX     = g++\n" +
+rules.write("CXX        = g++\n" +
             "COMP_FLAGS = -std=c++11 -fdiagnostics-color -DEXTENDED_FEATURE\n"+
             "CY_COMP    = $(CXX) $(COMP_FLAGS) $(INC)\n\n" +
             "ifneq ($(MAKECMDGOALS),)\n"
@@ -160,26 +176,38 @@ rule.write("CXX     = g++\n" +
             "INC := ", '')
 
 for i in opt.incDir:
-    rule.write(" \\\n    -I " + i, '')
-rule.write('\n')
+    rules.write(" \\\n    -I " + i, '')
+rules.write('\n')
 
-rule.write("#------------ Targets ------------#\n" +
-            "all: $(OBJ_COMMON) $(OBJ_LOCAL) " + source_file + "\n\n" +
-            "$(OBJ_COMMON) $(OBJ_LOCAL):\n" +
-            "\tmkdir -p $@\n\n" +
+rules.write("OBJ_COMMON := " + os.path.relpath("obj", os.getcwd()[os.getcwd().rfind("unit/")+5:]) + "\n" +
+            "OBJ_LOCAL  := obj\n\n" +
+            "#------------ Targets ------------#\n" +
+            "debug: COMP_FLAGS += -ggdb3\n" +
+            "debug: all\n\n" +
             "coverage: CXX = g++-7\n" +
             "coverage: COMP_FLAGS += --coverage\n" +
             "coverage: all\n\n" +
-            "debug: COMP_FLAGS += -g\n" +
-            "debug: all\n\n" +
             "mem-check: debug\n\n" +
-            "perf: COMP_FLAGS += -g\n" +
+            "perf: COMP_FLAGS += -ggdb3\n" +
             "perf: all\n\n" +
-            "sanitize: COMP_FLAGS += -g -D_FORTIFY_SOURCE=2 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow -fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error\n" +
+            "sanitize: COMP_FLAGS += -ggdb3 -D_FORTIFY_SOURCE=2 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow -fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error\n" +
             "sanitize: all\n")
 
-rule.createRule(opt.file)
-rule.write(source_file + ": " + ' '.join(rule.obj_list))
-rule.write("\t$(CY_COMP) -o $@ $^")
-rule.write("\nclean: " + ' '.join(rule.obj_list))
-rule.write("\t rm -f $^")
+rules.createRule('.', opt.file)
+rules.write(target + ": " + ' '.join(rules.obj_list))
+rules.write("\t$(CY_COMP) -o $@ $^\n")
+
+dir_list = []
+for obj in rules.obj_list:
+    dir = os.path.dirname(obj)
+    if dir not in dir_list:
+        dir_list.append(dir)
+
+rules.write("DIRS = " + ' '.join(dir_list) + "\n\n" +
+            "all: $(DIRS) " + target + "\n")
+
+rules.write("$(DIRS):")
+rules.write("\tmkdir -p $@")
+
+rules.write("\nclean: " + ' '.join(rules.obj_list))
+rules.write("\t rm -f $^")

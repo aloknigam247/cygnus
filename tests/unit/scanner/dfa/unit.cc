@@ -1,7 +1,5 @@
 #include "cytest.h"
 
-#include "nfa.h"
-
 #include "dfa.h"
 
 void convertNFA2DFA() {

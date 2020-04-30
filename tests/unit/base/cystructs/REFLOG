@@ -2,12 +2,10 @@
 >   
 
 [CASE 2]
->   |ERROR| iterator is empty
->   
+>   [ERROR] iterator is empty
 
 [CASE 3]
->   |ERROR| iterator is empty
->   
+>   [ERROR] iterator is empty
 
 [CASE 4]
 >   
