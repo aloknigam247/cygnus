@@ -25,11 +25,11 @@
 #ifndef SCANNER_CYLEX_H
 #define SCANNER_CYLEX_H
 
-#include "base/cyfile.h"
+#include "cyfile.h"
 
 #include <string>
 
-#include "scanner/nfa.h"
+#include "nfa.h"
 
 class CyLex {
     public:

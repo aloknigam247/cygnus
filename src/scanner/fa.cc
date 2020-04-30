@@ -22,7 +22,7 @@
  * SOFTWARE.                                                                        *
  ************************************************************************************/
 
-#include "scanner/fa.h"
+#include "fa.h"
 
 #include <cstdlib>
 #include <cstring>

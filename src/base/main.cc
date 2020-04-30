@@ -22,10 +22,10 @@
  * SOFTWARE.                                                                        *
  ************************************************************************************/
 
-#include "base/options.h"
-#include "compiler/cycompile.h"
-#include "base/log.h"
-#include "base/utils.h"
+#include "options.h"
+#include "cycompile.h"
+#include "log.h"
+#include "utils.h"
 
 int main(const int argc, const char* argv[]) {
     Options opt;

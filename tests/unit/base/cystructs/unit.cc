@@ -3,7 +3,7 @@
 
 #include "cytest.h"
 
-#include "base/cystructs.h"
+#include "cystructs.h"
 
 struct TestStruct {
     std::string name;

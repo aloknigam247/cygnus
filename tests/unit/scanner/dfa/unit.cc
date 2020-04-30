@@ -1,6 +1,6 @@
 #include "cytest.h"
 
-#include "scanner/dfa.h"
+#include "dfa.h"
 
 void convertNFA2DFA() {
     NFA nfa;

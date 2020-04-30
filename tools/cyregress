@@ -81,7 +81,7 @@ runFuncTest() {
 }
 
 runUnitTest() {
-    gen-make -i $CYGNUS_HOME/include -i $CYGNUS_HOME/src -i$CYGNUS_HOME/tests/utils/include -s $CYGNUS_HOME/src -s $CYGNUS_HOME/tests/utils/src unit.cc || return 1
+    gen-make $(find $CYGNUS_HOME/include -mindepth 1 -type d -printf "-i %p ") -i $CYGNUS_HOME/src/base -i$CYGNUS_HOME/tests/utils/include $(find $CYGNUS_HOME/src -mindepth 1 -type d -printf "-s %p ") -s $CYGNUS_HOME/tests/utils/src unit.cc || return 1
     make --no-print-directory $TEST_MODE 2>&1 | TEE make.log 
     {
     $tool ./unit | sed -e '/\[CASE/! s/.*/>   &/' -e ' 2,$ s/\[CASE/\n[CASE/' || return 1
