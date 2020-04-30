@@ -11,14 +11,6 @@ declare TEST_MODE=''
 declare FUNC_COUNT=0
 declare UNIT_COUNT=0
 
-TEE() {
-    echo "" > $1
-    while IFS= read line; do
-        echo "$line"
-        echo "$line" | sed -r -e 's|\x1b\[[;0-9]*m\x1b\[K||g' -e 's/\x1b\[[0-9]+m//g' >> $1
-    done
-}
-
 GENHTML() {
     genhtml --ignore-errors source reports/coverage/$1/coverage.info --output-directory reports/coverage/$1/html --demangle-cpp --css-file .internal/coverage.css -t "$1 coverage" --legend --rc genhtml_hi_limit=98 --rc genhtml_med_limit=90 > reports/coverage/$1/genhtml.log 2> /dev/null
     egrep -A 1 'lines\.\.\.\.\.\.:' reports/coverage/$1/genhtml.log
@@ -83,7 +75,8 @@ runFuncTest() {
 
 runUnitTest() {
     gen-make $(find $CYGNUS_HOME/include -mindepth 1 -type d -printf "-i %p ") -i $CYGNUS_HOME/src/base -i$CYGNUS_HOME/tests/utils/include $(find $CYGNUS_HOME/src -mindepth 1 -type d -printf "-s %p ") -s $CYGNUS_HOME/tests/utils/src unit.cc || return 1
-    make --no-print-directory $TEST_MODE 2>&1 | TEE make.log 
+    make --no-print-directory $TEST_MODE 2>&1 | tee make.log
+    sed -i -e 's|\x1b\[[;0-9]*m\x1b\[K||g' -e 's/\x1b\[[0-9]+m//g' make.log
     {
     $tool ./unit | sed -e '/\[CASE/! s/.*/>   &/' -e ' 2,$ s/\[CASE/\n[CASE/' || return 1
     echo
@@ -377,7 +370,8 @@ main() {
     echo "    PASS: $((tc_cnt - fail_cnt))"
     echo "    FAIL: $fail_cnt"
     RETURN_ERROR
-    } | TEE logs/cyregress${TEST_MODE:+-$TEST_MODE}.log
+    } 2>&1 | tee logs/cyregress${TEST_MODE:+-$TEST_MODE}.log
+    sed -i -e 's|\x1b\[[;0-9]*m\x1b\[K||g' -e 's/\x1b\[[0-9]+m//g' logs/cyregress${TEST_MODE:+-$TEST_MODE}.log
     return ${PIPESTATUS[0]}
 }
 

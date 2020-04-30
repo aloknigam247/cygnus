@@ -14,14 +14,6 @@ OPTION['--release']="value:bool,eval:BUILD_MODE=release,help:create release buil
 OPTION['--sanitize']="value:bool,eval:BUILD_MODE=sanitize,help:create sanitized build"
 OPTION['--strict']="value:bool,eval:STRICT=yes,help:use strict options for compilation"
 
-TEE() {
-    echo "" > $1
-    while IFS= read line; do
-        echo "$line"
-        echo "$line" | sed 's|\x1b\[[;0-9]*m\x1b\[K||g' >> $1
-    done
-}
-
 MAKE() {
     {
     if [[ ${VALUES['--force']} ]]; then
@@ -30,11 +22,15 @@ MAKE() {
 
     if [[ ${VALUES['--strict']} ]]; then
         make -q && make clean
-        make MODE=$1 STRICT=yes 2> >(TEE $report_dir/${BUILD_MODE}-errors)
+        make MODE=$1 STRICT=yes 2>$report_dir/${BUILD_MODE}-errors
     else
-        make MODE=$1 2> >(TEE $report_dir/${BUILD_MODE}-errors)
+        make MODE=$1 2>$report_dir/${BUILD_MODE}-errors
     fi
-    } | TEE logs/cybuild-${BUILD_MODE}.log
+
+    cat $report_dir/${BUILD_MODE}-errors
+    } | tee logs/cybuild-${BUILD_MODE}.log
+
+    sed -i 's|\x1b\[[;0-9]*m\x1b\[K||g' $report_dir/${BUILD_MODE}-errors logs/cybuild-${BUILD_MODE}.log
 }
 
 main() {
