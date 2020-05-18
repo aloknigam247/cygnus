@@ -13,7 +13,7 @@ struct Grammar *digest(const char *file_name) {
     if(file == NULL)
         return NULL;
 
-//    bisonParse(file);
+    bisonParse(file);
 
     fclose(file);
 
