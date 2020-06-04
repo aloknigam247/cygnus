@@ -1,6 +1,6 @@
 %option noyywrap
 %{
-#include "clg-bison.h"
+#include "lpg-bison.h"
 %}
 %%
 : 		    { printf("flex::COLON: %s\n", yytext);            yylval.str = strdup(yytext); return COLON; }

@@ -457,7 +457,7 @@ int yy_flex_debug = 0;
 char *yytext;
 #line 1 "lpg.l"
 #line 3 "lpg.l"
-#include "clg-bison.h"
+#include "lpg-bison.h"
 #line 462 "lpg-flex.c"
 #line 463 "lpg-flex.c"
 

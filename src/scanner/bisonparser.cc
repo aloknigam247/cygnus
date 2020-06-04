@@ -1,4 +1,7 @@
 #include "parser.h"
 
-void BisonParser::parse(std::string file) {
+extern "C" struct Grammar *digest(const char *file_name);
+
+Grammar* BisonParser::parse(std::string file) {
+    return digest(file.c_str());
 }

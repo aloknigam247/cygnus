@@ -1,4 +1,5 @@
 #include "lpg.h"
+#include "interface.h"
 
 Parser* ScannerFactory::giveParser() {
     Parser *p;
@@ -56,7 +57,7 @@ int LPG::parse(std::string lang_file) {
 */
 
 void LPG::generateParser(std::string lang_file) {
-    //Grammer *g = parser->parse(lang_file);
+    Grammar *g = parser->parse(lang_file);
 
     lex_writer->write();
 
