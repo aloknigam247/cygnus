@@ -1,6 +1,3 @@
-#ifndef INTERFACE_H
-#define INTERFACE_H
-
 struct VariableList {
     char *id;
     char *pattern;
@@ -12,7 +9,7 @@ struct RuleList {
     struct RuleList *next;
 };
 
-struct Grammar {
+struct CylGrammar {
     char *file_type;
     struct VariableList *variable_head;
     struct VariableList *variable_tail;
@@ -20,11 +17,6 @@ struct Grammar {
     struct RuleList *rule_tail;
 };
 
-extern struct Grammar instr_digest;
-
-struct Grammar *digest(const char *file_name);
-void insertRule(const char *rule);
-void insertVariable(const char *var, const char *patt);
-void setFileType(const char *file_type);
-
-#endif
+void insertRule(struct CylGrammar *digest, const char *rule);
+void insertVariable(struct CylGrammar *digest, const char *var, const char *patt);
+void setFileType(struct CylGrammar *digest, const char *file_type);

@@ -1,6 +1,6 @@
-#line 2 "lpg-flex.c"
+#line 2 "cyl-flex.c"
 
-#line 4 "lpg-flex.c"
+#line 4 "cyl-flex.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -455,11 +455,11 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "lpg.l"
-#line 3 "lpg.l"
-#include "lpg-bison.h"
-#line 462 "lpg-flex.c"
-#line 463 "lpg-flex.c"
+#line 1 "cyl.l"
+#line 3 "cyl.l"
+#include "cyl-bison.h"
+#line 462 "cyl-flex.c"
+#line 463 "cyl-flex.c"
 
 #define INITIAL 0
 
@@ -676,9 +676,9 @@ YY_DECL
 		}
 
 	{
-#line 5 "lpg.l"
+#line 5 "cyl.l"
 
-#line 682 "lpg-flex.c"
+#line 682 "cyl-flex.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -737,51 +737,51 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 6 "lpg.l"
+#line 6 "cyl.l"
 { printf("flex::COLON: %s\n", yytext);            yylval.str = strdup(yytext); return COLON; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 7 "lpg.l"
+#line 7 "cyl.l"
 { printf("flex::FILETYPE: %s\n", yytext);         yylval.str = strdup(yytext); return FILETYPE; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 8 "lpg.l"
+#line 8 "cyl.l"
 { printf("flex::LOWER_WORD: %s\n", yytext);       yylval.str = strdup(yytext); return LOWER_WORD; }
 	YY_BREAK
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 9 "lpg.l"
+#line 9 "cyl.l"
 { printf("flex::NL\n");                           yylval.str = strdup(yytext); return NL; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 10 "lpg.l"
+#line 10 "cyl.l"
 { printf("flex::PATTERN: %s\n", yytext);          yylval.str = strdup(yytext); return PATTERN; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 11 "lpg.l"
+#line 11 "cyl.l"
 { printf("flex::UPPER_WORD: %s\n", yytext);       yylval.str = strdup(yytext); return UPPER_WORD; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 12 "lpg.l"
+#line 12 "cyl.l"
 { printf("flex::Whitespace: \`%s\'\n", yytext);   yylval.str = strdup(yytext); return WS; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 13 "lpg.l"
+#line 13 "cyl.l"
 { printf("flex::ignored: \`%s\'\n", yytext); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 14 "lpg.l"
+#line 14 "cyl.l"
 ECHO;
 	YY_BREAK
-#line 785 "lpg-flex.c"
+#line 785 "cyl-flex.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1786,6 +1786,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 14 "lpg.l"
+#line 14 "cyl.l"
 
 

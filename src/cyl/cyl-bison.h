@@ -30,8 +30,8 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_YY_LPG_BISON_H_INCLUDED
-# define YY_YY_LPG_BISON_H_INCLUDED
+#ifndef YY_YY_CYL_BISON_H_INCLUDED
+# define YY_YY_CYL_BISON_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -60,11 +60,11 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 9 "lpg.y" /* yacc.c:1909  */
+#line 11 "cyl.y" /* yacc.c:1909  */
 
     char* str;
 
-#line 68 "lpg-bison.h" /* yacc.c:1909  */
+#line 68 "cyl-bison.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -77,4 +77,4 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_LPG_BISON_H_INCLUDED  */
+#endif /* !YY_YY_CYL_BISON_H_INCLUDED  */

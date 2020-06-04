@@ -1,5 +1,5 @@
-#include "lpg.h"
-#include "interface.h"
+#include "cyl.h"
+#include "cyl-grammar.h"
 
 Parser* ScannerFactory::giveParser() {
     Parser *p;
@@ -40,27 +40,20 @@ Writer* ScannerFactory::giveLexWriter() {
     return w;
 }
 
+extern "C" void* CylBisonEntry(const char*);
 
-LPG::LPG(ScannerType t) {
+Cyl::Cyl(ScannerType t) {
     ScannerFactory f(t);
     parser = f.giveParser();
     lex_writer = f.giveLexWriter();
     parse_writer = f.giveParseWriter();
+    ((BisonParser*)parser)->set_entry(CylBisonEntry);
 }
 
-/*
-int LPG::parse(std::string lang_file) {
-    struct Grammar *g = digest(lang_file.c_str());
-    generateParser(g, lang_file);
-    return 0;
-}
-*/
-
-void LPG::generateParser(std::string lang_file) {
-    Grammar *g = parser->parse(lang_file);
+void Cyl::generateParser(std::string cyl_file) {
+    Grammar *g = (Grammar*)parser->parse(cyl_file);
 
     lex_writer->write();
-
     parse_writer->write();
 }
 

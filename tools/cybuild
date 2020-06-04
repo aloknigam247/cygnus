@@ -30,8 +30,6 @@ MAKE() {
         #make MODE=$1 2>$report_dir/${BUILD_MODE}-errors
         make MODE=$1 3>&1 1>&2 2>&3 3>&- | tee $report_dir/${BUILD_MODE}-errors
     fi
-
-    echo "ERROR: "
     } | tee logs/cybuild-${BUILD_MODE}.log
 
     sed -i 's|\x1b\[[;0-9]*m\x1b\[K||g' $report_dir/${BUILD_MODE}-errors logs/cybuild-${BUILD_MODE}.log

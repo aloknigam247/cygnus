@@ -25,7 +25,7 @@
 #include "options.h"
 #include "log.h"
 #include "utils.h"
-#include "lpg.h"
+#include "cyl.h"
 #include "cycrawler.h"
 
 int main(const int argc, const char* argv[]) {
@@ -39,9 +39,9 @@ int main(const int argc, const char* argv[]) {
         std::cout << "Cygnus " << MAKE_STRING(VERSION) << '\n';
     }
     else if(opt.isSet("-l")) {
-        LPG lpg(GNU);
+        Cyl cyl(GNU);
         const char *lang_file = static_cast<const char*>(opt.get_value("-l"));
-        lpg.generateParser(lang_file);
+        cyl.generateParser(lang_file);
     }
     else {
         CyCrawler crawler;

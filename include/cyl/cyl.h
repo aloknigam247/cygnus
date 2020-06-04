@@ -17,9 +17,9 @@ class ScannerFactory {
     ScannerType type;
 };
 
-class LPG {
+class Cyl {
     public:
-    LPG(ScannerType type);
+    Cyl(ScannerType type);
     void generateParser(std::string lang_file);
 
     private:

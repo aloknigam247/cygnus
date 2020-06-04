@@ -62,15 +62,17 @@
 
 
 /* Copy the first part of user declarations.  */
-#line 1 "lpg.y" /* yacc.c:339  */
+#line 1 "cyl.y" /* yacc.c:339  */
 
 #include <stdio.h>
-#include "interface.h"
+#include "grammar.h"
 
 extern FILE *yyin;
 char buff[1000];
 
-#line 74 "lpg-bison.c" /* yacc.c:339  */
+struct CylGrammar *digest = NULL;
+
+#line 76 "cyl-bison.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -89,9 +91,9 @@ char buff[1000];
 #endif
 
 /* In a future release of Bison, this section will be replaced
-   by #include "lpg-bison.h".  */
-#ifndef YY_YY_LPG_BISON_H_INCLUDED
-# define YY_YY_LPG_BISON_H_INCLUDED
+   by #include "cyl-bison.h".  */
+#ifndef YY_YY_CYL_BISON_H_INCLUDED
+# define YY_YY_CYL_BISON_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -120,11 +122,11 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 9 "lpg.y" /* yacc.c:355  */
+#line 11 "cyl.y" /* yacc.c:355  */
 
     char* str;
 
-#line 128 "lpg-bison.c" /* yacc.c:355  */
+#line 130 "cyl-bison.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -137,11 +139,11 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_LPG_BISON_H_INCLUDED  */
+#endif /* !YY_YY_CYL_BISON_H_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
 
-#line 145 "lpg-bison.c" /* yacc.c:358  */
+#line 147 "cyl-bison.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -439,7 +441,7 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    22,    22,    24,    26,    28
+       0,    24,    24,    26,    28,    30
 };
 #endif
 
@@ -1211,25 +1213,25 @@ yyreduce:
   switch (yyn)
     {
         case 3:
-#line 24 "lpg.y" /* yacc.c:1646  */
-    { setFileType((yyvsp[0].str)); }
-#line 1217 "lpg-bison.c" /* yacc.c:1646  */
+#line 26 "cyl.y" /* yacc.c:1646  */
+    { setFileType(digest, (yyvsp[0].str)); }
+#line 1219 "cyl-bison.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 26 "lpg.y" /* yacc.c:1646  */
-    { insertVariable((yyvsp[-2].str), (yyvsp[0].str)); }
-#line 1223 "lpg-bison.c" /* yacc.c:1646  */
+#line 28 "cyl.y" /* yacc.c:1646  */
+    { insertVariable(digest, (yyvsp[-2].str), (yyvsp[0].str)); }
+#line 1225 "cyl-bison.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 28 "lpg.y" /* yacc.c:1646  */
-    { snprintf(buff, 1000, "%s%s%s%s", (yyvsp[-3].str), (yyvsp[-2].str), (yyvsp[-1].str), (yyvsp[0].str)); insertRule(buff); }
-#line 1229 "lpg-bison.c" /* yacc.c:1646  */
+#line 30 "cyl.y" /* yacc.c:1646  */
+    { snprintf(buff, 1000, "%s%s%s%s", (yyvsp[-3].str), (yyvsp[-2].str), (yyvsp[-1].str), (yyvsp[0].str)); insertRule(digest, buff); }
+#line 1231 "cyl-bison.c" /* yacc.c:1646  */
     break;
 
 
-#line 1233 "lpg-bison.c" /* yacc.c:1646  */
+#line 1235 "cyl-bison.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1457,13 +1459,21 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 30 "lpg.y" /* yacc.c:1906  */
+#line 32 "cyl.y" /* yacc.c:1906  */
 
-void bisonParse(FILE *file) {
-  yyin = file;
-  yyparse();
+void* CylBisonEntry(const char *file_name) {
+    FILE *file = fopen(file_name, "r");
+    if(file == NULL)
+        return NULL;
+
+    yyin = file;
+    digest = malloc(sizeof(struct CylGrammar));
+    yyparse();
+
+    fclose(file);
+    return digest;
 }
 
 yyerror(char *s) {
- printf("error: %s\n", s);
+    printf("error: %s\n", s);
 }

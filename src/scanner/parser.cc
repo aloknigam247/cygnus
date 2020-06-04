@@ -1,16 +1,12 @@
 #include "parser.h"
 
 Parser* parserFactory(ParserType type) {
-    Parser *p;
     switch(type) {
         case ParserType::Bison:
-            p = new BisonParser;
-            break;
+            return new BisonParser;
 #ifdef EXTENDED_FEATURE
         case ParserType::CyParser:
-            p = new CyParser;
-            break;
+            return new CyParser;
 #endif
     }
-    return p;
 }

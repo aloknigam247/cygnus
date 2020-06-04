@@ -1,19 +1,32 @@
 #include <string>
 
-struct Grammar;
+class Digest {
+    public:
+    void set_data(void* d) { data = d; }
+
+    private:
+    void *data;
+};
 
 class Parser {
     public:
-    virtual Grammar* parse(std::string file) = 0;
+    virtual Digest* parse(std::string file) = 0;
 };
 
 class BisonParser: public Parser {
-    Grammar* parse(std::string file) override;
+    public:
+    Digest* parse(std::string file) override;
+    void set_entry(void* (*p)(const char*)) { bison_entry = p; }
+
+    private:
+    void* (*bison_entry)(const char*);
+
 };
 
 #ifdef EXTENDED_FEATURE
 class CyParser: public Parser {
-    Grammar* parse(std::string file) override;
+    public:
+    Digest* parse(std::string file) override;
 };
 #endif
 
