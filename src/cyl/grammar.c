@@ -1,4 +1,4 @@
-#include "grammar.h"
+#include "cyl-grammar.h"
 
 #include <stdio.h>
 #include <string.h>

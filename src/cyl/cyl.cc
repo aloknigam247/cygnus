@@ -51,10 +51,10 @@ Cyl::Cyl(ScannerType t) {
 }
 
 void Cyl::generateParser(std::string cyl_file) {
-    Grammar *g = (Grammar*)parser->parse(cyl_file);
+    Digest *d = parser->parse(cyl_file);
 
-    lex_writer->write();
-    parse_writer->write();
+    lex_writer->write((CylGrammar*)d->get_data(), cyl_file);
+    parse_writer->write((CylGrammar*)d->get_data(), cyl_file);
 }
 
 /*

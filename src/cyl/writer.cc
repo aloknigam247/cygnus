@@ -21,13 +21,9 @@ Writer* writerFactory(WriterType type) { // TODO: can any other design pattern w
     return w;
 }
 
-void BisonWriter::write() {
-}
-
-/*
-void LPG::generateBison(Grammar *g, std::string file_base) {
+void BisonWriter::write(CylGrammar *g, std::string cyl_file) {
     CyFile bison;
-    bison.open(file_base + ".y", std::ios::out);
+    bison.open(cyl_file + ".y", std::ios::out);
 
     bison << "%define api.prefix {lang}\n";
     bison << "%code provides\n";
@@ -73,28 +69,28 @@ void LPG::generateBison(Grammar *g, std::string file_base) {
     bison << "}\n";
     bison.close();
 }
-*/
-void FlexWriter::write() {
-}
 
-/*
-void LPG::generateFlex(VariableList *variable_list, std::string file_base, std::string file_stem) {
-    if(!variable_list)
+void FlexWriter::write(CylGrammar *g, std::string cyl_file) {
+    if(!g->variable_head)
         return;
 
+    VariableList *variable = g->variable_head;
+/*
+void LPG::generateFlex(VariableList *variable_list, std::string file_base, std::string file_stem) {
+*/
     CyFile flex;
-    flex.open(file_base + ".l", std::ios::out);
+    flex.open(cyl_file + ".l", std::ios::out);
 
     flex << "%{\n";
-    flex << "#include \"" << file_stem << "-bison.h\"\n";
+    //flex << "#include \"" << file_stem << "-bison.h\"\n";
     flex << "%}\n";
     flex << "%%\n";
-    while(variable_list) {
-        std::string tmp = variable_list->pattern;
+    while(variable) {
+        std::string tmp = variable->pattern;
         tmp.erase(0,1);
         tmp.erase(tmp.size()-1, 1);
-        flex << tmp << " { return " << variable_list->id << "; }\n";
-        variable_list = variable_list->next;;
+        flex << tmp << " { return " << variable->id << "; }\n";
+        variable = variable->next;;
     }
     flex << "%%";
-}*/
+}

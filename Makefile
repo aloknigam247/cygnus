@@ -1,4 +1,4 @@
-#---------- Configs ---------- #
+#---------- Configs ----------#
 .DEFAULT_GOAL = compile
 .PHONY: compile lang src
 export Q	:= @

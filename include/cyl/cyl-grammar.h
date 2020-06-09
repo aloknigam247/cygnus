@@ -1,3 +1,6 @@
+#ifndef CYL_GRAMMAR_H
+#define CYL_GRAMMAR_H
+
 struct VariableList {
     char *id;
     char *pattern;
@@ -20,3 +23,5 @@ struct CylGrammar {
 void insertRule(struct CylGrammar *digest, const char *rule);
 void insertVariable(struct CylGrammar *digest, const char *var, const char *patt);
 void setFileType(struct CylGrammar *digest, const char *file_type);
+
+#endif

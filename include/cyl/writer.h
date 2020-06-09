@@ -1,27 +1,32 @@
+#include "cyl-grammar.h"
+
+#include <string>
+#include "cyfile.h"
+
 class Writer {
     public:
-    virtual void write() = 0;
+    virtual void write(CylGrammar *g, std::string file) = 0;
 };
 
 class BisonWriter: public Writer {
     public:
-    virtual void write() override;
+    virtual void write(CylGrammar *g, std::string file) override;
 };
 
 class FlexWriter: public Writer {
     public:
-    virtual void write() override;
+    virtual void write(CylGrammar *g, std::string file) override;
 };
 
 #ifdef EXTENDED_FEATURE
 class CyParseWriter: public Writer {
     public:
-    virtual void write() override;
+    virtual void write(CylGrammar *g, std::string file) override;
 };
 
 class CyLexWriter: public Writer {
     public:
-    virtual void write() override;
+    virtual void write(CylGrammar *g, std::string file) override;
 };
 #endif
 

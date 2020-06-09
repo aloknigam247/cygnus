@@ -1,6 +1,6 @@
 %{
 #include <stdio.h>
-#include "grammar.h"
+#include "cyl-grammar.h"
 
 extern FILE *yyin;
 char buff[1000];
