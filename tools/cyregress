@@ -10,6 +10,7 @@ declare OUT_DIR='test_run'
 declare TEST_MODE=''
 declare FUNC_COUNT=0
 declare UNIT_COUNT=0
+declare UNBUFF=''
 
 GENHTML() {
     genhtml --ignore-errors source reports/coverage/$1/coverage.info --output-directory reports/coverage/$1/html --demangle-cpp --css-file .internal/coverage.css -t "$1 coverage" --legend --rc genhtml_hi_limit=98 --rc genhtml_med_limit=90 > reports/coverage/$1/genhtml.log 2> /dev/null
@@ -119,7 +120,7 @@ runFuncTest() {
     {
     for i in ${!CASE[@]}; do
         echo "[CASE $((i+1))] $(echo ${CASE[$i]} | sed "s|$CYGNUS|cygnus|")"
-        $tool ${CASE[$i]} | sed 's/.*/>   &/' || return 1
+        $UNBUFF $tool ${CASE[$i]} | sed 's/.*/>   &/' || return 1
         echo
     done
     } 2>&1 > TESTLOG
@@ -130,7 +131,7 @@ runUnitTest() {
     make --no-print-directory $TEST_MODE 2>&1 | tee make.log
     sed -i -e 's|\x1b\[[;0-9]*m\x1b\[K||g' -e 's/\x1b\[[0-9]+m//g' make.log
     {
-    $tool ./unit | sed -e '/\[CASE/! s/.*/>   &/' -e ' 2,$ s/\[CASE/\n[CASE/' || return 1
+    $UNBUFF $tool ./unit | sed -e '/\[CASE/! s/.*/>   &/' -e ' 2,$ s/\[CASE/\n[CASE/' || return 1
     echo
     } 2>&1 > TESTLOG 
 }
@@ -360,6 +361,7 @@ main() {
     rm -rf reports/func reports/unit
     mkdir -p reports/func reports/unit
     export fail_cnt=0
+    test -f /usr/bin/unbuffer && UNBUFF='/usr/bin/unbuffer'
 
     #-----------#
     #    Run    #
