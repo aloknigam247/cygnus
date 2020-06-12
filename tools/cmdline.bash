@@ -16,7 +16,7 @@ EXIT() {
 # Wrapper for return    #
 # Usage: RETURN_ERROR   #
 #-----------------------#
-RETURN_ERROR() {
+RETURN_ERROR() {    # TODO: Do we need this
     return $_EXITCODE
 }
 
@@ -56,20 +56,25 @@ LOG() {
     esac
 }
 
-#-------------------------------------------------------------------#
-# How to create new option                                          #
-#   * eval:     : action to evaluate when option is found           #
-#   * help:     : create help statement, use . in place of space    #
-#   * metavar:  : string to be displayed for option argument        #
-#   * value:    : type of value                                     #
-#                  bool    - no argument                            #
-#               : string  - option expects single argument          #
-#   * with:     : mention dependency of option                      #
-#   ** POS      : special option to provide positional args         #
-#                                                                   #
-#   OPTION['option-name']="list of above options"                   #
-#   OPTION['POS']="variable-name"                                   #
-#-------------------------------------------------------------------#
+#---------------------------------------------------------------------------#
+# Usage: How to create new option                                           #
+#   OPTION['option-name']="list of above options"                           #
+#   OPTION['POS']="variable-name"                                           #
+#                                                                           #
+# How to access values                                                      #
+#   ${VALUES['option']}: returns value of option if given                   #
+#                                                                           #
+# List of option-name                                                       #
+#   * eval      : action to evaluate when option is found                   #
+#   * help      : create help statement, use . in place of space            #
+#   * metavar   : string to be displayed for option argument                #
+#   * POS       : special option to provide positional args                 #
+#   * value     : type of value                                             #
+#                   bool    - no argument                                   #
+#                   string  - option expects single argument                #
+#   * with      : space seperated list of dependent options to combine      #
+#   * without   : space seperated list of options that should not combine   #
+#---------------------------------------------------------------------------#
 declare -A OPTION
 declare -A VALUES
 declare _POS_NAME="POS"
@@ -78,7 +83,9 @@ declare _POS_NAME="POS"
 OPTION['-h']='value:bool,help:print help'
 OPTION['--help']='value:bool,help:print help'
 
-# Print usage
+#-------------#
+# Print usage #
+#-------------#
 usage() {
     # scan all options for tabular alignments
     local _max_len=0
@@ -174,7 +181,7 @@ optionError() {
     if [[ -z $_help ]]; then
         LOG W "short help for option \`$1' is missing."
     else
-            echo "    $1 $_meta: ${_help//./ } $_with $_without"
+            echo "    $1 $_meta: ${_help//./ }$_with$_without"
     fi
 }
 
@@ -234,13 +241,13 @@ parseCmdLine() {
                         ;;
                     with:*)
                         _deps=${_param#*:}
-                        for _o in ${_deps//,/ }; do
+                        for _o in ${_deps// /,}; do # IFS is ',' replace ' ' with ','
                             _with["$_o"]=$_opt
                         done
                         ;;
                     without:*)
                         _deps==${_param#*:}
-                        for _o in ${_deps//,/ }; do
+                        for _o in ${_deps// /,}; do # IFS is ',' replace ' ' with ','
                             _without["$_o"]=$_opt
                         done
                         ;;
