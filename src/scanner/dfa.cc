@@ -7,7 +7,6 @@ DFA::DFA(NFA nfa) {
     int t_size = table.size();
     int n_state = t_size;
 
-    State *t;
     for(int i=0; i<t_size; ++i) {
         State *s = &(table.row[i]);
         for(int j=0; j<128; ++j) {
@@ -15,11 +14,10 @@ DFA::DFA(NFA nfa) {
                 continue;
 #ifdef EXTENDED_FEATURE
             for(auto a: s->sym[j]) {
-                t = table.get_state(a);
                 for(int k=0; k<128; ++k) {
-                    if(t->sym[k].empty())
+                    if(table.get_state(a)->sym[k].empty())
                         continue;
-                    addTransition(n_state, k, t->sym[k].front());
+                    addTransition(n_state, k, table.get_state(a)->sym[k].front());
                 }
                 s = &(table.row[i]);   // s points wrong when vector is resized
             }
