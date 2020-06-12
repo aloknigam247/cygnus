@@ -1,8 +1,15 @@
 # Introduction
 
-A simple source code browser that is designed to work on ideally any source code (C++/Java/Python/SHELL/...).
-It uses pre-written files that are used to parse the source code file and attach attributes to the keywords.
-It creates an optimised database for searching.
+Source code browser.
+
+## Components
+![components.svg](https://raw.githubusercontent.com/aloknigam247/cygnus/dev/.internal/images/components.svg)
+
+## Build
+```bash
+source sourceme  
+cybuild
+```
 
 ## Quick Links
 > [Release Plan](https://github.com/aloknigam247/cygnus/wiki/Release-Plan-1.0)  
