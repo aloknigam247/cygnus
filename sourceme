@@ -10,8 +10,8 @@ if [[ ! $PATH =~ $CYGNUS_HOME/build/bin ]]; then
     export PATH=$CYGNUS_HOME/build/bin:$PATH
 fi
 
-if [[ ! $PATH =~ tools ]]; then
-    export PATH=tools:$PATH
+if [[ ! $PATH =~ $CYGNUS_HOME/tools ]]; then
+    export PATH=$CYGNUS_HOME/tools:$PATH
 fi
 
 echo CYGNUS_HOME: $CYGNUS_HOME

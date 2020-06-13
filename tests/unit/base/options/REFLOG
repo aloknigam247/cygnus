@@ -10,10 +10,10 @@
 >   [INFO] -s: string
 >   [INFO] positional: pos_param1
 >   [INFO] positional: pos_param2
->   |ERROR| option -c needs value character value.
->   |ERROR| option -i needs value integer value.
->   |ERROR| option -s needs value string value.
->   |ERROR| option -c needs value character value.
+>   |ERROR| option -c needs character value.
+>   |ERROR| option -i needs integer value.
+>   |ERROR| option -s needs string value.
+>   |ERROR| option -c needs character value.
 >   |ERROR| cd is not a valid integer.
 >   |ERROR| unknown option -u
 >   |ERROR| 999999999999999 is out of range.

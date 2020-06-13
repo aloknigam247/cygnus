@@ -8,6 +8,7 @@
 [CASE 3] cygnus -h
 >   usage: cygnus [options]
 >       -h: print help message
+>       -l: language file
 >       -v: version
 >   Files found:
 >   ./TESTLOG

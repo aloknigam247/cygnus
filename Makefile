@@ -74,6 +74,9 @@ compile: $(DUMP) src $(LINK)
 $(DUMP):
 	$Qmkdir -p $@
 
+src:
+	$(MAKE) -C $@
+
 $(LINK): $(EXE)
 	ln -sfr $< $@
 

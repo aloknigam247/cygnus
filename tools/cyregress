@@ -127,6 +127,7 @@ runFuncTest() {
 }
 
 runUnitTest() {
+    pwd
     gen-make $(find $CYGNUS_HOME/include -mindepth 1 -type d -printf "-i %p ") -i $CYGNUS_HOME/src/base -i$CYGNUS_HOME/tests/utils/include $(find $CYGNUS_HOME/src -mindepth 1 -type d -printf "-s %p ") -s $CYGNUS_HOME/tests/utils/src unit.cc || return 1
     make --no-print-directory $TEST_MODE 2>&1 | tee make.log
     sed -i -e 's|\x1b\[[;0-9]*m\x1b\[K||g' -e 's/\x1b\[[0-9]+m//g' make.log

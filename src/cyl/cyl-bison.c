@@ -69,7 +69,7 @@
 #line 1 "cyl.y"
 
 #include <stdio.h>
-#include "cyl-grammar.h"
+#include "cylgrammar.h"
 
 extern FILE *yyin;
 char buff[1000];

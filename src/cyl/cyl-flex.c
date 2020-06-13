@@ -738,38 +738,38 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 YY_RULE_SETUP
 #line 6 "cyl.l"
-{ printf("flex::COLON: %s\n", yytext);            yylval.str = strdup(yytext); return COLON; }
+{ printf("flex::COLON: %s\n", yytext);          yylval.str = strdup(yytext); return COLON; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
 #line 7 "cyl.l"
-{ printf("flex::FILETYPE: %s\n", yytext);         yylval.str = strdup(yytext); return FILETYPE; }
+{ printf("flex::FILETYPE: %s\n", yytext);       yylval.str = strdup(yytext); return FILETYPE; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
 #line 8 "cyl.l"
-{ printf("flex::LOWER_WORD: %s\n", yytext);       yylval.str = strdup(yytext); return LOWER_WORD; }
+{ printf("flex::LOWER_WORD: %s\n", yytext);     yylval.str = strdup(yytext); return LOWER_WORD; }
 	YY_BREAK
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
 #line 9 "cyl.l"
-{ printf("flex::NL\n");                           yylval.str = strdup(yytext); return NL; }
+{ printf("flex::NL\n");                         yylval.str = strdup(yytext); return NL; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 10 "cyl.l"
-{ printf("flex::PATTERN: %s\n", yytext);          yylval.str = strdup(yytext); return PATTERN; }
+{ printf("flex::PATTERN: %s\n", yytext);        yylval.str = strdup(yytext); return PATTERN; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 11 "cyl.l"
-{ printf("flex::UPPER_WORD: %s\n", yytext);       yylval.str = strdup(yytext); return UPPER_WORD; }
+{ printf("flex::UPPER_WORD: %s\n", yytext);     yylval.str = strdup(yytext); return UPPER_WORD; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 12 "cyl.l"
-{ printf("flex::Whitespace: \`%s\'\n", yytext);   yylval.str = strdup(yytext); return WS; }
+{ printf("flex::Whitespace: \`%s\'\n", yytext); yylval.str = strdup(yytext); return WS; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
