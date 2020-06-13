@@ -1,24 +1,8 @@
-#include "cyl-grammar.h"
+#include "cylgrammar.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
-void bisonParse(FILE *file);
-
-/*struct Grammar instr_digest = {NULL};
-
-struct Grammar *digest(const char *file_name) {
-    FILE *file = fopen(file_name, "r");
-    if(file == NULL)
-        return NULL;
-
-    bisonParse(file);
-
-    fclose(file);
-
-    return &instr_digest;
-}*/
 
 void insertRule(struct CylGrammar *digest, const char *rule) {
     struct RuleList *new = malloc(sizeof(struct RuleList));

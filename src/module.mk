@@ -22,10 +22,10 @@ $(FLEX_SRC): %-flex.c: %.l
 	flex -o $@ $^
 
 $(C_DEPS): $(DEP_DIR)/%.d : %.c
-	$(C_COMPILE) $(INCLUDE_DIR) -MM -MF $@ -MT $(OBJ_DIR)/$(^:.c=.o) $^
+	@$(C_COMPILE) $(INCLUDE_DIR) -MM -MF $@ -MT $(OBJ_DIR)/$(^:.c=.o) $^
 
 $(CPP_DEPS): $(DEP_DIR)/%.dpp : %.cc
-	$(CPP_COMPILE) $(INCLUDE_DIR) -MM -MF $@ -MT $(OBJ_DIR)/$(^:.cc=.o) $^
+	@$(CPP_COMPILE) $(INCLUDE_DIR) -MM -MF $@ -MT $(OBJ_DIR)/$(^:.cc=.o) $^
 
 $(DEP_DIR):
 	$Qmkdir -p $@

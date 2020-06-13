@@ -54,7 +54,7 @@ export OBJ_DIR DEP_DIR
 
 #---------- Compile Flags ----------# 
 COMPILER_FLAGS	+= -std=c++11 -fdiagnostics-color
-ifdef STRICT
+ifeq ($(STRICT),yes)
 COMPILER_FLAGS	+= -pedantic -Wall -Walloc-zero -Wcast-align -Wcast-qual -Wconversion\
 				-Wduplicated-branches -Wduplicated-cond -Weffc++ -Wextra -Wfloat-equal -Wformat=2\
 				-Winline -Wlogical-op -Wmissing-include-dirs -Woverloaded-virtual -Wshadow\
@@ -69,13 +69,10 @@ MAKE_FLAGS	+= --no-print-directory
 export MAKE	= $Qmake $(MAKE_FLAGS)
 
 #---------- Rules ----------#
-compile: $(DUMP) src $(LINK) #lang
+compile: $(DUMP) src $(LINK)
 
 $(DUMP):
 	$Qmkdir -p $@
-
-lang src:
-	$(MAKE) -C $@
 
 $(LINK): $(EXE)
 	ln -sfr $< $@

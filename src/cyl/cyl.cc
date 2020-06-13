@@ -53,22 +53,8 @@ Cyl::Cyl(ScannerType t) {
 void Cyl::generateParser(std::string cyl_file) {
     Digest *d = parser->parse(cyl_file);
 
-    lex_writer->write((CylGrammar*)d->get_data(), cyl_file);
-    parse_writer->write((CylGrammar*)d->get_data(), cyl_file);
+    CylGrammar *data = d->get_data();
+
+    lex_writer->write(data, cyl_file);
+    parse_writer->write(data, cyl_file);
 }
-
-/*
-    std::string file_base = lang_file.substr(0, lang_file.size()-4);
-    size_t pos = file_base.rfind('/');
-    if(pos == std::string::npos)
-        pos = 0;
-    else
-        pos++;
-    std::cout << "file_base: " << file_base << '\n';
-    std::cout << "pos: " << pos << '\n';
-    std::cout << "size: " << file_base.size() << '\n';
-
-    std::string file_stem = file_base.substr(pos, file_base.size()-pos);
-    generateBison(g, file_base);
-    generateFlex(g->variable_head, file_base, file_stem);
-*/

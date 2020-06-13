@@ -1,6 +1,0 @@
-TYPE    /[a-z]+/
-WS      /[ \t]+/
-NAME    /[a-z]+/
-SC      /;/
-
-stmt: TYPE WS NAME SC | TYPE WS NAME SC

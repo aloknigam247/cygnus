@@ -1,7 +1,0 @@
-CASE=(
-        "cygnus -l test.cyl"
-    )
-
-DIFFS=(
-        ['REFLOG']='TESTLOG'
-    )
