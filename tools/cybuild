@@ -22,7 +22,7 @@ MAKE() {
         make_force="-B"
     fi
 
-    make $make_force MODE=$1 STRICT=$STRICT 3>&1 1>&2 2>&3 3>&- | tee $report_dir/${BUILD_MODE}-errors | tee logs/cybuild-${BUILD_MODE}.log
+    make -r $make_force MODE=$1 STRICT=$STRICT 3>&1 1>&2 2>&3 3>&- | tee $report_dir/${BUILD_MODE}-errors | tee logs/cybuild-${BUILD_MODE}.log
 
     if [[ ${PIPESTATUS[0]} -ne 0 ]]; then
         return 1
