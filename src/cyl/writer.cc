@@ -1,3 +1,4 @@
+#ifdef EXTENDED_FEATURE
 #include "writer.h"
 
 Writer* writerFactory(WriterType type) { // TODO: can any other design pattern work here
@@ -94,3 +95,4 @@ void LPG::generateFlex(VariableList *variable_list, std::string file_base, std::
     }
     flex << "%%";
 }
+#endif

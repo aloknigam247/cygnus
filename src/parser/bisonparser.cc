@@ -1,3 +1,4 @@
+#ifdef EXTENDED_FEATURE
 #include "parser.h"
 
 Digest* BisonParser::parse(std::string file) {
@@ -5,3 +6,4 @@ Digest* BisonParser::parse(std::string file) {
     d->set_data(bison_entry(file.c_str()));
     return d;
 }
+#endif

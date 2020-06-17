@@ -1,3 +1,4 @@
+#ifdef EXTENDED_FETAURE
 #include "parser.h"
 #include "writer.h"
 
@@ -26,3 +27,4 @@ class Cyl {
     Parser *parser;
     Writer *lex_writer, *parse_writer;
 };
+#endif

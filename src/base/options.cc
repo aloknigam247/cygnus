@@ -91,7 +91,6 @@ bool Options::parse(const int argc, const char* argv[]) {
                             result = false;
                         }
                         break;
-#endif
                     case Option::STRING:
                         if(i+1 < argc && argv[i+1][0] != '-')
                             iter->set_value(argv[++i]);
@@ -102,6 +101,7 @@ bool Options::parse(const int argc, const char* argv[]) {
                         break;
                     default:
                         Log::e("Option not suppoted");
+#endif
                 }
             }
             else {
@@ -125,18 +125,17 @@ bool Options::isSet(const std::string& opt_name) {
     return (iter != m_option_list.end() && iter->isSet());
 }
 
+#ifdef EXTENDED_FEATURE
 Option::Value Options::get_value(const std::string& opt_name) {
     cystructs::Tree<Option*>::iterator iter = m_option_list.search(opt_name);
     if(iter != m_option_list.end()) {
         switch(iter->get_type()) {
-#ifdef EXTENDED_FEATURE
             case Option::BOOL:
                 return Option::Value(iter->get_bool_value());
             case Option::CHAR:
                 return Option::Value(iter->get_char_value());
             case Option::INT:
                 return Option::Value(iter->get_int_value());
-#endif
             case Option::STRING:
                 return Option::Value(iter->get_string_value());
             default:
@@ -145,6 +144,7 @@ Option::Value Options::get_value(const std::string& opt_name) {
     }
     return {};
 }
+#endif
 
 void Options::usage() const {
     cystructs::Tree<Option*>::iterator iter;

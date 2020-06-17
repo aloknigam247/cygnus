@@ -1,3 +1,4 @@
+#ifdef EXTENDED_FEATURE
 #include "parser.h"
 
 Parser* parserFactory(ParserType type) {
@@ -10,3 +11,4 @@ Parser* parserFactory(ParserType type) {
 #endif
     }
 }
+#endif

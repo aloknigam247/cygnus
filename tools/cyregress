@@ -13,7 +13,7 @@ declare UNIT_COUNT=0
 declare UNBUFF=''
 
 GENHTML() {
-    genhtml --ignore-errors source reports/coverage/$1/coverage.info --output-directory reports/coverage/$1/html --demangle-cpp --css-file .internal/coverage.css -t "$1 coverage" --legend --rc genhtml_hi_limit=98 --rc genhtml_med_limit=90 > reports/coverage/$1/genhtml.log 2> /dev/null
+    genhtml --ignore-errors source reports/coverage/$1/coverage.info --output-directory reports/coverage/$1/html --demangle-cpp --css-file .internal/coverage.css -t "$1 coverage" --legend --rc genhtml_hi_limit=95 --rc genhtml_med_limit=90 > reports/coverage/$1/genhtml.log 2> /dev/null
     egrep -A 1 'lines\.\.\.\.\.\.:' reports/coverage/$1/genhtml.log
 }
 
@@ -383,8 +383,11 @@ main() {
                 mkdir -p reports/coverage/func
                 rm -f reports/coverage/func/coverage.info
                 for dir in $(find build/obj/coverage -mindepth 1 -type d); do
-                    lcov --gcov-tool=gcov-7 -c -b src/${dir#build/obj/coverage/} -d $dir -d include --no-external -q >> reports/coverage/func/coverage.info 2> /dev/null
+                    #lcov --gcov-tool=gcov-7 -c -b src/${dir#build/obj/coverage/} -d $dir -d include --no-external -q >> reports/coverage/func/coverage.info 2> /dev/null
+                    lcov -c -b src/${dir#build/obj/coverage/} -d $dir -d include --no-external -q >> reports/coverage/func/coverage.info
                 done
+                # remove *.c, *.l, *.y from coverage.info
+                sed -i '/.*\.[cly]$/,/end_of_record/ d' reports/coverage/func/coverage.info
                 GENHTML func
             fi
 
@@ -393,7 +396,8 @@ main() {
                 mkdir -p reports/coverage/unit
                 rm -f reports/coverage/unit/coverage.info
                 for dir in $(find src -mindepth 1 -type d); do
-                    lcov --gcov-tool=gcov-7 -b $dir -c -d $OUT_DIR -d include --no-external -q >> reports/coverage/unit/coverage.info 2> /dev/null
+                    #lcov --gcov-tool=gcov-7 -b $dir -c -d $OUT_DIR -d include --no-external -q >> reports/coverage/unit/coverage.info #2> /dev/null
+                    lcov -b $dir -c -d $OUT_DIR -d include --no-external -q >> reports/coverage/unit/coverage.info
                 done
 
                 # Put missing files in coverage.info when all testcases in directory run

@@ -1,3 +1,4 @@
+#ifdef EXTENDED_FEATURE
 #include "cyl.h"
 #include "cylgrammar.h"
 
@@ -58,3 +59,4 @@ void Cyl::generateParser(std::string cyl_file) {
     lex_writer->write(data, cyl_file);
     parse_writer->write(data, cyl_file);
 }
+#endif

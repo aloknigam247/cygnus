@@ -184,7 +184,7 @@ rules.write("OBJ_COMMON := " + os.path.relpath("obj", os.getcwd()[os.getcwd().rf
             "#------------ Targets ------------#\n" +
             "debug: COMP_FLAGS += -ggdb3\n" +
             "debug: all\n\n" +
-            "coverage: CXX = g++-7\n" +
+            "coverage: CXX = g++\n" +
             "coverage: COMP_FLAGS += --coverage\n" +
             "coverage: all\n\n" +
             "mem-check: debug\n\n" +

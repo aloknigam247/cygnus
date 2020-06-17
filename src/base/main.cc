@@ -22,33 +22,19 @@
  * SOFTWARE.                                                                        *
  ************************************************************************************/
 
+#include <iostream>
 #include "options.h"
-#include "log.h"
 #include "utils.h"
-#include "cyl.h"
-#include "cycrawler.h"
 
 int main(const int argc, const char* argv[]) {
     Options opt;
     opt.addOption("-v", Option::BOOL, "version");
-    opt.addOption("-l", Option::STRING, "language file");
     if(!opt.parse(argc, argv))
         return 1;
 
     if(opt.isSet("-v")) {
         std::cout << "Cygnus " << MAKE_STRING(VERSION) << '\n';
     }
-    else if(opt.isSet("-l")) {
-        Cyl cyl(GNU);
-        const char *lang_file = static_cast<const char*>(opt.get_value("-l"));
-        cyl.generateParser(lang_file);
-    }
-    else {
-        CyCrawler crawler;
-        crawler.set_path(".");
-        std::cout << "Files found:\n";
-        for(auto file: crawler.crawl())
-            std::cout << file << '\n';
-    }
+
     return 0;
 }

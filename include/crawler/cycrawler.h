@@ -1,3 +1,4 @@
+#ifdef EXTENDEND_FEATURE
 #include <forward_list>
 #include <string>
 
@@ -10,3 +11,4 @@ class CyCrawler {
     std::forward_list<std::string> createFileList(std::string path);
     std::string path;
 };
+#endif

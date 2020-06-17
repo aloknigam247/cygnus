@@ -124,7 +124,6 @@ class Option {
      * @returns int value
      */
     int get_int_value() const { return m_value.i; }
-#endif
 
     /**
      * Get string value
@@ -132,6 +131,7 @@ class Option {
      * @returns string value
      */
     const char* get_string_value() const { return m_value.s; }
+#endif
 
     /**
      * Set bool value
@@ -154,7 +154,6 @@ class Option {
      * @param[in] value int value
      */
     void set_value(const int value) { is_set = true; m_value.i = value; }
-#endif
 
     /**
      * Set string value
@@ -162,6 +161,7 @@ class Option {
      * @param[in] value string value
      */
     void set_value(const char* value) { is_set = true; m_value.s = value; }
+#endif
 
     /**
      * Operator>
@@ -206,8 +206,8 @@ class Option {
         explicit Value(bool m_b) : b(m_b) {}
         explicit Value(char m_c) : c(m_c) {}
         explicit Value(int m_i) : i(m_i) {}
-#endif
         explicit Value(const char* m_s) : s(m_s) {}
+#endif
 
         explicit operator bool() { return b; }
         explicit operator char() { return c; }
