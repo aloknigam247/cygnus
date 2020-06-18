@@ -166,7 +166,7 @@ runTest() {
         UNIT_COUNT=$((UNIT_COUNT + 1))
         makeRunDir $testcase_dir $testcase
         cd $OUT_DIR/`dirname $testcase`
-        echo "[TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt] $testcase"
+        echo -e "\e[47m\e[30m[TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt]\e[0m $testcase"
         source `basename $1`
         for pre_run in ${!PRE_RUN[@]}; do
             eval ${PRE_RUN[pre_run]}
@@ -310,6 +310,7 @@ main() {
         done
         return
     fi
+
     {
     if [[ $test_out == $OUT_DIR ]]; then
         LOG EE "test directory and out directory cannot be same"
@@ -401,9 +402,9 @@ main() {
                 done
 
                 # Put missing files in coverage.info when all testcases in directory run
-                if [[ ${VALUES['-a']} ]]; then
+                if [[ ${VALUES['-a']} || ${VALUES['-u']} ]]; then
                     mkdir /tmp/cygnus_tmp -p
-                    find include src -regex ".*\.cc\|.*\.h\|.*\.tcc" | egrep -v "main.cc|cymem.cc" | sort -u | xargs realpath > /tmp/cygnus_tmp/all_files
+                    find include src -regextype egrep -regex ".*\.(c|cc|h|tcc)" | egrep -v "main.cc|cymem.cc" | sort -u | xargs realpath > /tmp/cygnus_tmp/all_files
                     egrep "SF:" reports/coverage/unit/coverage.info  | sed 's/SF://' | sort -u > /tmp/cygnus_tmp/covered_files
                     comm -23 /tmp/cygnus_tmp/all_files /tmp/cygnus_tmp/covered_files > /tmp/cygnus_tmp/uncovered_files
                     {

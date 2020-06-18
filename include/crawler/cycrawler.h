@@ -1,4 +1,4 @@
-#ifdef EXTENDEND_FEATURE
+#ifdef EXTENDED_FEATURE
 #include <forward_list>
 #include <string>
 
