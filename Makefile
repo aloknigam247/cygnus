@@ -44,13 +44,14 @@ endif
 #---------- Path Configurations ----------# 
 BLD_DIR	:= $(CURDIR)/build
 BIN_DIR	:= $(BLD_DIR)/bin/$(MODE)
-DEP_DIR	:= $(BLD_DIR)/dep/$(MODE)
+DEP_DIR	:= $(BLD_DIR)/dep
 OBJ_DIR	:= $(BLD_DIR)/obj/$(MODE)
+SRC_GEN	:= $(BLD_DIR)/src
 EXE		:= $(BIN_DIR)/cygnus-$(MODE)
-DUMP	:= $(BIN_DIR)
+DUMP	:= $(BIN_DIR) $(SRC_GEN)
 LINK	:= $(BLD_DIR)/bin/cygnus
 
-export OBJ_DIR DEP_DIR
+export DEP_DIR OBJ_DIR SRC_GEN
 
 #---------- Compile Flags ----------# 
 COMPILER_FLAGS	+= -fdiagnostics-color
@@ -80,7 +81,7 @@ src:
 $(LINK): $(EXE)
 	ln -sfr $< $@
 
-$(EXE): $(subst src,$(OBJ_DIR),$(subst .cc,.co,$(wildcard src/*/*.cc))) $(subst src,$(OBJ_DIR),$(subst .c,.o,$(wildcard src/*/*.c)))
+$(EXE): $(subst src,$(OBJ_DIR),$(subst .cc,.co,$(wildcard src/*/*.cc))) $(subst src,$(OBJ_DIR),$(subst .c,.o,$(wildcard src/*/*.c))) $(subst build/src,$(OBJ_DIR),$(subst .c,.o,$(wildcard build/src/*/*.c)))
 	$(CPP_COMPILE) -o $@ $^
 
 clean:
