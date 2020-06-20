@@ -76,7 +76,7 @@ runGDBFuncTest() {
 runGDBUnitTest() {
     gen-make $(find $CYGNUS_HOME/include -mindepth 1 -type d -printf "-i %p ") -i $CYGNUS_HOME/src/base -i$CYGNUS_HOME/tests/utils/include $(find $CYGNUS_HOME/src -mindepth 1 -type d -printf "-s %p ") -s $CYGNUS_HOME/tests/utils/src unit.cc || return 1
     make --no-print-directory $TEST_MODE
-    gdb -tui -q ./unit
+    gdb -q ./unit
     echo
 }
 
