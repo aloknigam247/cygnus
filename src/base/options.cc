@@ -114,7 +114,7 @@ Status Options::parse(const int argc, const char* argv[]) {
         }
     }
     cystructs::Tree<Option*>::iterator iter = m_option_list.search("-h");
-    if(iter != m_option_list.end() && iter->get_bool_value() && status != Status::SUCCESS) {
+    if(iter != m_option_list.end() && iter->get_bool_value() && status == Status::SUCCESS) {
         usage();
     }
     return status;
