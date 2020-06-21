@@ -13,7 +13,7 @@ declare UNIT_COUNT=0
 declare UNBUFF=''
 
 GENHTML() {
-    genhtml --ignore-errors source reports/coverage/$1/coverage.info --output-directory reports/coverage/$1/html --demangle-cpp --css-file .internal/coverage.css -t "$1 coverage" --legend --rc genhtml_hi_limit=98 --rc genhtml_med_limit=90 > reports/coverage/$1/genhtml.log 2> /dev/null
+    genhtml --ignore-errors source reports/coverage/$1/coverage.info --output-directory reports/coverage/$1/html --demangle-cpp --css-file .internal/coverage.css -t "$1 coverage" --legend --rc genhtml_hi_limit=98 --rc genhtml_med_limit=90 > reports/coverage/$1/genhtml.log 2>&1
     egrep -A 1 'lines\.\.\.\.\.\.:' reports/coverage/$1/genhtml.log
 }
 
@@ -60,9 +60,8 @@ makeRunDir(){
     local testcase_dir=$1
     local testcase=$2
     local test_out=$OUT_DIR/`dirname $testcase`
-    rm -rf $test_out
     mkdir -p $test_out || return 1
-    ln -rs $testcase_dir/`dirname $testcase`/* $test_out/ || return 1
+    ln -frs $testcase_dir/`dirname $testcase`/* $test_out/ || return 1
 }
 
 runGDBFuncTest() {
@@ -76,7 +75,7 @@ runGDBFuncTest() {
 runGDBUnitTest() {
     gen-make $(find $CYGNUS_HOME/include -mindepth 1 -type d -printf "-i %p ") -i $CYGNUS_HOME/src/base -i$CYGNUS_HOME/tests/utils/include $(find $CYGNUS_HOME/src -mindepth 1 -type d -printf "-s %p ") -s $CYGNUS_HOME/tests/utils/src unit.cc || return 1
     make --no-print-directory $TEST_MODE
-    gdb -tui -q ./unit
+    gdb -q ./unit
     echo
 }
 
@@ -129,6 +128,9 @@ runFuncTest() {
 runUnitTest() {
     gen-make $(find $CYGNUS_HOME/include -mindepth 1 -type d -printf "-i %p ") -i $CYGNUS_HOME/src/base -i$CYGNUS_HOME/tests/utils/include $(find $CYGNUS_HOME/src -mindepth 1 -type d -printf "-s %p ") -s $CYGNUS_HOME/tests/utils/src unit.cc || return 1
     make --no-print-directory $TEST_MODE 2>&1 | tee make.log
+    if [[ ${PIPESTATUS[0]} -ne 0 ]]; then
+        return 1
+    fi
     sed -i -e 's|\x1b\[[;0-9]*m\x1b\[K||g' -e 's/\x1b\[[0-9]+m//g' make.log
     {
     $UNBUFF $tool ./unit | sed -e '/\[CASE/! s/.*/>   &/' -e ' 2,$ s/\[CASE/\n[CASE/' || return 1
@@ -392,7 +394,7 @@ main() {
                 mkdir -p reports/coverage/unit
                 rm -f reports/coverage/unit/coverage.info
                 for dir in $(find src -mindepth 1 -type d); do
-                    lcov --gcov-tool=gcov-7 -b $dir -c -d $OUT_DIR -d include --no-external -q >> reports/coverage/unit/coverage.info 2> /dev/null
+                    lcov -b $dir -c -d $OUT_DIR -d include --no-external -q >> reports/coverage/unit/coverage.info 2> /dev/null
                 done
 
                 # Put missing files in coverage.info when all testcases in directory run

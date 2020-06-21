@@ -9,7 +9,7 @@ export C_COMPILER	= gcc
 
 ifeq ($(MODE),coverage)
 # Using ver 7 as lcov does not support ver 9 gcno file dump
-CPP_COMPILER	= g++-7
+CPP_COMPILER	= g++
 C_COMPILER		= gcc-7
 COMPILER_FLAGS	+= --coverage -g
 
