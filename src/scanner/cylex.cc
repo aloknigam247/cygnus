@@ -37,7 +37,7 @@ void CyLex::readFile(const char* file_name) {
 }
 
  void CyLex::analyse() {
-    std::string line, word;
+    CyString line, word;
     lex_fa.build();
     DFA dfa(lex_fa);
     while(std::getline(file, line)) {
@@ -45,7 +45,7 @@ void CyLex::readFile(const char* file_name) {
         for(int i = 0; i<line.size(); ++i) {
             if(line[i] == ' ') {
                 e = i;
-                std::string word = line.substr(b, e-b);
+                CyString word = line.substr(b, e-b);
                 if(dfa.execute(word.c_str())) {
                     std::cout << line << '\n';
                     break;
@@ -53,7 +53,7 @@ void CyLex::readFile(const char* file_name) {
                 b = e+1;
             }
         }
-        std::string word = line.substr(b);
+        CyString word = line.substr(b);
         if(dfa.execute(word.c_str()))
             std::cout << line << '\n';
     }

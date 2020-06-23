@@ -1,12 +1,13 @@
 #include <forward_list>
-#include <string>
+
+#include "cystring.h"
 
 class CyCrawler {
     public:
-    void set_path(std::string m_path) { path = m_path; }
-    std::forward_list<std::string> crawl();
+    void set_path(CyString m_path) { path = m_path; }
+    std::forward_list<CyString> crawl();
 
     private:
-    std::forward_list<std::string> createFileList(std::string path);
-    std::string path;
+    std::forward_list<CyString> createFileList(CyString path);
+    CyString path;
 };

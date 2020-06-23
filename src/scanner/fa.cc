@@ -131,7 +131,7 @@ void StateTable::print() const {
     line(m.max_len);
     for(auto r: row) {
         if(r.final_state) {
-            std::string s;
+            CyString s;
             s = '(';
             s+= r.tag;
             s += ')';
@@ -146,7 +146,7 @@ void StateTable::print() const {
                 col(m, i, ' ');
             }
             else {
-                std::string st;
+                CyString st;
                 for(auto a: r.sym[i]) {
                     st += std::to_string(a);
                     st += ',';
@@ -189,7 +189,7 @@ void FA::printDot(const char* file_stem) const {
     table.printDot(dotfile);
     dotfile.close();
 
-    /*std::string command;
+    /*CyString command;
 
     command = "dot -Tpng ";
     command += file_stem;
