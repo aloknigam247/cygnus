@@ -29,15 +29,15 @@
 
 #include <fstream>
 #include <list>
-#include <string>
 #include <vector>
 
+#include "cystring.h"
 #include "log.h"
 
 struct State {
     std::vector<int> sym[128];
     bool final_state;
-    std::string tag;
+    CyString tag;
 };
 
 struct Metrics {

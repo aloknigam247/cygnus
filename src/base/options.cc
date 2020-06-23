@@ -43,9 +43,9 @@ Options::~Options() {
     }
 }
 
-void Options::addOption(const std::string& option_name,
+void Options::addOption(const CyString& option_name,
                         Option::Type type,
-                        const std::string& help) {
+                        const CyString& help) {
     m_option_list.insert(new Option(option_name, type, help));
 }
 
@@ -120,13 +120,13 @@ Status Options::parse(const int argc, const char* argv[]) {
     return status;
 }
 
-bool Options::isSet(const std::string& opt_name) {
+bool Options::isSet(const CyString& opt_name) {
     cystructs::Tree<Option*>::iterator iter = m_option_list.search(opt_name);
     return (iter != m_option_list.end() && iter->isSet());
 }
 
 #ifdef EXTENDED_FEATURE
-Option::Value Options::get_value(const std::string& opt_name) {
+Option::Value Options::get_value(const CyString& opt_name) {
     cystructs::Tree<Option*>::iterator iter = m_option_list.search(opt_name);
     if(iter != m_option_list.end()) {
         switch(iter->get_type()) {

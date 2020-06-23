@@ -8,12 +8,12 @@
 
 #include "log.h"
 
-std::forward_list<std::string> CyCrawler::crawl() {
+std::forward_list<CyString> CyCrawler::crawl() {
     return createFileList(path);
 }
 
-std::forward_list<std::string> CyCrawler::createFileList(std::string path) {
-    std::forward_list<std::string> file_list;
+std::forward_list<CyString> CyCrawler::createFileList(CyString path) {
+    std::forward_list<CyString> file_list;
     DIR *dir = opendir(path.c_str());
     if(!dir) {
         switch(errno) {
