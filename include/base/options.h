@@ -37,6 +37,7 @@
 #include <string>
 #include <vector>
 
+#include "status.h"
 #include "cystructs.h"
 
 /**
@@ -254,9 +255,9 @@ class Options {
      *
      * @param[in] argc number of arguments
      * @param[in] argv array of arguments
-     * @returns true if command line is parsed without error
+     * @returns returns SUCCESS if parsed successfully
      */
-    bool parse(int argc, const char* argv[]);
+    Status parse(int argc, const char* argv[]);
 
     /**
      * Tells if option is set
