@@ -6,7 +6,7 @@
 >   name	tag	test_file	2
 >   name	tag	test_file	1
 >   
->   Lookup: name
+>   Lookup: random
 >   |ERROR| No database is connected
 >   
 

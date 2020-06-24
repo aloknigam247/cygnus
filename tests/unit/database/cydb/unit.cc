@@ -20,7 +20,7 @@ void lookupDB() {
     std::cout << '\n';
 
     db.disconnect();
-    std::cout << "Lookup: name\n";
+    std::cout << "Lookup: random\n";
     db.lookup("random");
 }
 
