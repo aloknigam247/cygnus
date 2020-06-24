@@ -1,0 +1,12 @@
+[CASE 1]
+>   
+
+[CASE 2]
+>   Lookup: name
+>   name	tag	test_file	2
+>   name	tag	test_file	1
+>   
+>   Lookup: name
+>   |ERROR| No database is connected
+>   
+
