@@ -1,4 +1,5 @@
 #include "cydb.h"
+#include "log.h"
 
 std::ostream& operator<<(std::ostream &out, const Record &rec) {
     out << rec.name << '\t' << rec.tag << '\t' << rec.file << '\t' << rec.loc << '\n';
@@ -25,8 +26,10 @@ void CyDB::addRecord(const Record& rec) {
 }
 
 std::forward_list<Record> CyDB::lookup(std::string name) {
-    if(!db_file.is_open())
+    if(!db_file.is_open()) {
+        Log::e("No database is connected");
         return {};
+    }
 
     std::forward_list<Record> res;
     Record rec;

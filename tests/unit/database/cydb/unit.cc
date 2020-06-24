@@ -17,9 +17,11 @@ void lookupDB() {
     for(auto const &r: db.lookup("name")) {
         std::cout << r;
     }
+    std::cout << '\n';
 
     db.disconnect();
-    db.lookup("name");
+    std::cout << "Lookup: name\n";
+    db.lookup("random");
 }
 
 int main() {
