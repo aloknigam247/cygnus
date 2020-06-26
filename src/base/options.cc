@@ -49,11 +49,11 @@ void Options::addOption(const std::string& option_name,
     m_option_list.insert(new Option(option_name, type, help));
 }
 
-bool Options::parse(const int argc, const char* argv[]) {
+Status Options::parse(const int argc, const char* argv[]) {
     if(argc == 1)
-        return true;
+        return Status::SUCCESS;
 
-    bool result = true;
+    Status status = Status::SUCCESS;
     for(int i=1; i<argc; ++i) {
         const char* opt = argv[i];
         if(opt[0] == '-') {
@@ -69,8 +69,8 @@ bool Options::parse(const int argc, const char* argv[]) {
                         if(i+1 < argc && strlen(argv[i+1]) == 1)
                             iter->set_value(*argv[++i]);
                         else {
-                            Log::e("option ", opt, " needs character value.");
-                            result = false;
+                            Log::e("option ", opt, " needs value character value.");
+                            status = Status::PARAM_TYPE_MISMATCH;
                         }
                         break;
                     case Option::INT:
@@ -80,23 +80,33 @@ bool Options::parse(const int argc, const char* argv[]) {
                             }
                             catch (const std::invalid_argument& e) {
                                 Log::e(argv[i], " is not a valid integer.");
-                                result = false;
+                                status = Status::PARAM_TYPE_MISMATCH;
                             }
                             catch (const std::out_of_range& e) {
                                 Log::e(argv[i], " is out of range.");
-                                result = false;
+                                status = Status::PARAM_TYPE_MISMATCH;
                             }
                         else {
+<<<<<<< HEAD
                             Log::e("option ", opt, " needs integer value.");
                             result = false;
+=======
+                            Log::e("option ", opt, " needs value integer value.");
+                            status = Status::PARAM_TYPE_MISMATCH;
+>>>>>>> origin/dev
                         }
                         break;
                     case Option::STRING:
                         if(i+1 < argc && argv[i+1][0] != '-')
                             iter->set_value(argv[++i]);
                         else {
+<<<<<<< HEAD
                             Log::e("option ", opt, " needs string value.");
                             result = false;
+=======
+                            Log::e("option ", opt, " needs value string value.");
+                            status = Status::PARAM_TYPE_MISMATCH;
+>>>>>>> origin/dev
                         }
                         break;
                     default:
@@ -106,7 +116,7 @@ bool Options::parse(const int argc, const char* argv[]) {
             }
             else {
                 Log::e("unknown option ", opt);
-                result = false;
+                status = Status::PARAM_UNKNOWN;
             }
         }
         else {
@@ -114,10 +124,10 @@ bool Options::parse(const int argc, const char* argv[]) {
         }
     }
     cystructs::Tree<Option*>::iterator iter = m_option_list.search("-h");
-    if(iter != m_option_list.end() && iter->get_bool_value() && result) {
+    if(iter != m_option_list.end() && iter->get_bool_value() && status == Status::SUCCESS) {
         usage();
     }
-    return result;
+    return status;
 }
 
 bool Options::isSet(const std::string& opt_name) {

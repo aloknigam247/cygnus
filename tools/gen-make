@@ -48,9 +48,10 @@ class Args:
 
 #----------------------- Class Rules -----------------------#
 class Rules:
-    src_list = []
     inc_list = []
+    lib_list = []
     obj_list = []
+    src_list = []
     node = {}
     makefile = ''
 
@@ -65,6 +66,11 @@ class Rules:
         for line in open(file, 'r').readlines():
             if (line.startswith("#include") and len(line.split('"')) > 1):
                 inc_file = line.split('"')[1]
+
+                if(inc_file == "ncurses.h"):
+                    self.lib_list.append("-lncurses")
+                    continue
+
                 dir = self.findDir(self.inc_list, inc_file)
                 if(dir):
                     includes[inc_file] = dir
@@ -195,7 +201,7 @@ rules.write("OBJ_COMMON := " + os.path.relpath("obj", os.getcwd()[os.getcwd().rf
 
 rules.createRule('.', opt.file)
 rules.write(source_file + ": " + ' '.join(rules.obj_list))
-rules.write("\t$(CY_COMP) -o $@ $^\n")
+rules.write("\t$(CY_COMP) -o $@ $^ " + ' '.join(rules.lib_list) +"\n")
 
 dir_list = []
 for obj in rules.obj_list:

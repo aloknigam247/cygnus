@@ -27,14 +27,18 @@
 #include "utils.h"
 
 int main(const int argc, const char* argv[]) {
+    Status status = Status::SUCCESS;
     Options opt;
+
     opt.addOption("-v", Option::BOOL, "version");
-    if(!opt.parse(argc, argv))
-        return 1;
+    status = opt.parse(argc, argv);
+
+    if(status != Status::SUCCESS)
+        return static_cast<int>(status);
 
     if(opt.isSet("-v")) {
         std::cout << "Cygnus " << MAKE_STRING(VERSION) << '\n';
     }
 
-    return 0;
+    return static_cast<int>(status);
 }
