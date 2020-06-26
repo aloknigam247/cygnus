@@ -1,3 +1,4 @@
+#ifdef EXTENDED_FEATURE
 #include <string>
 #include <memory>
 #include <forward_list>
@@ -24,3 +25,4 @@ class CyDB {
     private:
     CyFile db_file;
 };
+#endif
