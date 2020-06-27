@@ -381,7 +381,7 @@ main() {
                 mkdir -p reports/coverage/func
                 rm -f reports/coverage/func/coverage.info
                 for dir in $(find build/obj/coverage -mindepth 1 -type d); do
-                    lcov -c -b src/${dir#build/obj/coverage/} -d $dir -d include --no-external -q >> reports/coverage/func/coverage.info 2> /dev/null
+                    lcov --gcov-tool=gcov-7 -c -b src/${dir#build/obj/coverage/} -d $dir -d include --no-external -q >> reports/coverage/func/coverage.info 2> /dev/null
                 done
                 GENHTML func
             fi
@@ -391,7 +391,7 @@ main() {
                 mkdir -p reports/coverage/unit
                 rm -f reports/coverage/unit/coverage.info
                 for dir in $(find src -mindepth 1 -type d); do
-                    lcov -b $dir -c -d $OUT_DIR -d include --no-external -q >> reports/coverage/unit/coverage.info 2> /dev/null
+                    lcov --gcov-tool=gcov-7-b $dir -c -d $OUT_DIR -d include --no-external -q >> reports/coverage/unit/coverage.info 2> /dev/null
                 done
 
                 # Put missing files in coverage.info when all testcases in directory run
@@ -418,7 +418,7 @@ main() {
             if [[ ${VALUES['-a']} ]]; then
                 echo -e "\nComplete Coverage:"
                 mkdir -p reports/coverage/comp
-                lcov -b src/base -c -d build/obj/coverage -d $OUT_DIR -d include --no-external -o reports/coverage/comp/coverage.info -q 2> /dev/null
+                lcov --gcov-tool=gcov-7 -b src/base -c -d build/obj/coverage -d $OUT_DIR -d include --no-external -o reports/coverage/comp/coverage.info -q 2> /dev/null
 
                 # remove unit.cc from coverage.info
                 sed -i '/unit.cc$/,/end_of_record/ d' reports/coverage/comp/coverage.info
