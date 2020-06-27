@@ -1,5 +1,5 @@
 #ifdef EXTENDED_FEATURE
-#include "parser.h"
+#include "parserfactory.h"
 
 Parser* parserFactory(ParserType type) {
     switch(type) {
