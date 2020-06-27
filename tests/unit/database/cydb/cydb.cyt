@@ -1,0 +1,7 @@
+PRE_RUN=(
+            "rm test.db"
+        )
+
+DIFFS=(
+        ['REFLOG']='TESTLOG'
+    )

@@ -13,7 +13,7 @@ declare UNIT_COUNT=0
 declare UNBUFF=''
 
 GENHTML() {
-    genhtml --ignore-errors source reports/coverage/$1/coverage.info --output-directory reports/coverage/$1/html --demangle-cpp --css-file .internal/coverage.css -t "$1 coverage" --legend --rc genhtml_hi_limit=98 --rc genhtml_med_limit=90 > reports/coverage/$1/genhtml.log 2> /dev/null
+    genhtml --ignore-errors source reports/coverage/$1/coverage.info --output-directory reports/coverage/$1/html --demangle-cpp --css-file .internal/coverage.css -t "$1 coverage" --legend --rc genhtml_hi_limit=98 --rc genhtml_med_limit=90 > reports/coverage/$1/genhtml.log 2>&1
     egrep -A 1 'lines\.\.\.\.\.\.:' reports/coverage/$1/genhtml.log
 }
 
@@ -60,9 +60,8 @@ makeRunDir(){
     local testcase_dir=$1
     local testcase=$2
     local test_out=$OUT_DIR/`dirname $testcase`
-    rm -rf $test_out
     mkdir -p $test_out || return 1
-    ln -rs $testcase_dir/`dirname $testcase`/* $test_out/ || return 1
+    ln -frs $testcase_dir/`dirname $testcase`/* $test_out/ || return 1
 }
 
 runGDBFuncTest() {
@@ -133,7 +132,7 @@ runUnitTest() {
     {
     $UNBUFF $tool ./unit | sed -e '/\[CASE/! s/.*/>   &/' -e ' 2,$ s/\[CASE/\n[CASE/' || return 1
     echo
-    } 2>&1 > TESTLOG 
+    } 2>&1 > TESTLOG
 }
 
 runTest() {
@@ -275,9 +274,9 @@ runTest() {
 main() {
     mkdir -p logs
     parseCmdLine $@
-    OUT_DIR=${VALUES['-o']:-$OUT_DIR} 
+    OUT_DIR=${VALUES['-o']:-$OUT_DIR}
     validateTests
-    
+
     if [[ ${VALUES['--gdb']} ]]; then
         if [[ $test_out == $OUT_DIR ]]; then
             LOG EE "test directory and out directory cannot be same"
