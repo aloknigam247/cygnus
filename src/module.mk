@@ -25,7 +25,7 @@ $(SRC_MOD_DIR):
 	mkdir -p $@
 
 $(BISON_DEPS) $(FLEX_DEPS): $(DEP_DIR)/%.d: $(SRC_MOD_DIR)/%.c
-	$(C_COMPILE) $(INCLUDE_DIR) -MM -MF $@ -MT $(OBJ_DIR)/$(notdir $(^:.c=.o)) $^
+	$(C_COMPILE) $(INCLUDE_DIR) -MM -MF $@ -MT $(subst $(MODE),\$${MODE},$(OBJ_DIR))/$(notdir $(^:.c=.o)) $^
 
 $(BISON_SRC): $(SRC_MOD_DIR)/%-bison.c: %.y
 	bison --defines=$(@:.c=.h) -o $@ $^
@@ -46,10 +46,10 @@ module-$(MODULE): $(DEP_DIR) $(AUTOGEN_TARGETS) $(C_DEPS) $(CPP_DEPS)
 	$(MAKE) -f ../build.mk MODULE=$(MODULE)
 
 $(C_DEPS): $(DEP_DIR)/%.d : %.c
-	$(C_COMPILE) $(INCLUDE_DIR) -MM -MF $@ -MT $(OBJ_DIR)/$(^:.c=.o) $^
+	$(C_COMPILE) $(INCLUDE_DIR) -MM -MF $@ -MT $(subst $(MODE),\$${MODE},$(OBJ_DIR))/$(^:.c=.o) $^
 
 $(CPP_DEPS): $(DEP_DIR)/%.dpp : %.cc
-	$(CPP_COMPILE) $(INCLUDE_DIR) -MM -MF $@ -MT $(OBJ_DIR)/$(^:.cc=.co) $^
+	$(CPP_COMPILE) $(INCLUDE_DIR) -MM -MF $@ -MT $(subst $(MODE),\$${MODE},$(OBJ_DIR))/$(^:.cc=.co) $^
 
 $(DEP_DIR):
 	$Qmkdir -p $@

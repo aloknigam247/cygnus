@@ -8,7 +8,6 @@ export CPP_COMPILER	= g++
 export C_COMPILER	= gcc
 
 ifeq ($(MODE),coverage)
-# Using ver 7 as lcov does not support ver 9 gcno file dump
 CPP_COMPILER	= g++
 C_COMPILER		= gcc
 COMPILER_FLAGS	+= --coverage -ggdb3
@@ -26,7 +25,7 @@ else ifeq ($(MODE),release)
 COMPILER_FLAGS	+= -Ofast
 
 else ifeq ($(MODE),sanitize)
-COMPILER_FLAGS	+= -g3 -D_FORTIFY_SOURCE=2 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC \
+COMPILER_FLAGS	+= -ggdb3 -D_FORTIFY_SOURCE=2 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC \
 				-fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow\
 				-fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error
 

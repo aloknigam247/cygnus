@@ -265,7 +265,7 @@ parseCmdLine() {
                 VALUES[$_dest]=$_val
             fi
         elif [[ $1 =~ ^- ]]; then
-            LOG W "ignoring unknown option \`$_opt'"
+            LOG W "unknown option \`$_opt'"
             _error=1
         else
             _pos+=" $_opt"

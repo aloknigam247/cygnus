@@ -7,7 +7,7 @@ declare -a valid_tests
 declare -a fail_list
 
 declare OUT_DIR='test_run'
-declare TEST_MODE=''
+declare TEST_MODE='debug'
 declare FUNC_COUNT=0
 declare UNIT_COUNT=0
 declare UNBUFF=''
@@ -32,13 +32,13 @@ OPTION['POS']='dest:test_list,count:0+'
 
 validateTests() {
     if [[ ${VALUES['-a']} ]]; then
-        test -d ${VALUES['-a']} || LOG EE "directory \`${VALUES['-a']}' does not exit";
+        test -d ${VALUES['-a']} || LOG EE "directory \`${VALUES['-a']}' does not exists";
         valid_tests=$(find ${VALUES['-a']} -type f -name "*.cyt" | xargs realpath)
     elif [[ ${VALUES['-f']} ]]; then
-        test -d ${VALUES['-f']} || LOG EE "directory \`${VALUES['-f']}' does not exit";
+        test -d ${VALUES['-f']} || LOG EE "directory \`${VALUES['-f']}' does not exists";
         valid_tests=$(find ${VALUES['-f']} -type f -path "*func*.cyt" | xargs realpath)
     elif [[ ${VALUES['-u']} ]]; then
-        test -d ${VALUES['-u']} || LOG EE "directory \`${VALUES['-u']}' does not exit";
+        test -d ${VALUES['-u']} || LOG EE "directory \`${VALUES['-u']}' does not exists";
         valid_tests=$(find ${VALUES['-u']} -type f -path "*unit*.cyt" | xargs realpath)
     else
         for test in ${VALUES["test_list"]}; do
@@ -92,7 +92,7 @@ runGDBTest() {
         FUNC_COUNT=$((FUNC_COUNT + 1))
         makeRunDir $testcase_dir $testcase
         cd $OUT_DIR/`dirname $testcase`
-        echo "[TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt] $testcase"
+        echo -e "\e[47m\e[30m[TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt]\e[0m $testcase"
         source `basename $1`
         for pre_run in ${!PRE_RUN[@]}; do
             eval ${PRE_RUN[pre_run]}
@@ -106,7 +106,7 @@ runGDBTest() {
         UNIT_COUNT=$((UNIT_COUNT + 1))
         makeRunDir $testcase_dir $testcase
         cd $OUT_DIR/`dirname $testcase`
-        echo "[TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt] $testcase"
+        echo -e "\e[47m\e[30m[TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt]\e[0m $testcase"
         source `basename $1`
         for pre_run in ${!PRE_RUN[@]}; do
             eval ${PRE_RUN[pre_run]}
@@ -152,7 +152,7 @@ runTest() {
         FUNC_COUNT=$((FUNC_COUNT + 1))
         makeRunDir $testcase_dir $testcase
         cd $OUT_DIR/`dirname $testcase`
-        echo "[TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt] $testcase"
+        echo -e "\e[47m\e[30m[TESTCASE $((FUNC_COUNT + UNIT_COUNT))/$tc_cnt]\e[0m $testcase"
         source `basename $1`
         for pre_run in ${!PRE_RUN[@]}; do
             eval ${PRE_RUN[pre_run]}
@@ -294,7 +294,7 @@ main() {
         CYGNUS=$CYGNUS_HOME/build/bin/cygnus
 
         if [[ ${VALUES['-a']} || ${VALUES['-f']} ]] && [[ ! -x $CYGNUS ]]; then
-            LOG EE "$CYGNUS does not exist"
+            LOG EE "$CYGNUS does not exists"
         fi
         rm -rf reports/func reports/unit
         mkdir -p reports/func reports/unit
@@ -358,7 +358,11 @@ main() {
     esac
 
     if [[ ${VALUES['-a']} || ${VALUES['-f']} ]] && [[ ! -x $CYGNUS ]]; then
-        LOG EE "$CYGNUS does not exist"
+        LOG I "Building: cygnus in $TEST_MODE mode"
+        cybuild --$TEST_MODE
+        if [[ $? -ne 0 ]]; then
+            LOG EE "Build failed"
+        fi
     fi
     rm -rf reports/func reports/unit
     mkdir -p reports/func reports/unit
@@ -384,7 +388,6 @@ main() {
                 mkdir -p reports/coverage/func
                 rm -f reports/coverage/func/coverage.info
                 for dir in $(find build/obj/coverage -mindepth 1 -type d); do
-                    #lcov --gcov-tool=gcov-7 -c -b src/${dir#build/obj/coverage/} -d $dir -d include --no-external -q >> reports/coverage/func/coverage.info 2> /dev/null
                     lcov -c -b src/${dir#build/obj/coverage/} -d $dir -d include --no-external -q >> reports/coverage/func/coverage.info
                 done
                 # remove *.c, *.l, *.y from coverage.info
@@ -397,7 +400,6 @@ main() {
                 mkdir -p reports/coverage/unit
                 rm -f reports/coverage/unit/coverage.info
                 for dir in $(find src -mindepth 1 -type d); do
-                    #lcov --gcov-tool=gcov-7 -b $dir -c -d $OUT_DIR -d include --no-external -q >> reports/coverage/unit/coverage.info #2> /dev/null
                     lcov -b $dir -c -d $OUT_DIR -d include --no-external -q >> reports/coverage/unit/coverage.info
                 done
 

@@ -1,5 +1,5 @@
 #ifdef EXTENDED_FEATURE
-#include "parser.h"
+#include "bisonparser.h"
 
 Digest* BisonParser::parse(std::string file) {
     Digest *d = new Digest;
