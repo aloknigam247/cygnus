@@ -3,6 +3,8 @@
 from pathlib import Path
 
 import argparse
+import glob
+import os
 import re
 import sys
 
@@ -11,11 +13,10 @@ class Args:
     __parser = argparse.ArgumentParser()
 
     def __init__(self):
-        self.__parser.add_argument("dir", 
-                metavar="dir",
-                default=".",
+        self.__parser.add_argument("obj", 
+                metavar="obj",
                 nargs='+',
-                help="directory to scan for source files")
+                help="object to scan, object may be file or directory")
 
     def parse(self):
         return self.__parser.parse_args()
@@ -36,13 +37,13 @@ class Error:
             print(self.lineno, end = ':')
             if(self.begin > 3):
                 print(self.begin - 3, end = ':')
-        print(' error: ' + self.desc)
+        print(' ' + self.desc)
         if(self.line):
             print(' '*4 + self.line)
             if(self.begin > 3):
                 print(' '*self.begin + '^', end = '')
                 if(self.len > 0):
-                    print('~'*self.len, end = '')
+                    print('-'*self.len, end = '')
                 print('')
 
 #----------------------- Class StylePattern -----------------------#
@@ -229,18 +230,19 @@ def checkBraceStyle(file):
 
     return error_list
 
-#----------------------- Rule checkLineLength -----------------------#
-def checkLineLength(file):
+#----------------------- Rule ruleLineLength -----------------------#
+def ruleLineLength(file):
     error_list = []
     lineno=0
     for line in open(file, 'r').read().splitlines():
-        lineno=lineno+1
+        lineno = lineno+1
+        line = line.replace('\t', '·'*4)
         if(len(line) > 100):
             error_list.append(Error("line length is more than 100",
                             file,
                             line,
                             lineno,
-                            101,
+                            100,
                             len(line)-100
                             )
                         )
@@ -299,24 +301,29 @@ def checkSpaces(file):
 args = Args()
 opt = args.parse()
 
+file_list = []
+
 ccList = []
 hList = []
 
-common_rule_list = [
-                    checkLicense,
-                    checkBraceStyle,
-                    checkFuncNames,
-                    checkLineLength,
-                    checkSpaces
-                    ]
+rules_common = [
+        ruleLineLength
+        ]
 
-for dir in opt.dir:
-    ccList += (collectFiles(dir, "cc"))
-    ccList += (collectFiles(dir, "tcc"))
-    hList += (collectFiles(dir, "h"))
+for obj in opt.obj:
+    if(os.path.isfile(obj)):
+        file_list.append(obj)
+    for f in glob.glob(obj + '/**'):
+        if(os.path.isfile(f)):
+            file_list.append(f)
 
-for file in ccList+hList:
-    for rule in common_rule_list:
+#    ccList += (collectFiles(dir, "cc"))
+#    ccList += (collectFiles(dir, "tcc"))
+#    hList += (collectFiles(dir, "h"))
+
+
+for file in file_list:
+    for rule in rules_common:
         for error in rule(file):
             error.show()
 
