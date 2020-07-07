@@ -1,3 +1,4 @@
+#ifdef EXTENDED_FEATURE
 #include "cylgrammar.h"
 
 #include <string>
@@ -5,7 +6,7 @@
 
 class Writer {
     public:
-    virtual void write(CylGrammar *g, std::string file) = 0;
+    virtual void write(CylGrammar *g, std::string file) {}
 };
 
 class BisonWriter: public Writer {
@@ -18,17 +19,11 @@ class FlexWriter: public Writer {
     virtual void write(CylGrammar *g, std::string file) override;
 };
 
-#ifdef EXTENDED_FEATURE
 class CyParseWriter: public Writer {
-    public:
-    virtual void write(CylGrammar *g, std::string file) override;
 };
 
 class CyLexWriter: public Writer {
-    public:
-    virtual void write(CylGrammar *g, std::string file) override;
 };
-#endif
 
 enum class WriterType {
     Bison,
@@ -38,3 +33,4 @@ enum class WriterType {
 };
 
 Writer* writerFactory(WriterType type); // TODO: can any other design pattern work here
+#endif

@@ -1,6 +1,8 @@
 #ifdef EXTENDED_FEATURE
 #include "cyl.h"
 #include "cylgrammar.h"
+#include "parserfactory.h"
+#include "bisonparser.h"
 
 Parser* ScannerFactory::giveParser() {
     Parser *p;
@@ -41,14 +43,11 @@ Writer* ScannerFactory::giveLexWriter() {
     return w;
 }
 
-extern "C" void* CylBisonEntry(const char*);
-
 Cyl::Cyl(ScannerType t) {
     ScannerFactory f(t);
     parser = f.giveParser();
     lex_writer = f.giveLexWriter();
     parse_writer = f.giveParseWriter();
-    ((BisonParser*)parser)->set_entry(CylBisonEntry);
 }
 
 void Cyl::generateParser(std::string cyl_file) {

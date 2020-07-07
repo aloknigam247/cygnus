@@ -1,3 +1,5 @@
+#ifndef PARSER_H
+#define PARSER_H
 #include <string>
 
 class Digest {
@@ -13,3 +15,4 @@ class Parser {
     public:
     virtual Digest* parse(std::string file) = 0;
 };
+#endif

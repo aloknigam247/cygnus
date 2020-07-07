@@ -1,5 +1,5 @@
 #ifdef EXTENDED_FEATURE
-#include "bisonparser.h"
+#include "parser.h"
 
 enum class ParserType {
     Bison,

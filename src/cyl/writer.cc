@@ -1,27 +1,6 @@
 #ifdef EXTENDED_FEATURE
 #include "writer.h"
 
-Writer* writerFactory(WriterType type) { // TODO: can any other design pattern work here
-    Writer *w;
-    switch(type) {
-        case WriterType::Bison:
-            w = new BisonWriter;
-            break;
-#ifdef EXTENDED_FEATURE
-        case WriterType::CyLex:
-            w = new CyLexWriter;
-            break;
-        case WriterType::CyParse:
-            w = new CyParseWriter;
-            break;
-#endif
-        case WriterType::Flex:
-            w = new FlexWriter;
-            break;
-    }
-    return w;
-}
-
 void BisonWriter::write(CylGrammar *g, std::string cyl_file) {
     CyFile bison;
     bison.open(cyl_file + ".y", std::ios::out);
@@ -94,5 +73,26 @@ void LPG::generateFlex(VariableList *variable_list, std::string file_base, std::
         variable = variable->next;;
     }
     flex << "%%";
+}
+
+Writer* writerFactory(WriterType type) { // TODO: can any other design pattern work here
+    Writer *w;
+    switch(type) {
+        case WriterType::Bison:
+            w = new BisonWriter;
+            break;
+#ifdef EXTENDED_FEATURE
+        case WriterType::CyLex:
+            w = new CyLexWriter;
+            break;
+        case WriterType::CyParse:
+            w = new CyParseWriter;
+            break;
+#endif
+        case WriterType::Flex:
+            w = new FlexWriter;
+            break;
+    }
+    return w;
 }
 #endif

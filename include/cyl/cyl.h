@@ -1,4 +1,4 @@
-#ifdef EXTENDED_FETAURE
+#ifdef EXTENDED_FEATURE
 #include "parser.h"
 #include "writer.h"
 

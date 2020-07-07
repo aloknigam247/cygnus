@@ -1,14 +1,16 @@
 #ifdef EXTENDED_FEATURE
 #include "parserfactory.h"
+#include "bisonparser.h"
+#include "cyparser.h"
 
 Parser* parserFactory(ParserType type) {
+    Parser *p = nullptr;
     switch(type) {
         case ParserType::Bison:
-            return new BisonParser;
-#ifdef EXTENDED_FEATURE
+            p = new BisonParser;
         case ParserType::CyParser:
-            return new CyParser;
-#endif
+            p = new CyParser;
     }
+    return p;
 }
 #endif
