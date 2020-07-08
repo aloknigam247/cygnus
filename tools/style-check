@@ -28,7 +28,8 @@ class Error:
         self.file = file
         self.line = line
         self.lineno = lineno
-        self.begin = 4+begin
+        #self.begin = 4+begin
+        self.begin = begin
         self.len = len-1
 
     def show(self):
@@ -39,7 +40,8 @@ class Error:
                 print(self.begin - 3, end = ':')
         print(' ' + self.desc)
         if(self.line):
-            print(' '*4 + self.line)
+            #print(' '*4 + self.line)
+            print(self.line)
             if(self.begin > 3):
                 print(' '*self.begin + '^', end = '')
                 if(self.len > 0):
@@ -236,7 +238,7 @@ def ruleLineLength(file):
     lineno=0
     for line in open(file, 'r').read().splitlines():
         lineno = lineno+1
-        line = line.replace('\t', '·'*4)
+        line = line.replace('\t', ' '*4)
         if(len(line) > 100):
             error_list.append(Error("line length is more than 100",
                             file,
