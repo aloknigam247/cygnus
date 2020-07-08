@@ -4,7 +4,8 @@ else
     rPath=`pwd`/$BASH_SOURCE
 fi
 
-export CYGNUS_HOME=$(dirname $(realpath $rPath))
+#export CYGNUS_HOME=$(dirname $(realpath $rPath))
+export CYGNUS_HOME=$(pwd)
 
 if [[ ! $PATH =~ $CYGNUS_HOME/build/bin ]]; then
     export PATH=$CYGNUS_HOME/build/bin:$PATH
