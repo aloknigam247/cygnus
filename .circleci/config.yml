@@ -236,9 +236,9 @@ workflows:
       - sanitization:
           requires:
             - checkout
-              #- style-checks:
-              #requires:
-              #- checkout
+      - style-checks:
+          requires:
+            - checkout
       - gen-report:
           requires:
               - coverage
@@ -247,4 +247,4 @@ workflows:
               #            - mem-checks
               - release-tests
               - sanitization
-              #            - style-checks
+              - style-checks

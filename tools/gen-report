@@ -186,8 +186,8 @@ main() {
     #memReport
     ##perfReport
     releaseTestReport
-    #sanitizationReport
-    #styleReport
+    sanitizationReport
+    styleReport
     #warnReport
     exit $EXITCODE
 }
