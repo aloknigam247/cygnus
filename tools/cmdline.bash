@@ -146,11 +146,11 @@ usage() {
     EXIT
 }
 
-#-------------------------------#
-# Error message for option      #
-# Usage: optionError <option>   #
-#-------------------------------#
-optionError() {
+#----------------------------#
+# Error message for option   #
+# Usage: optionHelp <option> #
+#----------------------------#
+optionHelp() {
     local _IFS_Prev=$IFS
     local _meta=''
     local _help=''
@@ -231,7 +231,7 @@ parseCmdLine() {
                                 _val=$2
                                 shift
                             else
-                                optionError $_opt
+                                optionHelp $_opt
                                 _error=1
                                 continue
                             fi
@@ -246,7 +246,7 @@ parseCmdLine() {
                         done
                         ;;
                     without:*)
-                        _deps==${_param#*:}
+                        _deps=${_param#*:}
                         for _o in ${_deps// /,}; do # IFS is ',' replace ' ' with ','
                             _without["$_o"]=$_opt
                         done
@@ -288,14 +288,14 @@ parseCmdLine() {
     for _o in ${!_with[@]}; do
         if [[ -z ${VALUES[$_o]} ]]; then
             LOG E "option $_o is missing needed by ${_with[$_o]}"
-            optionError ${_with[$_o]}
+            optionHelp ${_with[$_o]}
         fi
     done
     
     for _o in ${!_without[@]}; do
         if [[ ${VALUES[$_o]} ]]; then
             LOG E "can not combine $_o with ${_without[$_o]}"
-            optionError ${_without[$_o]}
+            optionHelp ${_without[$_o]}
         fi
     done
     

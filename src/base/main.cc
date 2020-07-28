@@ -28,10 +28,14 @@
 #include "cycrawler.h"
 
 int main(const int argc, const char* argv[]) {
+    Status status = Status::SUCCESS;
     Options opt;
+
     opt.addOption("-v", Option::BOOL, "version");
-    if(!opt.parse(argc, argv))
-        return 1;
+    status = opt.parse(argc, argv);
+
+    if(status != Status::SUCCESS)
+        return static_cast<int>(status);
 
     if(opt.isSet("-v"))
         std::cout << "Cygnus " << MAKE_STRING(VERSION) << '\n';
@@ -43,5 +47,6 @@ int main(const int argc, const char* argv[]) {
         for(auto file: crawler.crawl())
             std::cout << file << '\n';
     }
-    return 0;
+
+    return static_cast<int>(status);
 }
