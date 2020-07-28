@@ -1,10 +1,11 @@
-if [[ $BASH_SOURCE =~ ^/ ]]; then
-    rPath=$BASH_SOURCE
-else
+#if [[ $BASH_SOURCE =~ ^/ ]]; then
+#    rPath=$BASH_SOURCE
+#else
     rPath=`pwd`/$BASH_SOURCE
-fi
+#fi
 
-export CYGNUS_HOME=$(dirname $(realpath $rPath))
+#export CYGNUS_HOME=$(dirname $(realpath $rPath))
+export CYGNUS_HOME=$(realpath $rPath)
 
 if [[ ! $PATH =~ $CYGNUS_HOME/build/bin ]]; then
     export PATH=$CYGNUS_HOME/build/bin:$PATH
