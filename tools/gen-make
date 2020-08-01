@@ -40,6 +40,7 @@ class Args:
         self.__parser.add_argument("file", help="genrate Makefile for this file")
         self.__parser.add_argument("-d", dest="cDir", metavar="dir", default=".", help="alternate location of file if not current directory")
         self.__parser.add_argument("-i", dest="incDir", metavar="dir", action="append", help="path of include directory")
+        self.__parser.add_argument("-l", dest="libs", metavar="lib", action="append", help="library to include")
         self.__parser.add_argument("-s", dest="srcDir", metavar="dir", action="append", help="path to source directory")
 
     def parse(self):
@@ -49,10 +50,9 @@ class Args:
 #----------------------- Class Rules -----------------------#
 class Rules:
     inc_list = []
-    lib_list = []
     obj_list = []
     src_list = []
-    node = {}
+    node     = {}
     makefile = ''
 
     def write(self, msg, end='\n'):
@@ -66,10 +66,6 @@ class Rules:
         for line in open(file, 'r').readlines():
             if (line.startswith("#include") and len(line.split('"')) > 1):
                 inc_file = line.split('"')[1]
-
-                if(inc_file == "ncurses.h"):
-                    self.lib_list.append("-lncurses")
-                    continue
 
                 dir = self.findDir(self.inc_list, inc_file)
                 if(dir):
@@ -201,7 +197,7 @@ rules.write("OBJ_COMMON := " + os.path.relpath("obj", os.getcwd()[os.getcwd().rf
 
 rules.createRule('.', opt.file)
 rules.write(source_file + ": " + ' '.join(rules.obj_list))
-rules.write("\t$(CY_COMP) -o $@ $^ " + ' '.join(rules.lib_list) +"\n")
+rules.write("\t$(CY_COMP) -o $@ $^ " + ' '.join(['-l' + lib for lib in opt.libs]) + "\n")
 
 dir_list = []
 for obj in rules.obj_list:

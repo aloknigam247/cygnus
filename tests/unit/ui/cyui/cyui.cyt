@@ -1,0 +1,8 @@
+DIFFS=(
+        ['REFLOG']='TESTLOG'
+      )
+
+LIBS=(
+        -lncurses
+        -lpanel
+     )

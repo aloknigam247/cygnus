@@ -64,19 +64,46 @@ makeRunDir(){
     ln -frs $testcase_dir/`dirname $testcase`/* $test_out/ || return 1
 }
 
-runGDBFuncTest() {
+#------------------#
+# Functional Tests #
+#------------------#
+commonFuncTest() {
+    local prefix=$1
+    local suffix=$2
     for i in ${!CASE[@]}; do
         echo "[CASE $((i+1))] $(echo ${CASE[$i]} | sed "s|$CYGNUS|cygnus|")"
-        gdb -q --args ${CASE[$i]}
+        eval $prefix ${CASE[$i]} $suffix
         echo
     done
 }
 
-runGDBUnitTest() {
-    gen-make $(find $CYGNUS_HOME/include -mindepth 1 -type d -printf "-i %p ") -i $CYGNUS_HOME/src/base -i$CYGNUS_HOME/tests/utils/include $(find $CYGNUS_HOME/src -mindepth 1 -type d -printf "-s %p ") -s $CYGNUS_HOME/tests/utils/src unit.cc || return 1
-    make --no-print-directory $TEST_MODE
-    gdb -q ./unit
+runFuncTest() {
+    commonFuncTest "$UNBUFF $tool" "| sed 's/.*/>\ \ \ &/'" 2>&1 > TESTLOG
+}
+
+runGDBFuncTest() {
+    commonFuncTest "gdb -q --args"
+}
+
+#------------#
+# Unit Tests #
+#------------#
+commonUnitTest() {
+    local prefix=$1
+    local suffix=$2
+    gen-make $(find $CYGNUS_HOME/include -mindepth 1 -type d -printf "-i %p ") -i $CYGNUS_HOME/src/base -i$CYGNUS_HOME/tests/utils/include $(find $CYGNUS_HOME/src -mindepth 1 -type d -printf "-s %p ") -s $CYGNUS_HOME/tests/utils/src ${LIBS[*]} unit.cc || return 1
+    make --no-print-directory $TEST_MODE 2>&1 | tee make.log
+    sed -i -e 's|\x1b\[[;0-9]*m\x1b\[K||g' -e 's/\x1b\[[0-9]+m//g' make.log
+    eval $prefix ./unit $suffix
     echo
+}
+
+runUnitTest() {
+    commonUnitTest "$UNBUFF $tool" "| sed -e '/\[CASE/! s/.*/>\ \ \ &/' -e ' 2,$ s/\[CASE/\n[CASE/' 2>&1 > TESTLOG"
+}
+
+runGDBUnitTest() {
+    commonUnitTest "gdb -q"
 }
 
 runGDBTest() {
@@ -115,31 +142,12 @@ runGDBTest() {
     fi
 }
 
-runFuncTest() {
-    {
-    for i in ${!CASE[@]}; do
-        echo "[CASE $((i+1))] $(echo ${CASE[$i]} | sed "s|$CYGNUS|cygnus|")"
-        $UNBUFF $tool ${CASE[$i]} | sed 's/.*/>   &/' || return 1
-        echo
-    done
-    } 2>&1 > TESTLOG
-}
-
-runUnitTest() {
-    gen-make $(find $CYGNUS_HOME/include -mindepth 1 -type d -printf "-i %p ") -i $CYGNUS_HOME/src/base -i$CYGNUS_HOME/tests/utils/include $(find $CYGNUS_HOME/src -mindepth 1 -type d -printf "-s %p ") -s $CYGNUS_HOME/tests/utils/src unit.cc || return 1
-    make --no-print-directory $TEST_MODE 2>&1 | tee make.log
-    sed -i -e 's|\x1b\[[;0-9]*m\x1b\[K||g' -e 's/\x1b\[[0-9]+m//g' make.log
-    {
-    $UNBUFF $tool ./unit | sed -e '/\[CASE/! s/.*/>   &/' -e ' 2,$ s/\[CASE/\n[CASE/' || return 1
-    echo
-    } 2>&1 > TESTLOG
-}
-
 runTest() {
     local test=$1
     local status=0
     declare -a CASES=()
     declare -A DIFFS=()
+    declare -a LIBS=()
     declare -a PRE_RUN=()
     declare -a SORT_OUTPUT=()
 
