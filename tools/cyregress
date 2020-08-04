@@ -406,7 +406,7 @@ main() {
                 # Put missing files in coverage.info when all testcases in directory run
                 if [[ ${VALUES['-a']} || ${VALUES['-u']} ]]; then
                     mkdir /tmp/cygnus_tmp -p
-                    find include src -regextype egrep -regex ".*\.(c|cc|h|tcc)" | egrep -v "main.cc|cymem.cc" | sort -u | xargs realpath > /tmp/cygnus_tmp/all_files
+                    find src -regextype egrep -regex ".*\.(c|cc|h|tcc)" | egrep -v "main.cc|cymem.cc" | sort -u | xargs realpath > /tmp/cygnus_tmp/all_files
                     egrep "SF:" reports/coverage/unit/coverage.info  | sed 's/SF://' | sort -u > /tmp/cygnus_tmp/covered_files
                     comm -23 /tmp/cygnus_tmp/all_files /tmp/cygnus_tmp/covered_files > /tmp/cygnus_tmp/uncovered_files
                     {

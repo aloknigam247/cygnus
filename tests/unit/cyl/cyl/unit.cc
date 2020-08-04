@@ -22,11 +22,11 @@ void ScannerFactoryTest() {
 
 void CylCygnusTest() {
     Cyl cyl(Cygnus);
-    cyl.generateParser("file");
 }
 
 void CylGNUTest() {
     Cyl cyl(GNU);
+    cyl.generateParser("file");
 }
 
 int main() {

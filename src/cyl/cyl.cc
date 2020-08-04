@@ -50,12 +50,15 @@ Cyl::Cyl(ScannerType t) {
     parse_writer = f.giveParseWriter();
 }
 
-void Cyl::generateParser(std::string cyl_file) {
+Status Cyl::generateParser(std::string cyl_file) {
     Digest *d = parser->parse(cyl_file);
+    if(!d)
+        return Status::CYL_PARSE_ERROR;
 
     CylGrammar *data = (CylGrammar*)d->get_data();
-
     lex_writer->write(data, cyl_file);
     parse_writer->write(data, cyl_file);
+
+    return Status::SUCCESS;
 }
 #endif

@@ -75,6 +75,12 @@ void LPG::generateFlex(VariableList *variable_list, std::string file_base, std::
     flex << "%%";
 }
 
+void CyParseWriter::write(CylGrammar *g, std::string cyl_file) {
+}
+
+void CyLexWriter::write(CylGrammar *g, std::string cyl_file) {
+}
+
 Writer* writerFactory(WriterType type) { // TODO: can any other design pattern work here
     Writer *w;
     switch(type) {

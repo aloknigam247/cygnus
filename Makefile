@@ -22,10 +22,10 @@ else ifeq ($(MODE),perf)
 COMPILER_FLAGS	+= -ggdb3
 
 else ifeq ($(MODE),release)
-COMPILER_FLAGS	+= -Ofast
+COMPILER_FLAGS	+= -Ofast -D_FORTIFY_SOURCE=2
 
 else ifeq ($(MODE),sanitize)
-COMPILER_FLAGS	+= -ggdb3 -D_FORTIFY_SOURCE=2 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC \
+COMPILER_FLAGS	+= -ggdb3 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC \
 				-fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow\
 				-fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error
 

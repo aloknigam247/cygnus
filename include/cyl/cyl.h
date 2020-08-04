@@ -1,6 +1,7 @@
 #ifdef EXTENDED_FEATURE
 #include "parser.h"
 #include "writer.h"
+#include "status.h"
 
 enum ScannerType {
     Cygnus,
@@ -21,7 +22,7 @@ class ScannerFactory {
 class Cyl {
     public:
     Cyl(ScannerType type);
-    void generateParser(std::string lang_file);
+    Status generateParser(std::string lang_file);
 
     private:
     Parser *parser;

@@ -6,7 +6,7 @@
 
 class Writer {
     public:
-    virtual void write(CylGrammar *g, std::string file) {}
+    virtual void write(CylGrammar *g, std::string file) = 0;
 };
 
 class BisonWriter: public Writer {
@@ -20,9 +20,13 @@ class FlexWriter: public Writer {
 };
 
 class CyParseWriter: public Writer {
+    public:
+    virtual void write(CylGrammar *g, std::string file) override;
 };
 
 class CyLexWriter: public Writer {
+    public:
+    virtual void write(CylGrammar *g, std::string file) override;
 };
 
 enum class WriterType {

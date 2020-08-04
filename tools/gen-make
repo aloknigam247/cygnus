@@ -196,7 +196,7 @@ rules.write("OBJ_COMMON := " + os.path.relpath("obj", os.getcwd()[os.getcwd().rf
             "mem-check: debug\n\n" +
             "perf: COMP_FLAGS += -ggdb3\n" +
             "perf: all\n\n" +
-            "sanitize: COMP_FLAGS += -ggdb3 -D_FORTIFY_SOURCE=2 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow -fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error\n" +
+            "sanitize: COMP_FLAGS += -ggdb3 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow -fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error\n" +
             "sanitize: all\n")
 
 rules.createRule('.', opt.file)
