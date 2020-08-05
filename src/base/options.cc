@@ -69,7 +69,7 @@ Status Options::parse(const int argc, const char* argv[]) {
                         if(i+1 < argc && strlen(argv[i+1]) == 1)
                             iter->set_value(*argv[++i]);
                         else {
-                            Log::e("option ", opt, " needs value character value.");
+                            Log::e("option ", opt, " needs character value.");
                             status = Status::PARAM_TYPE_MISMATCH;
                         }
                         break;
@@ -87,7 +87,7 @@ Status Options::parse(const int argc, const char* argv[]) {
                                 status = Status::PARAM_TYPE_MISMATCH;
                             }
                         else {
-                            Log::e("option ", opt, " needs value integer value.");
+                            Log::e("option ", opt, " needs integer value.");
                             status = Status::PARAM_TYPE_MISMATCH;
                         }
                         break;
@@ -95,13 +95,13 @@ Status Options::parse(const int argc, const char* argv[]) {
                         if(i+1 < argc && argv[i+1][0] != '-')
                             iter->set_value(argv[++i]);
                         else {
-                            Log::e("option ", opt, " needs value string value.");
+                            Log::e("option ", opt, " needs string value.");
                             status = Status::PARAM_TYPE_MISMATCH;
                         }
                         break;
-#endif
                     default:
                         Log::e("Option not suppoted");
+#endif
                 }
             }
             else {

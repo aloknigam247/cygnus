@@ -2,7 +2,9 @@
 
 source cmdline.bash    # command line parser
 
-declare BUILD_MODE=debug
+declare BUILD_MODE="debug"
+declare ERROR=0
+declare STRICT="no"
 
 OPTION['--clean']="value:bool,eval:BUILD_MODE=clean,help:clean generated files"
 OPTION['--coverage']="value:bool,eval:BUILD_MODE=coverage,help:create coverage build"
@@ -15,20 +17,16 @@ OPTION['--sanitize']="value:bool,eval:BUILD_MODE=sanitize,help:create sanitized 
 OPTION['--strict']="value:bool,eval:STRICT=yes,help:use strict options for compilation"
 
 MAKE() {
-    {
+    local make_force=""
     if [[ ${VALUES['--force']} ]]; then
-        make clean
+        make_force="-B"
     fi
 
-    if [[ ${VALUES['--strict']} ]]; then
-        make -q && make clean
-        make MODE=$1 STRICT=yes 2>$report_dir/${BUILD_MODE}-errors
-    else
-        make MODE=$1 2>$report_dir/${BUILD_MODE}-errors
-    fi
+    make -r $make_force MODE=$1 STRICT=$STRICT 3>&1 1>&2 2>&3 3>&- | tee $report_dir/${BUILD_MODE}-errors | tee logs/cybuild-${BUILD_MODE}.log
 
-    cat $report_dir/${BUILD_MODE}-errors
-    } | tee logs/cybuild-${BUILD_MODE}.log
+    if [[ ${PIPESTATUS[0]} -ne 0 ]]; then
+        return 1
+    fi
 
     sed -i 's|\x1b\[[;0-9]*m\x1b\[K||g' $report_dir/${BUILD_MODE}-errors logs/cybuild-${BUILD_MODE}.log
 }
@@ -36,6 +34,7 @@ MAKE() {
 main() {
     parseCmdLine $@
     local errors=0
+    local warnings=0
     local report_dir="reports/compiler"
     mkdir -p $report_dir
     SECONDS=0
@@ -61,19 +60,34 @@ main() {
         sanitize)
             MAKE sanitize
             ;;
-        *)
-            MAKE debug
-            ;;
-    esac
+    esac || ERROR=1
 
     if [[ ! $BUILD_MODE == "clean" ]]; then
         build_time=$(TZ=UTC0 printf '%(%Hh:%Mm:%Ss)T\n' $SECONDS)
 
-        test -f $report_dir/${BUILD_MODE}-errors \
-            && errors=$(egrep -c "error:|warning:" $report_dir/${BUILD_MODE}-errors)
-        echo -e "\e[1;31mErrors|Warnings: $errors\e[m"
+        if [[ -f $report_dir/${BUILD_MODE}-errors ]]; then
+            errors=$(egrep -c "error:" $report_dir/${BUILD_MODE}-errors)
+            warnings=$(egrep -c "warning:" $report_dir/${BUILD_MODE}-errors)
+            if [[ $warnings -ne 0 ]]; then
+                echo -e "\e[1;33mWarnings: $warnings\e[m"
+                #if [[ ${VALUES['--strict']} ]]; then Enable it when compiler warnings are enabled
+                #    ERROR=1
+                #fi
+            fi
+            if [[ $errors -ne 0 ]]; then
+                echo -e "\e[1;31mErrors: $errors\e[m"
+                ERROR=1
+            fi
+        fi
+    fi
 
-        echo "$(du -h $CYGNUS_HOME/build/bin/$BUILD_MODE/cygnus-$BUILD_MODE | cut -f1) in $build_time"
+    if [[ $ERROR -eq 0 ]]; then
+        exe=$CYGNUS_HOME/build/bin/$BUILD_MODE/cygnus-$BUILD_MODE
+        test -f $exe && echo $(du -h $exe | cut -f1) in $build_time
+        echo -e "\e[1;32mSuccess\e[m"
+    else
+        echo -e "\e[1;31mFailed\e[m"
+        return 1
     fi
 }
 

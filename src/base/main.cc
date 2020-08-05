@@ -22,10 +22,9 @@
  * SOFTWARE.                                                                        *
  ************************************************************************************/
 
+#include <iostream>
 #include "options.h"
-#include "log.h"
 #include "utils.h"
-#include "cycrawler.h"
 
 int main(const int argc, const char* argv[]) {
     Status status = Status::SUCCESS;
@@ -37,15 +36,8 @@ int main(const int argc, const char* argv[]) {
     if(status != Status::SUCCESS)
         return static_cast<int>(status);
 
-    if(opt.isSet("-v"))
+    if(opt.isSet("-v")) {
         std::cout << "Cygnus " << MAKE_STRING(VERSION) << '\n';
-
-    else {
-        CyCrawler crawler;
-        crawler.set_path(".");
-        std::cout << "Files found:\n";
-        for(auto file: crawler.crawl())
-            std::cout << file << '\n';
     }
 
     return static_cast<int>(status);

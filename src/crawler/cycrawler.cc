@@ -1,3 +1,4 @@
+#ifdef EXTENDED_FEATURE
 #include "cycrawler.h"
 
 #include <sys/types.h>
@@ -17,7 +18,6 @@ std::forward_list<std::string> CyCrawler::createFileList(std::string path) {
     DIR *dir = opendir(path.c_str());
     if(!dir) {
         switch(errno) {
-#ifdef EXTENDED_FEATURE
             case EACCES:
                 Log::e(path, " Permisson denied");
                 break;
@@ -27,7 +27,6 @@ std::forward_list<std::string> CyCrawler::createFileList(std::string path) {
             case ENOTDIR:
                 Log::e("Not a directory");
                 break;
-#endif
             default:
                 Log::e("Unexpected error");
         }
@@ -54,3 +53,4 @@ std::forward_list<std::string> CyCrawler::createFileList(std::string path) {
 
     return file_list;
 }
+#endif
