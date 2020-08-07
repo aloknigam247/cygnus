@@ -38,9 +38,11 @@ class Args:
 
     def __init__(self):
         self.__parser.add_argument("file", help="genrate Makefile for this file")
-        self.__parser.add_argument("-d", dest="cDir", metavar="dir", default=".", help="alternate location of file if not current directory")
-        self.__parser.add_argument("-i", dest="incDir", metavar="dir", action="append", help="path of include directory")
-        self.__parser.add_argument("-s", dest="srcDir", metavar="dir", action="append", help="path to source directory")
+        self.__parser.add_argument("--bison", dest="bison_files", metavar="file", action="append", help="bison files to include")
+        self.__parser.add_argument("-d", dest="cdir", metavar="dir", default=".", help="alternate location of file if not current directory")
+        self.__parser.add_argument("--flex", dest="flex_files", metavar="file", action="append", help="flex files to include")
+        self.__parser.add_argument("-i", dest="inc_dir", metavar="dir", action="append", help="path of include directory")
+        self.__parser.add_argument("-s", dest="src_dir", metavar="dir", action="append", help="path to source directory")
 
     def parse(self):
         return self.__parser.parse_args()
@@ -108,16 +110,23 @@ class Rules:
         dir = self.findDir(self.src_list, cc)
         if(dir):
             return dir, cc
+        c = h_file.replace(".h", ".c") # Yes there is a better way to do this, compare w/o extension
+        dir = self.findDir(self.src_list, c)
+        if(dir):
+            return dir, c
         return None, None
 
-    #-------------------------------------------------#
-    # Converts .cc to .o and return its path for make #
-    #-------------------------------------------------#
+    #----------------------------------------------------#
+    # Converts .cc/.c to .o and return its path for make #
+    #----------------------------------------------------#
     def cc2o(self, dir, file):
         obj_dir = '$(OBJ_LOCAL)'
         if dir in self.src_list:
             obj_dir = '$(OBJ_COMMON)'
-        dot_o = obj_dir + '/' + file.replace(".cc", ".o")
+        if file.endswith(".c"):
+            dot_o = obj_dir + '/' + file.replace(".c", ".o")
+        else:
+            dot_o = obj_dir + '/' + file.replace(".cc", ".o")
         return dot_o
 
     #----------------------------------#
@@ -146,19 +155,26 @@ class Rules:
                 ret = self.createRule(src_dir, src_file)
                 if(ret):
                     ret_list.union(ret)
+        elif(file.endswith(".c")):
+            dot_o = self.cc2o(dir, file)
+            self.obj_list.append(dot_o)
+            self.write(dot_o + ": " + complete_file + ' ', '')
+            for inc_file, inc_dir in incs.items():
+                self.write(' '.join(self.allDepends(inc_dir + '/' + inc_file)), ' ')
+            self.write('\n\t$(C_COMPILE) -c -o $@ $<\n')
         elif(file.endswith(".cc")):
             dot_o = self.cc2o(dir, file)
             self.obj_list.append(dot_o)
             self.write(dot_o + ": " + complete_file + ' ', '')
             for inc_file, inc_dir in incs.items():
                 self.write(' '.join(self.allDepends(inc_dir + '/' + inc_file)), ' ')
-            self.write('\n\t$(CY_COMP) -c -o $@ $<\n')
+            self.write('\n\t$(CPP_COMPILE) -c -o $@ $<\n')
 
 #----------------------- main() -----------------------#
 args = Args()
 opt = args.parse()
 
-os.chdir(opt.cDir)
+os.chdir(opt.cdir)
 source_file = "unit"
 
 if(not os.path.exists(opt.file)):
@@ -166,48 +182,85 @@ if(not os.path.exists(opt.file)):
     quit(1)
 
 rules = Rules()
-rules.src_list = opt.srcDir
-rules.inc_list = opt.incDir
+rules.src_list = opt.src_dir
+rules.inc_list = opt.inc_dir
 rules.makefile = open('Makefile', 'w')
 rules.write("#------------ Configs ------------#")
 
-rules.write("CXX        = g++\n" +
-            "COMP_FLAGS = -std=c++11 -fdiagnostics-color -DEXTENDED_FEATURE\n"+
-            "CY_COMP    = $(CXX) $(COMP_FLAGS) $(INC)\n\n" +
+rules.write("C_COMPILER     = gcc\n" +
+            "CPP_COMPILER   = g++\n" +
+            "COMPILER_FLAGS = -std=c++11 -fdiagnostics-color -DEXTENDED_FEATURE\n"+
+            "C_COMPILE      = $(C_COMPILER) $(COMPILER_FLAGS) $(INC)\n" +
+            "CPP_COMPILE    = $(CPP_COMPILER) $(COMPILER_FLAGS) $(INC)\n\n" +
             "ifneq ($(MAKECMDGOALS),)\n"
             "TARGET=/$(MAKECMDGOALS)\n"
             "endif\n\n"
             "OBJ_COMMON := " + os.path.relpath("obj", os.getcwd()[os.getcwd().rfind("unit/")+5:]) + "$(TARGET)\n" +
-            "OBJ_LOCAL  := obj$(TARGET)\n\n" +
-            "INC := ", '')
+            "OBJ_LOCAL  := obj$(TARGET)")
 
-for i in opt.incDir:
+if opt.bison_files or opt.flex_files:
+    rules.write("SRC_COMMON := " + os.path.relpath("src", os.getcwd()[os.getcwd().rfind("unit/")+5:]))
+
+rules.write("\nINC := ", '')
+for i in opt.inc_dir:
     rules.write(" \\\n    -I " + i, '')
 rules.write('\n')
 
-rules.write("OBJ_COMMON := " + os.path.relpath("obj", os.getcwd()[os.getcwd().rfind("unit/")+5:]) + "\n" +
-            "OBJ_LOCAL  := obj\n\n" +
-            "#------------ Targets ------------#\n" +
-            "debug: COMP_FLAGS += -ggdb3\n" +
+rules.write("#------------ Targets ------------#\n" +
+            "debug: COMPILER_FLAGS += -ggdb3\n" +
             "debug: all\n\n" +
-            "coverage: CXX = g++\n" +
-            "coverage: COMP_FLAGS += --coverage\n" +
+            "coverage: COMPILER_FLAGS += --coverage\n" +
             "coverage: all\n\n" +
             "mem-check: debug\n\n" +
-            "perf: COMP_FLAGS += -ggdb3\n" +
+            "perf: COMPILER_FLAGS += -ggdb3\n" +
             "perf: all\n\n" +
-            "sanitize: COMP_FLAGS += -ggdb3 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow -fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error\n" +
+            "sanitize: COMPILER_FLAGS += -ggdb3 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=float-cast-overflow -fsanitize=leak -fsanitize=undefined -fsanitize-undefined-trap-on-error\n" +
             "sanitize: all\n")
 
-rules.createRule('.', opt.file)
-rules.write(source_file + ": " + ' '.join(rules.obj_list))
-rules.write("\t$(CY_COMP) -o $@ $^ " + ' '.join(rules.lib_list) +"\n")
+all_src_list = []
+bison_obj_list = []
+for f in opt.bison_files:
+    bison_stem = f.replace(".y", "-bison")
+    bison_src = "$(SRC_COMMON)/" + bison_stem + ".c"
+    bison_obj = "$(OBJ_COMMON)/" + bison_stem + ".o"
+    all_src_list.append(bison_src)
+    bison_obj_list.append(bison_obj)
 
+    rules.write(bison_src + ": $(CYGNUS_HOME)/src/" + f + "\n" +
+            "\tbison --defines=$(@:.c=.h) -o $@ $^\n"
+            )
+    
+    rules.write(bison_obj + ": " + bison_src + "\n" +
+                "\t$(C_COMPILE) -c -o $@ $^\n"
+            )
+
+flex_obj_list = []
+for f in opt.flex_files:
+    flex_stem = f.replace(".l", "-flex")
+    flex_src = "$(SRC_COMMON)/" + flex_stem + ".c"
+    flex_obj = "$(OBJ_COMMON)/" + flex_stem + ".o"
+    all_src_list.append(flex_src)
+    flex_obj_list.append(flex_obj)
+
+    rules.write(flex_src + ": $(CYGNUS_HOME)/src/" + f + "\n" +
+            "\tflex -o $@ $^\n"
+            )
+
+    rules.write(flex_obj + ": " + flex_src + "\n" +
+                "\t$(C_COMPILE) -c -o $@ $^\n"
+            )
+
+rules.createRule('.', opt.file)
+all_obj_list = bison_obj_list + flex_obj_list + rules.obj_list
+rules.write(source_file + ": " + ' '.join(all_obj_list))
+rules.write("\t$(CPP_COMPILE) -o $@ $^ " + ' '.join(rules.lib_list) +"\n")
+
+all_gen_list = all_obj_list + all_src_list
 dir_list = []
-for obj in rules.obj_list:
-    dir = os.path.dirname(obj)
-    if dir not in dir_list:
-        dir_list.append(dir)
+for l in all_gen_list:
+    d = os.path.dirname(l)
+    if d not in dir_list:
+        dir_list.append(d)
 
 rules.write("DIRS = " + ' '.join(dir_list) + "\n\n" +
             "all: $(DIRS) " + source_file + "\n")
@@ -215,5 +268,5 @@ rules.write("DIRS = " + ' '.join(dir_list) + "\n\n" +
 rules.write("$(DIRS):")
 rules.write("\tmkdir -p $@")
 
-rules.write("\nclean: " + ' '.join(rules.obj_list))
-rules.write("\t rm -f $^")
+rules.write("\nclean: " + ' '.join(all_obj_list))
+rules.write("\trm -f $^")

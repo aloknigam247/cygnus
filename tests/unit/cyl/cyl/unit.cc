@@ -2,12 +2,6 @@
 #include "cytest.h"
 #include <cassert>
 
-extern "C" {
-void* CylBisonEntry(const char *c) {
-    return nullptr;
-}
-}
-
 void ScannerFactoryTest() {
     ScannerFactory cygnus_factory(Cygnus);
     assert(cygnus_factory.giveParser() != nullptr);
