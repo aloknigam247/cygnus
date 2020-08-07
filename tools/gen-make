@@ -110,15 +110,15 @@ class Rules:
         dir = self.findDir(self.src_list, cc)
         if(dir):
             return dir, cc
-        c = h_file.replace(".h", ".c")
+        c = h_file.replace(".h", ".c") # Yes there is a better way to do this, compare w/o extension
         dir = self.findDir(self.src_list, c)
         if(dir):
             return dir, c
         return None, None
 
-    #-------------------------------------------------#
-    # Converts .cc to .o and return its path for make #
-    #-------------------------------------------------#
+    #----------------------------------------------------#
+    # Converts .cc/.c to .o and return its path for make #
+    #----------------------------------------------------#
     def cc2o(self, dir, file):
         obj_dir = '$(OBJ_LOCAL)'
         if dir in self.src_list:
