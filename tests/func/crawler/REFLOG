@@ -1,26 +1,17 @@
 [CASE 1] cygnus
-
 [CASE 2] cygnus -d test_dir_not_exist
 >   |ERROR| unknown option -d
-
-[CASE 3] cygnus -d test_dir
 >   |ERROR| unknown option -d
-
+[CASE 3] cygnus -d test_dir
 [CASE 4] cygnus -d test_dir/dir_empty
 >   |ERROR| unknown option -d
-
 [CASE 5] cygnus -d test_dir/file
 >   |ERROR| unknown option -d
-
 [CASE 6] cygnus -d test_dir/dir_link
 >   |ERROR| unknown option -d
-
 [CASE 7] cygnus -d test_dir/file_link
 >   |ERROR| unknown option -d
-
 [CASE 8] cygnus -d test_dir/broken_link
 >   |ERROR| unknown option -d
-
 [CASE 9] cygnus -d test_dir/loop_link
 >   |ERROR| unknown option -d
-

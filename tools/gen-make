@@ -37,11 +37,11 @@ class Args:
     __parser = argparse.ArgumentParser()
 
     def __init__(self):
-        self.__parser.add_argument("--bison", default="", dest="bison_files", metavar="file", action="append", help="bison files to include")
+        self.__parser.add_argument("--bison", default=[], dest="bison_files", metavar="file", action="append", help="bison files to include")
         self.__parser.add_argument("-d", dest="cdir", metavar="dir", default=".", help="alternate location of file if not current directory")
-        self.__parser.add_argument("--flex", default="", dest="flex_files", metavar="file", action="append", help="flex files to include")
+        self.__parser.add_argument("--flex", default=[], dest="flex_files", metavar="file", action="append", help="flex files to include")
         self.__parser.add_argument("-i", dest="inc_dir", metavar="dir", action="append", help="path of include directory")
-        self.__parser.add_argument("-l", default="", dest="libs", metavar="lib", action="append", help="library to include")
+        self.__parser.add_argument("-l", default=[], dest="libs", metavar="lib", action="append", help="library to include")
         self.__parser.add_argument("-s", dest="src_dir", metavar="dir", action="append", help="path to source directory")
         self.__parser.add_argument("file", help="genrate Makefile for this file")
 
