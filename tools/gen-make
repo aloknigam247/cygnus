@@ -37,12 +37,13 @@ class Args:
     __parser = argparse.ArgumentParser()
 
     def __init__(self):
-        self.__parser.add_argument("file", help="genrate Makefile for this file")
-        self.__parser.add_argument("--bison", dest="bison_files", metavar="file", action="append", help="bison files to include")
+        self.__parser.add_argument("--bison", default="", dest="bison_files", metavar="file", action="append", help="bison files to include")
         self.__parser.add_argument("-d", dest="cdir", metavar="dir", default=".", help="alternate location of file if not current directory")
-        self.__parser.add_argument("--flex", dest="flex_files", metavar="file", action="append", help="flex files to include")
+        self.__parser.add_argument("--flex", default="", dest="flex_files", metavar="file", action="append", help="flex files to include")
         self.__parser.add_argument("-i", dest="inc_dir", metavar="dir", action="append", help="path of include directory")
+        self.__parser.add_argument("-l", default="", dest="libs", metavar="lib", action="append", help="library to include")
         self.__parser.add_argument("-s", dest="src_dir", metavar="dir", action="append", help="path to source directory")
+        self.__parser.add_argument("file", help="genrate Makefile for this file")
 
     def parse(self):
         return self.__parser.parse_args()
@@ -51,10 +52,9 @@ class Args:
 #----------------------- Class Rules -----------------------#
 class Rules:
     inc_list = []
-    lib_list = []
     obj_list = []
     src_list = []
-    node = {}
+    node     = {}
     makefile = ''
 
     def write(self, msg, end='\n'):
@@ -68,10 +68,6 @@ class Rules:
         for line in open(file, 'r').readlines():
             if (line.startswith("#include") and len(line.split('"')) > 1):
                 inc_file = line.split('"')[1]
-
-                if(inc_file == "ncurses.h"):
-                    self.lib_list.append("-lncurses")
-                    continue
 
                 dir = self.findDir(self.inc_list, inc_file)
                 if(dir):
@@ -253,7 +249,7 @@ for f in opt.flex_files:
 rules.createRule('.', opt.file)
 all_obj_list = bison_obj_list + flex_obj_list + rules.obj_list
 rules.write(source_file + ": " + ' '.join(all_obj_list))
-rules.write("\t$(CPP_COMPILE) -o $@ $^ " + ' '.join(rules.lib_list) +"\n")
+rules.write("\t$(CPP_COMPILE) -o $@ $^ " + ' '.join(['-l' + lib for lib in opt.libs]) + "\n")
 
 all_gen_list = all_obj_list + all_src_list
 dir_list = []
