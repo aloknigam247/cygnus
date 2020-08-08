@@ -73,7 +73,6 @@ commonFuncTest() {
     for i in ${!CASE[@]}; do
         echo "[CASE $((i+1))] $(echo ${CASE[$i]} | sed "s|$CYGNUS|cygnus|")"
         eval $prefix ${CASE[$i]} $suffix
-        echo
     done
 }
 
@@ -106,7 +105,6 @@ commonUnitTest() {
     make --no-print-directory $TEST_MODE 2>&1 | tee make.log
     sed -i -e 's|\x1b\[[;0-9]*m\x1b\[K||g' -e 's/\x1b\[[0-9]+m//g' make.log
     eval $prefix ./unit $suffix
-    echo
 }
 
 runUnitTest() {
@@ -253,15 +251,15 @@ runTest() {
             status=1
             if [[ ${VALUES['-r']} ]]; then
                 cp ${DIFFS[$ref]} $ref
-                echo "$ref updated"
+                echo -e "\e[34m$ref updated\e[0m"
             fi
         fi
     done
 
     if [[ $status -eq 0 ]]; then
-        echo "status: PASS"
+        echo -e "\e[32mstatus: PASS\e[0m"
     else
-        echo "status: FAIL"
+        echo -e "\e[31mstatus: FAIL\e[0m"
         fail_cnt=$((fail_cnt + 1))
         fail_list+=($testcase)
     fi
@@ -482,9 +480,9 @@ main() {
         SET_ERROR 1
     fi
     echo -e "\nSummary:"
-    echo "    RUN:  $tc_cnt"
-    echo "    PASS: $((tc_cnt - fail_cnt))"
-    echo "    FAIL: $fail_cnt"
+    echo -e "    \e[33mRUN:  $tc_cnt\e[0m"
+    echo -e "    \e[32mPASS: $((tc_cnt - fail_cnt))\e[0m"
+    echo -e "    \e[31mFAIL: $fail_cnt\e[0m"
     RETURN_ERROR
     } 2>&1 | tee logs/cyregress${TEST_MODE:+-$TEST_MODE}.log
     sed -i -e 's|\x1b\[[;0-9]*m\x1b\[K||g' -e 's/\x1b\[[0-9]+m//g' logs/cyregress${TEST_MODE:+-$TEST_MODE}.log
