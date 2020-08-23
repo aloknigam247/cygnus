@@ -1,0 +1,2 @@
+Extension: c
+dec: ([a-z]+)return ( ) ([a-z]+)fun (;)

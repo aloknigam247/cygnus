@@ -1,63 +1,60 @@
 #ifdef EXTENDED_FEATURE
 #include "cyl.h"
 #include "cylgrammar.h"
-#include "parserfactory.h"
 #include "bisonparser.h"
+#include <iostream>
+#include <cstring>
 
-Parser* ScannerFactory::giveParser() {
-    Parser *p;
-    switch(type) {
-        case Cygnus:
-            p = parserFactory(ParserType::CyParser);
-            break;
-        case GNU:
-            p = parserFactory(ParserType::Bison);
-            break;
-    }
-    return p;
-}
-
-Writer* ScannerFactory::giveParseWriter() {
-    Writer *w;
-    switch(type) {
-        case Cygnus:
-            w = writerFactory(WriterType::CyParse);
-            break;
-        case GNU:
-            w = writerFactory(WriterType::Bison);
-            break;
-    }
-    return w;
-}
-
-Writer* ScannerFactory::giveLexWriter() {
-    Writer *w;
-    switch(type) {
-        case Cygnus:
-            w = writerFactory(WriterType::CyLex);
-            break;
-        case GNU:
-            w = writerFactory(WriterType::Flex);
-            break;
-    }
-    return w;
-}
-
-Cyl::Cyl(ScannerType t) {
-    ScannerFactory f(t);
-    parser = f.giveParser();
-    lex_writer = f.giveLexWriter();
-    parse_writer = f.giveParseWriter();
-}
-
-Status Cyl::generateParser(std::string cyl_file) {
+Status Cyl::readCyl(std::string cyl_file) {
+    Parser *parser = new BisonParser;
     Digest *d = parser->parse(cyl_file);
     if(!d)
         return Status::CYL_PARSE_ERROR;
 
     CylGrammar *data = (CylGrammar*)d->get_data();
-    lex_writer->write(data, cyl_file);
-    parse_writer->write(data, cyl_file);
+
+    LanguageBlock lb;
+    std::string str2 = "(";
+    std::map<int, std::string> tag_pair;
+    PattTagStmtList *cur_stmt = data->patt_stmt_head;
+
+    int beg = 0;
+    for(int i=0, len=0; data->ext[i] != '\0'; ++i, ++len) {
+        if(data->ext[i] == ',') {
+            lb.exts.push_back(std::string(data->ext, beg, len));
+            len = 0;
+            beg = i+1;
+        }
+    }
+    if(data->ext[beg] != '\0') {
+        lb.exts.push_back(std::string(data->ext + beg));
+    }
+    
+    while(cur_stmt) {
+        printf("STMT TAG: %s\n", cur_stmt->stmt_tag);
+        PattTagList *cur_tag = cur_stmt->patt_tag_list;
+
+        std::string str1 = "";
+        int i=1;
+        tag_pair.clear();
+        while(cur_tag) {
+            printf("PATT: %s TAG: %s\n", cur_tag->patt, cur_tag->tag);
+            str1 += cur_tag->patt;
+            str2.append(cur_tag->patt+1, strlen(cur_tag->patt)-2);
+            if(cur_tag->tag)
+                tag_pair[i] = std::string(cur_tag->tag);
+            cur_tag = cur_tag->next;
+            ++i;
+        }
+        lb.child_pattern.push_back(str1);
+        str2 += ")|(";
+        cur_stmt = cur_stmt->next;
+        lb.tag_pair_col.push_back(tag_pair);
+    }
+    str2.pop_back();
+    str2.pop_back();
+    lb.parent_pattern = str2;
+    lang_col.push_back(lb);
 
     return Status::SUCCESS;
 }

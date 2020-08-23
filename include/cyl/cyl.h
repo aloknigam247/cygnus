@@ -1,31 +1,21 @@
 #ifdef EXTENDED_FEATURE
-#include "parser.h"
-#include "writer.h"
 #include "status.h"
+#include <string>
+#include <map>
+#include <vector>
 
-enum ScannerType {
-    Cygnus,
-    GNU
-};
-
-class ScannerFactory {
-    public:
-    ScannerFactory(ScannerType t): type(t) {}
-    Parser* giveParser();
-    Writer* giveLexWriter();
-    Writer* giveParseWriter();
-
-    private:
-    ScannerType type;
+struct LanguageBlock {
+    std::vector<std::string> exts;
+    std::string parent_pattern;
+    std::vector<std::string> child_pattern;
+    std::vector<std::map<int, std::string>> tag_pair_col;
 };
 
 class Cyl {
     public:
-    Cyl(ScannerType type);
-    Status generateParser(std::string lang_file);
+    Status readCyl(std::string lang_file);
 
     private:
-    Parser *parser;
-    Writer *lex_writer, *parse_writer;
+    std::vector<LanguageBlock> lang_col;
 };
 #endif

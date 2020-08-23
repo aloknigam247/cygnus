@@ -1,8 +1,29 @@
 [CASE 1]
->   
-
-[CASE 2]
->   
-
-[CASE 3]
+>   flex::EXTENSION: Extension
+>   flex::COLON: :
+>   flex::Whitespace: ' '
+>   flex::LOWER_WORD: c
+>   flex::NL
+>   flex::LOWER_WORD: dec
+>   flex::COLON: :
+>   flex::Whitespace: ' '
+>   flex::PATTERN: ([a-z]+)
+>   flex::LOWER_WORD: return
+>   new pattern tag unit: ([a-z]+) belongs return
+>   flex::Whitespace: ' '
+>   flex::PATTERN: ( )
+>   flex::Whitespace: ' '
+>   new pattern tag unit: ( ) belongs (null)
+>   flex::PATTERN: ([a-z]+)
+>   flex::LOWER_WORD: fun
+>   new pattern tag unit: ([a-z]+) belongs fun
+>   flex::Whitespace: ' '
+>   flex::PATTERN: (;)
+>   flex::NL
+>   new pattern tag unit: (;) belongs (null)
+>   STMT TAG: dec
+>   PATT: ([a-z]+) TAG: return
+>   PATT: ( ) TAG: (null)
+>   PATT: ([a-z]+) TAG: fun
+>   PATT: (;) TAG: (null)
 >   
