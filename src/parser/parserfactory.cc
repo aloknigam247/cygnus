@@ -8,8 +8,10 @@ Parser* parserFactory(ParserType type) {
     switch(type) {
         case ParserType::Bison:
             p = new BisonParser;
+            break;
         case ParserType::CyParser:
             p = new CyParser;
+            break;
     }
     return p;
 }

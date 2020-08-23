@@ -438,8 +438,8 @@ main() {
                     } >> reports/coverage/unit/coverage.info
                 fi
 
-                # remove unit.cc from coverage.info
-                sed -i '/unit.cc$/,/end_of_record/ d' reports/coverage/unit/coverage.info
+                # remove unit.cc, *-bison.c and *-flex.c from coverage.info
+                sed -i -r '/(unit.cc|-flex.c|-bison.c)$/,/end_of_record/ d' reports/coverage/unit/coverage.info
 
                 GENHTML unit
             fi

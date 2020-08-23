@@ -1,41 +1,25 @@
 #include "cylgrammar.h"
+#include "genericlist.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-void insertRule(struct CylGrammar *digest, const char *rule) {
-    struct RuleList *new = malloc(sizeof(struct RuleList));
-    new->str = strdup(rule);
-    new->next = NULL;
+struct PattTagList* newPattTagList(const char *p, const char *t) {
+    struct PattTagList *new_patt_tag = malloc(sizeof(struct PattTagList));
+    new_patt_tag->patt = p ? strdup(p) : NULL ;
+    new_patt_tag->tag = t ? strdup(t) : NULL;
+    new_patt_tag->next = NULL;
+    printf("new pattern tag unit: %s belongs %s\n", p, t);
 
-    if(digest->rule_tail == NULL)
-        digest->rule_head = new;
-    else
-        digest->rule_tail->next = new;
-
-    digest->rule_tail = new;
-
-    printf("new rule: %s\n", rule);
+    return new_patt_tag;
 }
 
-void insertVariable(struct CylGrammar *digest, const char *var, const char *patt) {
-    struct VariableList *new = malloc(sizeof(struct VariableList));
-    new->id = strdup(var);
-    new->pattern = strdup(patt);
-    new->next = NULL;
+struct PattTagStmtList* newPattTagStmtList(const char* tag, struct PattTagList* tag_list) {
+    struct PattTagStmtList *new_patt_stmt = malloc(sizeof(struct PattTagStmtList));
+    new_patt_stmt->stmt_tag = tag ? strdup(tag) : NULL;
+    new_patt_stmt->patt_tag_list = reverseGenericList(tag_list);
+    new_patt_stmt->next = NULL;
 
-    if(digest->variable_tail == NULL)
-        digest->variable_head = new;
-    else
-        digest->variable_tail->next = new;
-
-    digest->variable_tail = new;
-
-    printf("new variable: %s = %s\n", var, patt);
-}
-
-void setFileType(struct CylGrammar *digest, const char *file_type) {
-    digest->file_type = strdup(file_type);
-    printf("filetype set: %s\n", file_type);
+    return new_patt_stmt;
 }
