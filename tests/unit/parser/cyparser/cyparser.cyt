@@ -1,3 +1,11 @@
 DIFFS=(
         ['REFLOG']='TESTLOG'
     )
+
+BISON_FILES=(
+        cyl/cyl.y
+    )
+
+FLEX_FILES=(
+        cyl/cyl.l
+    )
