@@ -185,7 +185,7 @@ rules.write("#------------ Configs ------------#")
 
 rules.write("C_COMPILER     = gcc\n" +
             "CPP_COMPILER   = g++\n" +
-            "COMPILER_FLAGS = -std=c++11 -fdiagnostics-color -DEXTENDED_FEATURE\n"+
+            "COMPILER_FLAGS = -std=c++2a -fdiagnostics-color -DEXTENDED_FEATURE\n"+
             "C_COMPILE      = $(C_COMPILER) $(COMPILER_FLAGS) $(INC)\n" +
             "CPP_COMPILE    = $(CPP_COMPILER) $(COMPILER_FLAGS) $(INC)\n\n" +
             "ifneq ($(MAKECMDGOALS),)\n"

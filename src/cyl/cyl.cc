@@ -6,14 +6,14 @@
 #include <cstring>
 
 Status Cyl::readCyl(std::string cyl_file) {
-    Parser *parser = new BisonParser;
+    BisonParser *parser = new BisonParser;
     Digest *d = parser->parse(cyl_file);
     if(!d)
         return Status::CYL_PARSE_ERROR;
 
     CylGrammar *data = (CylGrammar*)d->get_data();
 
-    LanguageBlock lb;
+    LangBlock lb;
     std::string str2 = "(";
     std::map<int, std::string> tag_pair;
     PattTagStmtList *cur_stmt = data->patt_stmt_head;
@@ -29,7 +29,7 @@ Status Cyl::readCyl(std::string cyl_file) {
     if(data->ext[beg] != '\0') {
         lb.exts.push_back(std::string(data->ext + beg));
     }
-    
+
     while(cur_stmt) {
         printf("STMT TAG: %s\n", cur_stmt->stmt_tag);
         PattTagList *cur_tag = cur_stmt->patt_tag_list;

@@ -41,7 +41,7 @@ patt_tag: patt_tag_unit             { $<pattTagPtr>$ = $<pattTagPtr>1; }
 patt_tag_unit: PATTERN            { $<pattTagPtr>$ = newPattTagList($1, NULL); }
              | PATTERN LOWER_WORD { $<pattTagPtr>$ = newPattTagList($1, $2); }
 %%
-void* CylBisonEntry(const char *file_name) {
+struct CylGrammar* CylBisonEntry(const char *file_name) {
     FILE *file = fopen(file_name, "r");
     if(file == NULL)
         return NULL;

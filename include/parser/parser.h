@@ -2,17 +2,9 @@
 #define PARSER_H
 #include <string>
 
-class Digest {
-    public:
-    void set_data(void* d) { data = d; }
-    void* get_data() { return data; }
-
-    private:
-    void *data;
-};
-
+template <typename RET>
 class Parser {
     public:
-    virtual Digest* parse(std::string file) = 0;
+    virtual RET parse(std::string file) = 0;
 };
 #endif

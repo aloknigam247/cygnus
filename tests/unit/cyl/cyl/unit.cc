@@ -1,6 +1,5 @@
 #include "cyl.h"
 #include "cytest.h"
-#include <cassert>
 
 void CylTest() {
     Cyl cyl;

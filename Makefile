@@ -62,7 +62,7 @@ COMPILER_FLAGS	+= -pedantic -Wall -Walloc-zero -Wcast-align -Wcast-qual -Wconver
 				-Wswitch-default -Wswitch-enum -Wunused -Wunused-macros
 endif
 export C_COMPILE	:= $(C_COMPILER) -std=c11 $(COMPILER_FLAGS)
-export CPP_COMPILE	:= $(CPP_COMPILER) -std=c++11 $(COMPILER_FLAGS)
+export CPP_COMPILE	:= $(CPP_COMPILER) -std=c++2a $(COMPILER_FLAGS)
 
 #---------- Make Flags ----------#
 MAKE_FLAGS	+= --no-print-directory 

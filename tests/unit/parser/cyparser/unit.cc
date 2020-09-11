@@ -1,12 +1,15 @@
 #include "cyparser.h"
 #include "cytest.h"
-
-#include <cassert>
+#include "cyl.h"
 
 void parse() {
-    CyParser p;
-    Digest *d = p.parse("test.cyl");
-    assert(d == nullptr);
+    Cyl cyl;
+    cyl.readCyl("test.cyl");
+
+    CyParser parser;
+    parser.setLangBlock(cyl.getLangBlock()[0]);
+
+    CyDigest *d = parser.parse("test.c");
 }
 
 int main() {

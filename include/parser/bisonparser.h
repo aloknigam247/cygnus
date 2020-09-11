@@ -1,8 +1,9 @@
 #ifdef EXTENDED_FEATURE
 #include "parser.h"
+#include "bisondigest.h"
 
-class BisonParser: public Parser {
+class BisonParser: public Parser<BisonDigest*> {
     public:
-    Digest* parse(std::string file) override;
+    BisonDigest* parse(std::string file) override;
 };
 #endif
