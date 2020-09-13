@@ -1,4 +1,3 @@
-#ifdef EXTENDED_FEATURE
 #include "cyparser.h"
 
 #include <fstream>
@@ -44,5 +43,5 @@ CyDigest* CyParser::parse(std::string file) {
         str = res.suffix();
     }
     delete[] fstr;
+    return digest;
 }
-#endif

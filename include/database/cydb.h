@@ -1,4 +1,5 @@
-#ifdef EXTENDED_FEATURE
+#ifndef CYDB_H
+#define CYDB_H
 #include <string>
 #include <memory>
 #include <forward_list>

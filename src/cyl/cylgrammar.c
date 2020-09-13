@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
 struct PattTagList* newPattTagList(const char *p, const char *t) {
     struct PattTagList *new_patt_tag = malloc(sizeof(struct PattTagList));
     new_patt_tag->patt = p ? strdup(p) : NULL ;

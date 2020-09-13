@@ -4,3 +4,6 @@ reports
 test_run
 tags
 cscope.out
+GPATH
+GRTAGS
+GTAGS

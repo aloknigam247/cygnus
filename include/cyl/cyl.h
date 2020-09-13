@@ -1,6 +1,5 @@
 #ifndef CYL_H
 #define CYL_H
-#ifdef EXTENDED_FEATURE
 #include "status.h"
 #include <string>
 #include <map>
@@ -13,15 +12,16 @@ struct LangBlock {
     std::vector<std::map<int, std::string>> tag_pair_col;
 };
 
-using LangBlockCol = std::vector<LangBlock>;
+using LangBlockColl = std::map<std::string, LangBlock>;
 
 class Cyl {
     public:
     Status readCyl(std::string lang_file);
-    LangBlockCol getLangBlock() { return lang_col; }
+    LangBlock getLangBlock(std::string filetype);
+    std::vector<std::string> filetypes();
+    std::vector<std::string> fileExts(std::string filetype) { return {filetype}; }
 
     private:
-    LangBlockCol lang_col;
+    LangBlockColl lang_coll;
 };
-#endif
 #endif

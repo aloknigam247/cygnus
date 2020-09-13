@@ -1,14 +1,11 @@
-#ifdef EXTENDED_FEATURE
 #include <forward_list>
 #include <string>
+#include <vector>
 
 class CyCrawler {
     public:
-    void set_path(std::string m_path) { path = m_path; }
-    std::forward_list<std::string> crawl();
+    std::forward_list<std::string> crawl(std::string path, std::vector<std::string> exts);
 
     private:
-    std::forward_list<std::string> createFileList(std::string path);
-    std::string path;
+    std::forward_list<std::string> createFileList(std::string path, std::vector<std::string> exts);
 };
-#endif

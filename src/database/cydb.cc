@@ -1,4 +1,3 @@
-#ifdef EXTENDED_FEATURE
 #include "cydb.h"
 #include "log.h"
 
@@ -41,4 +40,3 @@ std::forward_list<Record> CyDB::lookup(std::string name) {
 
     return res;
 }
-#endif
