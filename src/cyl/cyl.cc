@@ -1,4 +1,3 @@
-#ifdef EXTENDED_FEATURE
 #include "cyl.h"
 #include "cylgrammar.h"
 #include "bisonparser.h"
@@ -54,8 +53,19 @@ Status Cyl::readCyl(std::string cyl_file) {
     str2.pop_back();
     str2.pop_back();
     lb.parent_pattern = str2;
-    lang_col.push_back(lb);
+    lang_coll[lb.exts[0]] = lb;
 
     return Status::SUCCESS;
 }
-#endif
+
+LangBlock Cyl::getLangBlock(std::string filetype) {
+    return lang_coll[filetype];
+}
+
+std::vector<std::string> Cyl::filetypes() {
+    std::vector<std::string> list;
+    for(auto [key, value]: lang_coll) {
+        list.push_back(key);
+    }
+    return list;
+}

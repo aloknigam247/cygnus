@@ -23,7 +23,13 @@
  ************************************************************************************/
 
 #include <iostream>
+#include <stdlib.h>
+#include <forward_list>
 #include "options.h"
+#include "cycrawler.h"
+#include "cyl.h"
+#include "cydb.h"
+#include "cyparser.h"
 #include "utils.h"
 
 int main(const int argc, const char* argv[]) {
@@ -40,5 +46,38 @@ int main(const int argc, const char* argv[]) {
         std::cout << "Cygnus " << MAKE_STRING(VERSION) << '\n';
     }
 
+    if(const char *lang_dir; lang_dir = getenv("CYGNUS_LANG_DIR")) {
+        std::cout << "lang_dir: " << lang_dir << '\n';
+        CyCrawler crawler;
+        std::forward_list<std::string> cyl_files = crawler.crawl(lang_dir, {".cyl"});
+
+        Cyl cyl;
+        for(auto file: cyl_files)
+            cyl.readCyl(file);
+
+        CyDB db;
+        db.connect("cygnus.db");
+        for(auto filetype: cyl.filetypes()) {
+            for(auto file: crawler.crawl("./", cyl.fileExts(filetype))) {
+                CyParser cyparse;
+                cyparse.setLangBlock(cyl.getLangBlock(filetype));
+                CyDigest *digest = cyparse.parse(file);
+
+                for(auto rec: digest->getRecords()) {
+                    db.addRecord(rec);
+                }
+            }
+        }
+        db.disconnect();
+    }
+
+    CyDB db;
+    db.connect("cygnus.db");
+    if(argc == 2) {
+        for(auto rec: db.lookup(argv[1])) {
+            std::cout << rec << '\n';
+        }
+    }
+    db.disconnect();
     return static_cast<int>(status);
 }

@@ -1,4 +1,3 @@
-#ifdef EXTENDED_FEATURE
 #include "parser.h"
 #include "cydigest.h"
 #include "cyl.h"
@@ -11,4 +10,3 @@ class CyParser: public Parser<CyDigest*> {
     private:
     LangBlock lang_blk;
 };
-#endif

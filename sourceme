@@ -16,3 +16,4 @@ if [[ ! $PATH =~ $CYGNUS_HOME/tools ]]; then
 fi
 
 echo CYGNUS_HOME: $CYGNUS_HOME
+export CYGNUS_LANG_DIR="$CYGNUS_HOME/lang"

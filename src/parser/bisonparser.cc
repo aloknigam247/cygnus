@@ -1,4 +1,3 @@
-#ifdef EXTENDED_FEATURE
 #include "bisonparser.h"
 
 /* Bison entry function */
@@ -9,4 +8,3 @@ BisonDigest* BisonParser::parse(std::string file) {
     d->set_data(CylBisonEntry(file.c_str()));
     return d;
 }
-#endif
