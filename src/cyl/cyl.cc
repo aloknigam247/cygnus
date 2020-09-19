@@ -54,6 +54,9 @@ Status Cyl::readCyl(std::string cyl_file) {
     str2.pop_back();
     str2.pop_back();
     lb.parent_pattern = str2;
+
+    std::cout << "parent pattern: " << str2 << '\n';
+
     lang_coll[lb.exts[0]] = lb;
 
     return Status::SUCCESS;

@@ -1,0 +1,12 @@
+PRE_RUN=( # TODO: remove this hack in future
+        "rm test.cc"
+        "cp ../../../../tests/func/langauges/cpp/test.cc ."
+    )
+
+CASE=(
+        "cygnus; cat cygnus.db"
+    )
+
+DIFFS=(
+        ['REFLOG']='TESTLOG'
+    )

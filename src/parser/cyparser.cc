@@ -21,16 +21,18 @@ CyDigest* CyParser::parse(std::string file) {
 
     size_t lnum = 1;
     std::smatch res;
-    std::regex parent_regex(lang_blk.parent_pattern);
+    std::regex parent_regex(lang_blk.parent_pattern, std::regex::egrep);
     while(std::regex_search(str, res, parent_regex)) {
+        std::cout << lang_blk.parent_pattern << ": " <<  res.str() << '\n';
         for(char c: res.prefix().str())
             if(c == '\n')
                 ++lnum;
 
         for(size_t i = 1; i < res.size(); ++i) {
             if(res[i].matched) {
+                std::cout << lang_blk.child_pattern[i-1] << '\n';
                 std::smatch sub_res;
-                std::regex child_regex(lang_blk.child_pattern[i-1]);
+                std::regex child_regex(lang_blk.child_pattern[i-1], std::regex::egrep);
                 std::string s = res.str();
                 std::regex_search(s, sub_res, child_regex);
                 std::map<int, std::string> m = lang_blk.tag_pair_col[i-1];
