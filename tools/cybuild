@@ -69,7 +69,7 @@ main() {
             errors=$(egrep -c "error:" $report_dir/${BUILD_MODE}-errors)
             warnings=$(egrep -c "warning:" $report_dir/${BUILD_MODE}-errors)
             if [[ $warnings -ne 0 ]]; then
-                echo -e "\e[1;43mWarnings: $warnings\e[m"
+                echo -e "\e[48;5;172mWarnings: $warnings\e[m"
                 #if [[ ${VALUES['--strict']} ]]; then Enable it when compiler warnings are enabled
                 #    ERROR=1
                 #fi

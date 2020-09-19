@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cstring>
 
+/* More comments are better */
 Status Cyl::readCyl(std::string cyl_file) {
     BisonParser *parser = new BisonParser;
     Digest *d = parser->parse(cyl_file);

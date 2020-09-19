@@ -1,7 +1,7 @@
 # Commands
 # sudo docker build -t aloknigam247/cygnus -f .docker/Dockerfile .
 # sudo docker push aloknigam247/cygnus
-FROM gcc:9.2.0
+FROM gcc:9.2.0 # Move to gcc 10
 
 RUN apt-get update
 RUN apt-get upgrade -y

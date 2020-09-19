@@ -7,5 +7,5 @@ class CyCrawler {
     std::forward_list<std::string> crawl(std::string path, std::vector<std::string> exts);
 
     private:
-    std::forward_list<std::string> createFileList(std::string path, std::vector<std::string> exts);
+    std::forward_list<std::string> createFileList(std::string path, std::vector<std::string> exts); //TODO: this function is not needed
 };

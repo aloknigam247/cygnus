@@ -13,7 +13,7 @@ std::forward_list<std::string> CyCrawler::crawl(std::string path, std::vector<st
 
 std::forward_list<std::string> CyCrawler::createFileList(std::string path, std::vector<std::string> exts) {
     std::forward_list<std::string> file_list;
-    DIR *dir = opendir(path.c_str());
+    DIR *dir = opendir(path.c_str()); // TODO: Use c++ filesystem classes
     if(!dir) {
         switch(errno) {
             case EACCES:

@@ -31,8 +31,12 @@
 #include "cydb.h"
 #include "cyparser.h"
 #include "utils.h"
+#include "cyperf.h"
+
+CyPerf global_perf(nullptr, nullptr);
 
 int main(const int argc, const char* argv[]) {
+    PERF_ME;
     Status status = Status::SUCCESS;
     Options opt;
 

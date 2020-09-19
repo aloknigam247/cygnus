@@ -6,7 +6,7 @@
 #include <vector>
 
 namespace cytest {
-class Log {
+class Log { // TODO: use pack expansion and not recursive calls
     public:
     template <typename... Args>
     static void d(const Args... args) { std::cout << "[DEBUG] "; display(args...); }
@@ -29,37 +29,17 @@ class Log {
 
 typedef void (*caseType)();
 
-enum SimulateProperty {
-    NumProperty
-};
-
-class Session {
-    public:
-    static Session& get();
-    void set_property_ptr(bool *p) { property = p; }
-    bool get_property(SimulateProperty prop) { return property == nullptr ? false : property[prop]; }
-
-    private:
-    Session() : property(nullptr) {}
-    static Session* s;
-    bool *property;
-};
-
 struct Case {
     caseType case_ptr;
-    bool property[NumProperty];
 };
 
 class Testcase {
     public:
     void add(caseType p);
     void run();
-    void simulation_set(SimulateProperty prop);
-    void simulation_reset(SimulateProperty prop);
 
     private:
     std::vector<Case> case_list;
-    bool property[NumProperty];
 };
 }
 
