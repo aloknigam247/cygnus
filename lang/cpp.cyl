@@ -1,2 +1,3 @@
 Extension: cc
-dec: ([a-z]+)type ( ) ([a-z]+)var (;)
+def: %[a-z]+% % % %[a-z]+%funcdef %\(\)% % % %\{%
+ref: %[a-z]+%funcref %\(\)%
