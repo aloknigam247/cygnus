@@ -1,44 +1,24 @@
 #include <iostream>
 
 #include "cytest.h"
+#include "cyperf.h"
+CyPerf global_perf(nullptr, nullptr);
 
 namespace cytest {
-Session* Session::s = nullptr;
-
-Session& Session::get() {
-    if(!s)
-        s = new Session;
-
-    return *s;
-}
-
 void Testcase::add(caseType p) {
     Case c;
     c.case_ptr = p;
-    for(int i=0; i<NumProperty; ++i)
-        c.property[i] = property[i];
     case_list.push_back(c);
 }
 
 void Testcase::run() {
-    Session &s = Session::get();
     int i=1;
     for(auto case_obj: case_list) {
         std::cout << "[CASE " << i << ']' << '\n';
-        //s.set_property_ptr(case_obj.property);
         case_obj.case_ptr();
         std::cout << '\n';
         ++i;
     }
-    s.set_property_ptr(nullptr);
-}
-
-void Testcase::simulation_set(SimulateProperty prop) {
-    property[prop] = true;
-}
-
-void Testcase::simulation_reset(SimulateProperty prop) {
-    property[prop] = false;
 }
 }
 

@@ -42,7 +42,7 @@
  *
  * Implements the logging framework for all types of logs, debug, error, info, warning
  */
-class Log {
+class Log { //TODO: use pack expansion instead of recursive calls
     public:
     /**
      * Prints the comma seperated arguments of any type that supports operator<<.

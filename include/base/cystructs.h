@@ -49,7 +49,7 @@ namespace cystructs {
  * @tparam T Type of data to store in Tree
  */
 template <typename T>
-class Tree {
+class Tree { // NOTE: use balanced tree instead of binary tree
     struct Node;
 
     public:

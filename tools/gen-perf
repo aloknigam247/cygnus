@@ -1,12 +1,69 @@
 #!/usr/bin/python3
 
+import argparse
 import re
 import sys
 import os
 
-for line in sys.stdin:
-    l = line[0:line.rfind('[')]
-    ir = l.split()[0]
-    fun = re.sub(".*src",'src',(''.join(l.split()[1:])))
+#----------------------- Class Args -----------------------#
+class Args:
+    __parser = argparse.ArgumentParser()
 
-    print(fun + ';' + ir)
+    def __init__(self):
+        self.__parser.add_argument("-g", action="count", help="generate collective report")
+        self.__parser.add_argument("-d", action="count", help="generate collective report")
+        self.__parser.add_argument("list", nargs="+", help="list of perfdata")
+
+    def parse(self):
+        return self.__parser.parse_args()
+
+class PerfData:
+    num_calls = 2
+    min_rt    = 3
+    max_rt    = 4
+    avg_rt    = 5
+    perf_map = dict()
+    def read(self, perf_file):
+        for line in open(perf_file, 'r').read().splitlines():
+            col = line.split('\t')
+            #print (col)
+
+            if col[0]+col[1] in self.perf_map:
+                pb = self.perf_map[col[0]+col[1]]
+                
+                pb[self.num_calls] = str(int(pb[self.num_calls]) + 1)
+                
+                if int(col[self.min_rt]) < int(pb[self.min_rt]):
+                    pb[self.min_rt] = col[self.min_rt]
+                
+                if int(col[self.max_rt]) > int(pb[self.max_rt]):
+                    pb[self.max_rt] = col[self.max_rt]
+
+                pb[self.avg_rt] = str((int(float(pb[self.avg_rt])) + int(float(col[self.avg_rt])))/2)
+                i = (int(float(pb[self.avg_rt])) + int(float(col[self.avg_rt])))
+            
+            else:
+                self.perf_map[col[0]+col[1]] = col
+        return
+
+    def dump(self):
+        for m in self.perf_map:
+            print('\t'.join(self.perf_map[m]))
+        return
+
+#----------------------- main() -----------------------#
+args = Args()
+opt = args.parse()
+
+if opt.g:
+    pd = PerfData()
+    for f in opt.list:
+        pd.read(f)
+
+    pd.dump()
+elif opt.d:
+    print("diff")
+    pd1 = PerfData()
+    pd2 = PerfData()
+    pd1.read(opt.list[0])
+    pd2.read(opt.list[1])

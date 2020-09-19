@@ -286,8 +286,6 @@ runTest() {
             fi
             ;;
         perf)
-            callgrind_annotate --threshold=100 callgrind.out | egrep "$CYGNUS_HOME/src/" | gen-perf > TESTPERF
-            perf-diff REFPERF TESTPERF | tee perf.diff
             ;;
     esac
     cd - > /dev/null
@@ -365,7 +363,7 @@ main() {
             CYGNUS=$CYGNUS_HOME/build/bin/perf/cygnus-perf
             OUT_DIR="$OUT_DIR/perf"
             mkdir -p reports/perf
-            tool="valgrind --tool=callgrind --callgrind-out-file=callgrind.out"
+            #tool="valgrind --tool=callgrind --callgrind-out-file=callgrind.out"
             ;;
         sanitize)
             CYGNUS=$CYGNUS_HOME/build/bin/sanitize/cygnus-sanitize
@@ -467,6 +465,8 @@ main() {
             fi
             echo "    Memory Errors: $(find $OUT_DIR/unit $OUT_DIR/func -name "mem.err" | xargs egrep -h "CHECKSUM" | sort -u | wc -l)"
             ;;
+        perf)
+            find $OUT_DIR -name "perfdata" | xargs gen-perf -g | sort > reports/perf/perfreport
     esac
 
     #-----------#

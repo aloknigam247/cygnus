@@ -28,6 +28,7 @@
 #include <fstream>
 
 class CyFile: public std::fstream {
+    // TODO:Print open file descriptors in destructor
 };
 
 #endif
