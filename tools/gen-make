@@ -20,7 +20,7 @@ class IO:
         tag = IO.tag_id.get(mode)
         if(tag == None):
             raise Exception("unknown mode \`" + mode + "' specified")
-        
+
         print("|%s| %s" %(tag, msg))
 
     @staticmethod
@@ -225,7 +225,7 @@ for f in opt.bison_files:
     rules.write(bison_src + ": $(CYGNUS_HOME)/src/" + f + "\n" +
             "\tbison --defines=$(@:.c=.h) -o $@ $^\n"
             )
-    
+
     rules.write(bison_obj + ": " + bison_src + "\n" +
                 "\t$(C_COMPILE) -c -o $@ $^\n"
             )

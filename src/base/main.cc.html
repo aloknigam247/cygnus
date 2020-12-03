@@ -1,0 +1,92 @@
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><i><font color="#9A1900">/************************************************************************************</font></i>
+<i><font color="#9A1900"> * MIT License                                                                      *</font></i>
+<i><font color="#9A1900"> *                                                                                  *</font></i>
+<i><font color="#9A1900"> * Copyright (c) 2020 Alok Nigam                                                    *</font></i>
+<i><font color="#9A1900"> *                                                                                  *</font></i>
+<i><font color="#9A1900"> * Permission is hereby granted, free of charge, to any person obtaining a copy     *</font></i>
+<i><font color="#9A1900"> * of this software and associated documentation files (the "Software"), to deal    *</font></i>
+<i><font color="#9A1900"> * in the Software without restriction, including without limitation the rights     *</font></i>
+<i><font color="#9A1900"> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell        *</font></i>
+<i><font color="#9A1900"> * copies of the Software, and to permit persons to whom the Software is            *</font></i>
+<i><font color="#9A1900"> * furnished to do so, subject to the following conditions:                         *</font></i>
+<i><font color="#9A1900"> *                                                                                  *</font></i>
+<i><font color="#9A1900"> * The above copyright notice and this permission notice shall be included in all   *</font></i>
+<i><font color="#9A1900"> * copies or substantial portions of the Software.                                  *</font></i>
+<i><font color="#9A1900"> *                                                                                  *</font></i>
+<i><font color="#9A1900"> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR       *</font></i>
+<i><font color="#9A1900"> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,         *</font></i>
+<i><font color="#9A1900"> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE      *</font></i>
+<i><font color="#9A1900"> * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER           *</font></i>
+<i><font color="#9A1900"> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,    *</font></i>
+<i><font color="#9A1900"> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE    *</font></i>
+<i><font color="#9A1900"> * SOFTWARE.                                                                        *</font></i>
+<i><font color="#9A1900"> ************************************************************************************/</font></i>
+
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;iostream&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;stdlib.h&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;forward_list&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"options.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"cycrawler.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"cyl.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"cydb.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"cyparser.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"utils.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"cyperf.h"</font>
+
+<font color="#008080">CyPerf</font> <b><font color="#000000">global_perf</font></b><font color="#990000">(</font>nullptr<font color="#990000">,</font> nullptr<font color="#990000">);</font>
+
+<font color="#009900">int</font> <b><font color="#000000">main</font></b><font color="#990000">(</font><b><font color="#0000FF">const</font></b> <font color="#009900">int</font> argc<font color="#990000">,</font> <b><font color="#0000FF">const</font></b> <font color="#009900">char</font><font color="#990000">*</font> argv<font color="#990000">[])</font> <font color="#FF0000">{</font>
+    PERF_ME<font color="#990000">;</font>
+    <font color="#008080">Status</font> status <font color="#990000">=</font> Status<font color="#990000">::</font>SUCCESS<font color="#990000">;</font>
+    <font color="#008080">Options</font> opt<font color="#990000">;</font>
+
+    opt<font color="#990000">.</font><b><font color="#000000">addOption</font></b><font color="#990000">(</font><font color="#FF0000">"-v"</font><font color="#990000">,</font> Option<font color="#990000">::</font>BOOL<font color="#990000">,</font> <font color="#FF0000">"version"</font><font color="#990000">);</font>
+    status <font color="#990000">=</font> opt<font color="#990000">.</font><b><font color="#000000">parse</font></b><font color="#990000">(</font>argc<font color="#990000">,</font> argv<font color="#990000">);</font>
+
+    <b><font color="#0000FF">if</font></b><font color="#990000">(</font>status <font color="#990000">!=</font> Status<font color="#990000">::</font>SUCCESS<font color="#990000">)</font>
+        <b><font color="#0000FF">return</font></b> <b><font color="#0000FF">static_cast</font></b><font color="#990000">&lt;</font><font color="#009900">int</font><font color="#990000">&gt;(</font>status<font color="#990000">);</font>
+
+    <b><font color="#0000FF">if</font></b><font color="#990000">(</font>opt<font color="#990000">.</font><b><font color="#000000">isSet</font></b><font color="#990000">(</font><font color="#FF0000">"-v"</font><font color="#990000">))</font> <font color="#FF0000">{</font>
+        std<font color="#990000">::</font>cout <font color="#990000">&lt;&lt;</font> <font color="#FF0000">"Cygnus "</font> <font color="#990000">&lt;&lt;</font> <b><font color="#000000">MAKE_STRING</font></b><font color="#990000">(</font>VERSION<font color="#990000">)</font> <font color="#990000">&lt;&lt;</font> <font color="#FF0000">'</font><font color="#CC33CC">\n</font><font color="#FF0000">'</font><font color="#990000">;</font>
+    <font color="#FF0000">}</font>
+
+    <b><font color="#0000FF">if</font></b><font color="#990000">(</font><b><font color="#0000FF">const</font></b> <font color="#009900">char</font> <font color="#990000">*</font>lang_dir<font color="#990000">;</font> lang_dir <font color="#990000">=</font> <b><font color="#000000">getenv</font></b><font color="#990000">(</font><font color="#FF0000">"CYGNUS_LANG_DIR"</font><font color="#990000">))</font> <font color="#FF0000">{</font>
+        std<font color="#990000">::</font>cout <font color="#990000">&lt;&lt;</font> <font color="#FF0000">"lang_dir: "</font> <font color="#990000">&lt;&lt;</font> lang_dir <font color="#990000">&lt;&lt;</font> <font color="#FF0000">'</font><font color="#CC33CC">\n</font><font color="#FF0000">'</font><font color="#990000">;</font>
+        <font color="#008080">CyCrawler</font> crawler<font color="#990000">;</font>
+        std<font color="#990000">::</font><font color="#008080">forward_list&lt;std::string&gt;</font> cyl_files <font color="#990000">=</font> crawler<font color="#990000">.</font><b><font color="#000000">crawl</font></b><font color="#990000">(</font>lang_dir<font color="#990000">,</font> <font color="#FF0000">{</font><font color="#FF0000">".cyl"</font><font color="#FF0000">}</font><font color="#990000">);</font>
+
+        <font color="#008080">Cyl</font> cyl<font color="#990000">;</font>
+        <b><font color="#0000FF">for</font></b><font color="#990000">(</font><b><font color="#0000FF">auto</font></b> file<font color="#990000">:</font> cyl_files<font color="#990000">)</font>
+            cyl<font color="#990000">.</font><b><font color="#000000">readCyl</font></b><font color="#990000">(</font>file<font color="#990000">);</font>
+
+        <font color="#008080">CyDB</font> db<font color="#990000">;</font>
+        db<font color="#990000">.</font><b><font color="#000000">connect</font></b><font color="#990000">(</font><font color="#FF0000">"cygnus.db"</font><font color="#990000">);</font>
+        <b><font color="#0000FF">for</font></b><font color="#990000">(</font><b><font color="#0000FF">auto</font></b> filetype<font color="#990000">:</font> cyl<font color="#990000">.</font><b><font color="#000000">filetypes</font></b><font color="#990000">())</font> <font color="#FF0000">{</font>
+            <b><font color="#0000FF">for</font></b><font color="#990000">(</font><b><font color="#0000FF">auto</font></b> file<font color="#990000">:</font> crawler<font color="#990000">.</font><b><font color="#000000">crawl</font></b><font color="#990000">(</font><font color="#FF0000">"./"</font><font color="#990000">,</font> cyl<font color="#990000">.</font><b><font color="#000000">fileExts</font></b><font color="#990000">(</font>filetype<font color="#990000">)))</font> <font color="#FF0000">{</font>
+                <font color="#008080">CyParser</font> cyparse<font color="#990000">;</font>
+                cyparse<font color="#990000">.</font><b><font color="#000000">setLangBlock</font></b><font color="#990000">(</font>cyl<font color="#990000">.</font><b><font color="#000000">getLangBlock</font></b><font color="#990000">(</font>filetype<font color="#990000">));</font>
+                <font color="#008080">CyDigest</font> <font color="#990000">*</font>digest <font color="#990000">=</font> cyparse<font color="#990000">.</font><b><font color="#000000">parse</font></b><font color="#990000">(</font>file<font color="#990000">);</font>
+
+                <b><font color="#0000FF">for</font></b><font color="#990000">(</font><b><font color="#0000FF">auto</font></b> rec<font color="#990000">:</font> digest<font color="#990000">-&gt;</font><b><font color="#000000">getRecords</font></b><font color="#990000">())</font> <font color="#FF0000">{</font>
+                    db<font color="#990000">.</font><b><font color="#000000">addRecord</font></b><font color="#990000">(</font>rec<font color="#990000">);</font>
+                <font color="#FF0000">}</font>
+            <font color="#FF0000">}</font>
+        <font color="#FF0000">}</font>
+        db<font color="#990000">.</font><b><font color="#000000">disconnect</font></b><font color="#990000">();</font>
+    <font color="#FF0000">}</font>
+
+    <font color="#008080">CyDB</font> db<font color="#990000">;</font>
+    db<font color="#990000">.</font><b><font color="#000000">connect</font></b><font color="#990000">(</font><font color="#FF0000">"cygnus.db"</font><font color="#990000">);</font>
+    <b><font color="#0000FF">if</font></b><font color="#990000">(</font>argc <font color="#990000">==</font> <font color="#993399">2</font><font color="#990000">)</font> <font color="#FF0000">{</font>
+        <b><font color="#0000FF">for</font></b><font color="#990000">(</font><b><font color="#0000FF">auto</font></b> rec<font color="#990000">:</font> db<font color="#990000">.</font><b><font color="#000000">lookup</font></b><font color="#990000">(</font>argv<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">]))</font> <font color="#FF0000">{</font>
+            std<font color="#990000">::</font>cout <font color="#990000">&lt;&lt;</font> rec <font color="#990000">&lt;&lt;</font> <font color="#FF0000">'</font><font color="#CC33CC">\n</font><font color="#FF0000">'</font><font color="#990000">;</font>
+        <font color="#FF0000">}</font>
+    <font color="#FF0000">}</font>
+    db<font color="#990000">.</font><b><font color="#000000">disconnect</font></b><font color="#990000">();</font>
+    <b><font color="#0000FF">return</font></b> <b><font color="#0000FF">static_cast</font></b><font color="#990000">&lt;</font><font color="#009900">int</font><font color="#990000">&gt;(</font>status<font color="#990000">);</font>
+<font color="#FF0000">}</font>
+</tt></pre>
