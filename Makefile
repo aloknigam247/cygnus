@@ -1,6 +1,6 @@
 #---------- Configs ----------#
 .DEFAULT_GOAL = compile
-.PHONY: compile lang src
+.PHONY: compile external lang src
 export Q	:= @
 
 #---------- Modes ----------# 
@@ -44,13 +44,14 @@ endif
 BLD_DIR	:= $(CURDIR)/build
 BIN_DIR	:= $(BLD_DIR)/bin/$(MODE)
 DEP_DIR	:= $(BLD_DIR)/dep
+LIB_DIR := $(BLD_DIR)/lib
 OBJ_DIR	:= $(BLD_DIR)/obj/$(MODE)
 SRC_GEN	:= $(BLD_DIR)/src
 EXE		:= $(BIN_DIR)/cygnus-$(MODE)
-DUMP	:= $(BIN_DIR) $(SRC_GEN)
+DUMP	:= $(BIN_DIR) $(DEP_DIR) $(LIB_DIR) $(OBJ_DIR) $(SRC_GEN)
 LINK	:= $(BLD_DIR)/bin/cygnus
 
-export DEP_DIR OBJ_DIR SRC_GEN
+export DEP_DIR LIB_DIR OBJ_DIR SRC_GEN
 
 #---------- Compile Flags ----------# 
 COMPILER_FLAGS	+= -fdiagnostics-color
@@ -66,14 +67,17 @@ export C_COMPILE	:= $(C_COMPILER) $(COMPILER_FLAGS)
 export CPP_COMPILE	:= $(CPP_COMPILER) -std=c++2a $(COMPILER_FLAGS)
 
 #---------- Make Flags ----------#
-MAKE_FLAGS	+= --no-print-directory 
+export MAKE_FLAGS	+= --no-print-directory
 export MAKE	= $Qmake $(MAKE_FLAGS)
 
 #---------- Rules ----------#
-compile: $(DUMP) src $(LINK)
+compile: $(DUMP) external src $(LINK)
 
 $(DUMP):
 	$Qmkdir -p $@
+
+external:
+	$(MAKE) -C $@
 
 src:
 	$(MAKE) -C $@
