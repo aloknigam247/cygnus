@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := module-$(MODULE)
 
-export INCLUDE_DIR := $(shell find $(CYGNUS_HOME)/include -mindepth 1 -type d -printf "-I %p " ) -I ../../src/base
+export INCLUDE_DIR := $(shell find $(CYGNUS_HOME)/include -mindepth 1 -type d -printf "-I %p " ) -I ../../src/base -I ../../build/include
 
 BISON_FILES	= $(wildcard *.y)
 FLEX_FILES	= $(wildcard *.l)

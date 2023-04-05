@@ -44,14 +44,15 @@ endif
 BLD_DIR	:= $(CURDIR)/build
 BIN_DIR	:= $(BLD_DIR)/bin/$(MODE)
 DEP_DIR	:= $(BLD_DIR)/dep
+INC_DIR := $(BLD_DIR)/include
 LIB_DIR := $(BLD_DIR)/lib
 OBJ_DIR	:= $(BLD_DIR)/obj/$(MODE)
 SRC_GEN	:= $(BLD_DIR)/src
 EXE		:= $(BIN_DIR)/cygnus-$(MODE)
-DUMP	:= $(BIN_DIR) $(DEP_DIR) $(LIB_DIR) $(OBJ_DIR) $(SRC_GEN)
+DUMP	:= $(BIN_DIR) $(INC_DIR) $(DEP_DIR) $(LIB_DIR) $(OBJ_DIR) $(SRC_GEN)
 LINK	:= $(BLD_DIR)/bin/cygnus
 
-export DEP_DIR LIB_DIR OBJ_DIR SRC_GEN
+export DEP_DIR INC_DIR LIB_DIR OBJ_DIR SRC_GEN
 
 #---------- Compile Flags ----------# 
 COMPILER_FLAGS	+= -fdiagnostics-color
