@@ -30,7 +30,7 @@ std::forward_list<std::string> CyCrawler::createFileList(std::string path, std::
         }
     }
     else {
-        dirent *dirp = readdir(dir);;
+        dirent *dirp = readdir(dir);
         while(dirp) {
             switch(dirp->d_type) {
                 case DT_DIR:

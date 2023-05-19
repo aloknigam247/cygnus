@@ -18,6 +18,11 @@ Generate compile_commands.json
 bear -- make -rB MODE=debug STRICT=no
 ```
 
+Generate Treesitter
+```bash
+tree-sitter generate -build --libdir .
+```
+
 ## Quick Links
 > [Release Plan](https://github.com/aloknigam247/cygnus/wiki/Release-Plan-1.0)  
 > [Style Guide](https://github.com/aloknigam247/cygnus/wiki/Style-Guide)  

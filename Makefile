@@ -1,6 +1,7 @@
+# THOUGHT: Clip full file names in build if possible, since make will always run from top
 #---------- Configs ----------#
 .DEFAULT_GOAL = compile
-.PHONY: compile external lang src
+.PHONY: compile libs lang src
 export Q	:= @
 
 #---------- Modes ----------# 
@@ -72,12 +73,12 @@ export MAKE_FLAGS	+= --no-print-directory
 export MAKE	= $Qmake $(MAKE_FLAGS)
 
 #---------- Rules ----------#
-compile: $(DUMP) external src $(LINK)
+compile: $(DUMP) libs src $(LINK)
 
 $(DUMP):
 	$Qmkdir -p $@
 
-external:
+libs:
 	$(MAKE) -C $@
 
 src:
@@ -86,7 +87,8 @@ src:
 $(LINK): $(EXE)
 	ln -sfr $< $@
 
-$(EXE): $(subst src,$(OBJ_DIR),$(subst .cc,.co,$(wildcard src/*/*.cc))) $(subst src,$(OBJ_DIR),$(subst .c,.o,$(wildcard src/*/*.c))) $(subst build/src,$(OBJ_DIR),$(subst .c,.o,$(wildcard build/src/*/*.c)))
+# TODO: Break below line to smaller width
+$(EXE): $(subst src,$(OBJ_DIR),$(subst .cc,.co,$(wildcard src/*/*.cc))) $(subst src,$(OBJ_DIR),$(subst .c,.o,$(wildcard src/*/*.c))) $(subst $(SRC_GEN),$(OBJ_DIR),$(subst .c,.o,$(wildcard $(SRC_GEN)/*/*.c))) $(shell find libs -mindepth 1 -maxdepth 1 -type d -printf "$(LIB_DIR)/%f.a ")
 	$(CPP_COMPILE) -o $@ $^
 
 clean:

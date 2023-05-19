@@ -30,6 +30,7 @@
 #include "cyl.h"
 #include "cydb.h"
 #include "cyparser.h"
+#include "tsparser.h"
 #include "utils.h"
 #include "cyperf.h"
 
@@ -55,6 +56,8 @@ int main(const int argc, const char* argv[]) {
         CyCrawler crawler;
         std::forward_list<std::string> cyl_files = crawler.crawl(lang_dir, {".cyl"});
 
+        // Download and compile tree sitter
+
         Cyl cyl;
         for(auto file: cyl_files)
             cyl.readCyl(file);
@@ -62,14 +65,16 @@ int main(const int argc, const char* argv[]) {
         CyDB db;
         db.connect("cygnus.db");
         for(auto filetype: cyl.filetypes()) {
+            // FEAT: get directory to scan from commandline
+            // FEAT: get filetypes from commandline
             for(auto file: crawler.crawl("./", cyl.fileExts(filetype))) {
-                CyParser cyparse;
-                cyparse.setLangBlock(cyl.getLangBlock(filetype));
-                CyDigest *digest = cyparse.parse(file);
+                TsParser parser;
+                // parser.setLangBlock(cyl.getLangBlock(filetype));
+                parser.parse(file);
 
-                for(auto rec: digest->getRecords()) {
-                    db.addRecord(rec);
-                }
+                // for(auto rec: digest->getRecords()) {
+                //     db.addRecord(rec);
+                // }
             }
         }
         db.disconnect();
