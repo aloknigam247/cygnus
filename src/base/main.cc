@@ -52,7 +52,7 @@ int main(const int argc, const char* argv[]) {
     }
 
     if(const char *lang_dir; lang_dir = getenv("CYGNUS_LANG_DIR")) {
-        std::cout << "lang_dir: " << lang_dir << '\n';
+        // std::cout << "lang_dir: " << lang_dir << '\n';
         CyCrawler crawler;
         std::forward_list<std::string> cyl_files = crawler.crawl(lang_dir, {".cyl"});
 

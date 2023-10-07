@@ -1,18 +1,42 @@
 ﻿#include <assert.h>
+#include <iostream>
 #include <string.h>
 #include <stdio.h>
 #include "tsparser.h"
 #include "tree_sitter/api.h"
+#include <dlfcn.h>
+
+const TSLanguage *load_cpp_library() {
+  // Get the handle to the library.
+  void *handle = dlopen("./cpp.so", RTLD_LAZY);
+  if (handle == NULL) {
+    fprintf(stderr, "Could not open library: %s\n", dlerror());
+    return NULL;
+  }
+
+  // Get the address of the function.
+  void *tree_sitter_lang = dlsym(handle, "tree_sitter_cpp");
+  if (tree_sitter_lang == NULL) {
+    fprintf(stderr, "Could not find function: %s\n", dlerror());
+    return NULL;
+  }
+
+  return (const TSLanguage*)tree_sitter_lang;
+}
+
+extern "C" const TSLanguage* tree_sitter_cpp();
 
 void TsParser::parse(std::string file) {
     // Create a parser.
     TSParser *parser = ts_parser_new();
 
-    // Set the parser's language (JSON in this case).
-    // ts_parser_set_language(parser, tree_sitter_json());
+    // Set the parser's language (CPP in this case).
+    // bool result = ts_parser_set_language(parser, load_cpp_library());
+    bool result = ts_parser_set_language(parser, tree_sitter_cpp());
+    // bool result = ts_parser_set_language(parser, tree_sitter_cpp());
 
     // Build a syntax tree based on source code stored in a string.
-    const char *source_code = "[1, null]";
+    const char *source_code = "int i;";
     TSTree *tree = ts_parser_parse_string(parser, NULL, source_code, strlen(source_code));
 
     // Get the root node of the syntax tree.

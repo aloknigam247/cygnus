@@ -88,7 +88,7 @@ $(LINK): $(EXE)
 	ln -sfr $< $@
 
 # TODO: Break below line to smaller width
-$(EXE): $(subst src,$(OBJ_DIR),$(subst .cc,.co,$(wildcard src/*/*.cc))) $(subst src,$(OBJ_DIR),$(subst .c,.o,$(wildcard src/*/*.c))) $(subst $(SRC_GEN),$(OBJ_DIR),$(subst .c,.o,$(wildcard $(SRC_GEN)/*/*.c))) $(shell find libs -mindepth 1 -maxdepth 1 -type d -printf "$(LIB_DIR)/%f.a ")
+$(EXE): $(subst src,$(OBJ_DIR),$(subst .cc,.co,$(wildcard src/*/*.cc))) $(subst src,$(OBJ_DIR),$(subst .c,.o,$(wildcard src/*/*.c))) $(subst $(SRC_GEN),$(OBJ_DIR),$(subst .c,.o,$(wildcard $(SRC_GEN)/*/*.c))) $(shell find libs -mindepth 1 -maxdepth 1 -type d -printf "$(LIB_DIR)/%f.a ") cpp.so
 	$(CPP_COMPILE) -o $@ $^
 
 clean:
