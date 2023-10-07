@@ -1,4 +1,5 @@
 ﻿#include <assert.h>
+#include <fstream>
 #include <iostream>
 #include <string.h>
 #include <stdio.h>
@@ -31,12 +32,25 @@ void TsParser::parse(std::string file) {
     TSParser *parser = ts_parser_new();
 
     // Set the parser's language (CPP in this case).
-    // bool result = ts_parser_set_language(parser, load_cpp_library());
     bool result = ts_parser_set_language(parser, tree_sitter_cpp());
-    // bool result = ts_parser_set_language(parser, tree_sitter_cpp());
 
     // Build a syntax tree based on source code stored in a string.
-    const char *source_code = "int i;";
+    std::ifstream infile(file);
+    if (!infile.is_open()) {
+        std::cout << "Error in opening file " << file;
+        return;
+    }
+
+    infile.seekg(0, std::ios::end);
+    int file_size = infile.tellg();
+
+    char* source_code = new char[file_size + 1];
+
+    infile.seekg(0, std::ios::beg);
+    infile.read(source_code, file_size);
+    infile.close();
+    source_code[file_size] = '\0';
+
     TSTree *tree = ts_parser_parse_string(parser, NULL, source_code, strlen(source_code));
 
     // Get the root node of the syntax tree.
@@ -46,23 +60,13 @@ void TsParser::parse(std::string file) {
     TSNode array_node = ts_node_named_child(root_node, 0);
     TSNode number_node = ts_node_named_child(array_node, 0);
 
-    // Check that the nodes have the expected types.
-    assert(strcmp(ts_node_type(root_node), "document") == 0);
-    assert(strcmp(ts_node_type(array_node), "array") == 0);
-    assert(strcmp(ts_node_type(number_node), "number") == 0);
-
-    // Check that the nodes have the expected child counts.
-    assert(ts_node_child_count(root_node) == 1);
-    assert(ts_node_child_count(array_node) == 5);
-    assert(ts_node_named_child_count(array_node) == 2);
-    assert(ts_node_child_count(number_node) == 0);
-
     // Print the syntax tree as an S-expression.
     char *string = ts_node_string(root_node);
     printf("Syntax tree: %s\n", string);
 
     // Free all of the heap-allocated memory.
     free(string);
+    delete[] source_code;
     ts_tree_delete(tree);
     ts_parser_delete(parser);
 }

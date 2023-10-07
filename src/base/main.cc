@@ -67,15 +67,17 @@ int main(const int argc, const char* argv[]) {
         for(auto filetype: cyl.filetypes()) {
             // FEAT: get directory to scan from commandline
             // FEAT: get filetypes from commandline
-            for(auto file: crawler.crawl("./", cyl.fileExts(filetype))) {
-                TsParser parser;
+            TsParser parser;
+            parser.parse("test.cc");
+            // for(auto file: crawler.crawl("./", cyl.fileExts(filetype))) {
+                // TsParser parser;
                 // parser.setLangBlock(cyl.getLangBlock(filetype));
-                parser.parse(file);
+                // parser.parse(file);
 
                 // for(auto rec: digest->getRecords()) {
                 //     db.addRecord(rec);
                 // }
-            }
+            // }
         }
         db.disconnect();
     }
